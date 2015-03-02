@@ -11,6 +11,7 @@ import logging
 import subprocess 
 import shlex
 import re
+import sys
 
 def run_subprocess(command_string, cwd=None): 
     logging.info("Running: %s", command_string)
