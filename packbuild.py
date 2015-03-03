@@ -84,12 +84,9 @@ def main():
             commit_hash_str = commit_hash.decode("utf-8").strip()
 
             # package version string
-            #package_ver_string = "1:%s+1SNAPSHOT%s-%s-%s"%(args.version, utctime, commit_hash[:6], checkout_alphanum)
             package_ver_string = "1:{0}+1SNAPSHOT{1}-{2}-{3}".format(args.version, utctime, commit_hash_str[:6], checkout_alphanum)
             package_ver_string_noepoch = "{0}+1SNAPSHOT{1}-{2}-{3}".format(args.version, utctime, commit_hash_str[:6], checkout_alphanum)
             logging.info("package version: %s", package_ver_string)
-
-            # First modify changelog for precise
 
             # dict: package_name -> directory
             packagedir_dic = { "archivematica-common":"archivematicaCommon",
@@ -158,38 +155,118 @@ def main():
             raise
 
     elif args.repository == "ss":
-        print ("TODO")
-    
+        try:        
+            #git clone 
+            command_string = 'git clone git@git.artefactual.com:archivematica-storage-service.git'
+            run_subprocess(command_string, cwd=working_dir)
+
+            #git checkout
+            repo_dir = os.path.join(working_dir,"archivematica-storage-service")
+            command_string = 'git checkout '+args.checkout
+            run_subprocess(command_string, cwd=repo_dir)
+
+            #git submodule init
+            command_string = 'git submodule init'
+            run_subprocess(command_string, cwd=repo_dir)
+
+            #git submodule update
+            command_string = 'git submodule update'
+            run_subprocess(command_string, cwd=repo_dir)
+
+            #install pip requirements workaround
+            pip_reqs = [
+                        "Django==1.5.4",
+                        "django-braces==1.0.0",
+                        "django-model-utils==1.3.1",
+                        "logutils==0.3.3",
+                        "South==0.8.4",
+                        "django-tastypie==0.9.15",
+                        "django-extensions==1.1.1",
+                        "lxml==3.2.3",
+                        "django-jsonfield==0.9.12",
+                        "bagit==1.3.7",
+                        "django-annoying==0.7.7",
+                        "requests>=2.3.0",
+                        "httplib2",
+                        "argparse",
+                        "dateutils",
+                        "mimeparse",
+                        "python-dateutil",
+                        "pytz",
+                        "six",
+                        ]                        
+
+            for req in pip_reqs:
+                command_string = 'pip install \'{0}\' -d lib'.format(req)
+                run_subprocess(command_string, cwd=repo_dir)
+
+
+            #check the latest commit
+            command_string = 'git rev-parse HEAD'
+            commit_hash = run_subprocess_co(command_string, cwd=repo_dir)
+            # need to convert output from byte to string
+            commit_hash_str = commit_hash.decode("utf-8").strip()
+
+            # package version string
+            package_ver_string = "1:{0}+1SNAPSHOT{1}-{2}-{3}".format(args.version, utctime, commit_hash_str[:6], checkout_alphanum)
+            package_ver_string_noepoch = "{0}+1SNAPSHOT{1}-{2}-{3}".format(args.version, utctime, commit_hash_str[:6], checkout_alphanum)
+            logging.info("package version: %s", package_ver_string)
+ 
+
+            # dict: distribution -> numeric version
+            distronum_dic = { "precise":"12.04",
+                              "trusty":"14.04",
+                            }
+
+            # lines for the changelog
+            
+            chglog_maintainer = "Artefactual Systems <sysadmin@artefactual.com>"
+            chglog_time = time.strftime("%a, %d %b %Y %H:%M:%S +0000", build_time)
+            line = ["","","","","",""]
+            line[2] = "  * commit: {0}".format(commit_hash_str)
+            line[3] = "  * checkout: {0}".format(args.checkout)
+            line[5] = " -- {0}  {1}".format(chglog_maintainer, chglog_time)
+
+            # Iterate on distros
+            for d in distronum_dic:
+                p = "archivematica-storage-service"
+                line[0] = "{0} ({1}~{2}) {3}; urgency=high".format(p, package_ver_string, distronum_dic[d], d)
+                for l in line:
+                    print(l)
+                print()
+
+                # write debian changelog file
+                chglog_file = os.path.join(repo_dir, "debian","changelog" )
+                logging.info("writing debian changelog in %s", chglog_file)
+
+                f = open(chglog_file, 'r')
+                temp = f.read()
+                f.close()
+
+                f = open(chglog_file, 'w')
+                for l in line:
+                    f.write(l+'\n')
+                f.write(temp)
+                f.close()
+
+                # debuild
+                command_string = 'debuild --no-tgz-check -S -k{0} -I'.format(args.key)
+                run_subprocess(command_string, cwd=repo_dir)
+
+                # dput
+                dput_dir = working_dir
+                dput_filename = "{0}_{1}~{2}_source.changes".format(p, package_ver_string_noepoch, distronum_dic[d])
+                command_string = 'dput ppa:{0} {1}'.format(args.ppa, dput_filename)
+                run_subprocess(command_string, cwd=dput_dir)
 
 
 
+        except subprocess.CalledProcessError as e:
+            logging.error("Subprocess returned code %d", e.returncode)
+        except:
+            print("Unexpected error:", sys.exc_info()[0])
+            raise
 
-
-    #package_string = args.repository+"-"+args.version \
-    #                    +"+1SNAPSHOT"+utctime+"-"+checkout_alphanum 
-    
-    #logging.info ("package_string= %s", package_string)
-
-
-"""
-    os.makedirs(build_path)
-
-    # clone corresponding git repo
-    if args.repository == "ss":
-        logging.info("Cloning git repo for Storage Service")
-
-        command_string = 'git clone https://github.com/artefactual/archivematica-storage-service.git'
-        logging.info("calling subprocess for: %s", command_string)
-        p = subprocess.Popen(shlex.split(command_string), cwd=build_path )
-        p.wait()
-
-        command_string = 'git checkout -t '+args.branch
-        logging.info("calling subprocess for: %s", command_string)
-        p = subprocess.Popen(shlex.split(command_string), cwd=build_path )
-        p.wait()
-
-    return 0
-"""
 
 if __name__ == '__main__':
     main()
