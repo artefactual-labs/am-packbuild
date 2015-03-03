@@ -42,7 +42,8 @@ def main():
     parser.add_argument("-c", "--checkout", help="branch/commit/tag to checkout", required=True)
     parser.add_argument("-p", "--ppa", help="ppa to upload", required=True)
     parser.add_argument("-k", "--key", help="key for package signing", required=True)
-    
+    parser.add_argument("-b", "--build", help="build number. If this option is present, will build a release package")
+
     args = parser.parse_args()
     
     # create package version string
@@ -86,8 +87,13 @@ def main():
             commit_hash_str = commit_hash.decode("utf-8").strip()
 
             # package version string
-            package_ver_string = "1:{0}+1SNAPSHOT{1}-{2}-{3}".format(args.version, utctime, commit_hash_str[:6], checkout_alphanum)
-            package_ver_string_noepoch = "{0}+1SNAPSHOT{1}-{2}-{3}".format(args.version, utctime, commit_hash_str[:6], checkout_alphanum)
+            if args.build:
+                package_ver_string = "1:{0}-{1}".format(args.version, args.build)
+                package_ver_string_noepoch = "{0}-{1}".format(args.version, args.build)
+            else:
+                package_ver_string = "1:{0}+1SNAPSHOT{1}-{2}-{3}".format(args.version, utctime, commit_hash_str[:6], checkout_alphanum)
+                package_ver_string_noepoch = "{0}+1SNAPSHOT{1}-{2}-{3}".format(args.version, utctime, commit_hash_str[:6], checkout_alphanum)
+
             logging.info("package version: %s", package_ver_string)
 
             # dict: package_name -> directory
@@ -223,8 +229,14 @@ def main():
             commit_hash_str = commit_hash.decode("utf-8").strip()
 
             # package version string
-            package_ver_string = "1:{0}+1SNAPSHOT{1}-{2}-{3}".format(args.version, utctime, commit_hash_str[:6], checkout_alphanum)
-            package_ver_string_noepoch = "{0}+1SNAPSHOT{1}-{2}-{3}".format(args.version, utctime, commit_hash_str[:6], checkout_alphanum)
+            if args.build:
+                package_ver_string = "1:{0}-{1}".format(args.version, args.build)
+                package_ver_string_noepoch = "{0}-{1}".format(args.version, args.build)
+            else:
+                package_ver_string = "1:{0}+1SNAPSHOT{1}-{2}-{3}".format(args.version, utctime, commit_hash_str[:6], checkout_alphanum)
+                package_ver_string_noepoch = "{0}+1SNAPSHOT{1}-{2}-{3}".format(args.version, utctime, commit_hash_str[:6], checkout_alphanum)
+
+
             logging.info("package version: %s", package_ver_string)
  
 
