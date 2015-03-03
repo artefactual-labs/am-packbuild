@@ -12,6 +12,8 @@ import subprocess
 import shlex
 import re
 import sys
+import shutil
+import glob
 
 def run_subprocess(command_string, cwd=None): 
     logging.info("Running: %s", command_string)
@@ -173,32 +175,45 @@ def main():
             command_string = 'git submodule update'
             run_subprocess(command_string, cwd=repo_dir)
 
-            #install pip requirements workaround
-            pip_reqs = [
-                        "Django==1.5.4",
-                        "django-braces==1.0.0",
-                        "django-model-utils==1.3.1",
-                        "logutils==0.3.3",
-                        "South==0.8.4",
-                        "django-tastypie==0.9.15",
-                        "django-extensions==1.1.1",
-                        "lxml==3.2.3",
-                        "django-jsonfield==0.9.12",
-                        "bagit==1.3.7",
-                        "django-annoying==0.7.7",
-                        "requests>=2.3.0",
-                        "httplib2",
-                        "argparse",
-                        "dateutils",
-                        "mimeparse",
-                        "python-dateutil",
-                        "pytz",
-                        "six",
-                        ]                        
 
-            for req in pip_reqs:
-                command_string = 'pip install \'{0}\' -d lib'.format(req)
-                run_subprocess(command_string, cwd=repo_dir)
+            #install pip requirements workaround
+            #currently launchpad gives package builder errors when using pip to download libraries
+            #currently workaround is just to copy the .tar.gz files from a previous install
+
+            # pip_reqs = [
+            #             "Django==1.5.4",
+            #             "django-braces==1.0.0",
+            #             "django-model-utils==1.3.1",
+            #             "logutils==0.3.3",
+            #             "South==0.8.4",
+            #             "django-tastypie==0.9.15",
+            #             "django-extensions==1.1.1",
+            #             "lxml==3.2.3",
+            #             "django-jsonfield==0.9.12",
+            #             "bagit==1.3.7",
+            #             "django-annoying==0.7.7",
+            #             "requests>=2.3.0",
+            #             "httplib2",
+            #             "argparse",
+            #             "dateutils",
+            #             "mimeparse",
+            #             "python-dateutil",
+            #             "pytz",
+            #             "six",
+            #             ]                        
+            # for req in pip_reqs:
+            #     command_string = 'pip install \'{0}\' -d lib'.format(req)
+            #     run_subprocess(command_string, cwd=repo_dir)
+
+            logging.info("Copying files to lib")
+            src_dir = os.path.join(os.path.dirname(__file__), "files", "ss-lib")
+            dst_dir = os.path.join(repo_dir, "lib")
+            logging.info("src_dir: %s", src_dir)
+            logging.info("dst_dir: %s", dst_dir)
+            filelist = glob.glob(os.path.join(src_dir, '*.*'))
+            logging.info("filelist: %s", filelist)
+            for file in filelist:
+                shutil.copy2(file, dst_dir)
 
 
             #check the latest commit
