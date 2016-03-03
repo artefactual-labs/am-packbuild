@@ -1,0 +1,26 @@
+{
+    "extensions": {
+        "enabled": [
+            "python_venv",
+            "blocks"
+        ]
+    },
+    "core": {
+        "group": "Application/System",
+        "license": "AGPLv3",
+        "name": "archivematica-storage-service",
+        "summary": "archivematica-storage-service",
+        "release": "1"
+    },
+    "python_venv": {
+        "name": "archivematica-storage-services",
+        "path": "/opt"
+    },
+    "blocks": {
+	"install": [
+	],
+        "desc": [
+            "Archivematica storage service"
+        ]
+    }
+}
