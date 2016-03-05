@@ -18,9 +18,8 @@ BuildRoot: %(mktemp -ud %{_tmppath}/%{SOURCE0}-%{version}-%{release}-XXXXXX)
 Summary: archivematica-common
 Group: Application/System
 License: AGPLv3
-#Source0: https://github.com/artefactual/archivematica-mcp-server/archive/qa/0.x.tar.gz
-#Source0: 0.x.tar.gz
-Requires: sudo
+
+Requires: sudo, python-mimeparse, python-dateutil
 AutoReq: No
 AutoProv: No
 

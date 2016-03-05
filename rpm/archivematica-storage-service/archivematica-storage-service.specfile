@@ -20,7 +20,7 @@ Group: Application/System
 License: AGPLv3
 #Source0: https://github.com/artefactual/archivematica-storage-service/archive/qa/0.x.tar.gz
 #Source0: 0.x.tar.gz
-Requires: rsync, python-lxml, nginx
+Requires: rsync, python-lxml, nginx, uwsgi, uwsgi-plugin-python
 AutoReq: No
 AutoProv: No
 
