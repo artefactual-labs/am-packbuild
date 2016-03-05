@@ -26,20 +26,13 @@ AutoProv: No
 
 # Blocks
 %files
-/%{venv_install_dir}
-#/var/archivematica/*
 /usr/share/archivematica/
-#/var/archivematica/mcp-server/*
-#/var/archivematica/.mcp-server
 /usr/lib/archivematica/MCPServer
-/etc/serverConfig.conf
+%config /etc/serverConfig.conf
 /init.d/archivematica-mcp-serverd
 /init/archivematica-mcp-server.conf
 
 %install
-%{venv_cmd} %{venv_dir}
-%{venv_pip} -r %{_sourcedir}/%{venv_name}/src/archivematicaCommon/requirements/production.txt
-
 mkdir -p %{buildroot}/etc/ %{buildroot}/init/  %{buildroot}/init.d/ %{buildroot}//usr/lib/archivematica/MCPServer
 
 cp -rf  %{_sourcedir}/%{venv_name}/src/MCPServer/etc/* %{buildroot}/etc/
