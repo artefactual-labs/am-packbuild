@@ -130,5 +130,5 @@ rm -f /tmp/storage_service.log
 
 
 %description
-Archivematica storage service
+Django webapp for managing storage in an Archivematica
 

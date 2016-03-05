@@ -51,5 +51,6 @@ rm -rf %{buildroot}
 %post
 
 %description
-Archivematica storage service
+Common libraries for archivematica
+
 

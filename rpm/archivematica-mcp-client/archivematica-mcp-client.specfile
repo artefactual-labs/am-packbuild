@@ -70,5 +70,5 @@ sudo chmod -R g+ws $logdir
 
 
 %description
-Archivematica MCP Client 
+MCP Client for Archivematica
 

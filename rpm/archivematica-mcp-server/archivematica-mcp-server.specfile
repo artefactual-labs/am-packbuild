@@ -83,5 +83,6 @@ sudo chmod -R g+ws $logdir
 
 
 %description
-Archivematica storage service
+MCP Server for Archivematica
+
 
