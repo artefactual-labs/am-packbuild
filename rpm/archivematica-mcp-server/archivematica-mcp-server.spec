@@ -19,7 +19,7 @@ Summary: archivematica-mcp-server
 Group: Application/System
 License: AGPLv3
 Source0: https://github.com/artefactual/archivematica/
-Requires: archivematic-common, sudo, gearmand, uuid , python-inotify, python-lxml
+Requires: archivematica-common, sudo, gearmand, uuid , python-inotify, python-lxml
 AutoReq: No
 AutoProv: No
 
