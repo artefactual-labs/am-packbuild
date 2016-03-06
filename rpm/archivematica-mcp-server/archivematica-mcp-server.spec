@@ -18,9 +18,8 @@ BuildRoot: %(mktemp -ud %{_tmppath}/%{SOURCE0}-%{version}-%{release}-XXXXXX)
 Summary: archivematica-mcp-server
 Group: Application/System
 License: AGPLv3
-#Source0: https://github.com/artefactual/archivematica-mcp-server/archive/qa/0.x.tar.gz
-#Source0: 0.x.tar.gz
-Requires: sudo, gearmand, uuid
+Source0: https://github.com/artefactual/archivematica/
+Requires: archivematic-common, sudo, gearmand, uuid , python-inotify, python-lxml
 AutoReq: No
 AutoProv: No
 
@@ -28,16 +27,17 @@ AutoProv: No
 %files
 /usr/share/archivematica/
 /usr/lib/archivematica/MCPServer
-%config /etc/serverConfig.conf
-/init.d/archivematica-mcp-serverd
-/init/archivematica-mcp-server.conf
+%config /etc/archivematica/MCPServer/serverConfig.conf
+%config /etc/init.d/archivematica-mcp-serverd
+%config /etc/init/archivematica-mcp-server.conf
 
 %install
-mkdir -p %{buildroot}/etc/ %{buildroot}/init/  %{buildroot}/init.d/ %{buildroot}//usr/lib/archivematica/MCPServer
+mkdir -p %{buildroot}/etc/ %{buildroot}/etc/init/  %{buildroot}/etc/init.d/ %{buildroot}//usr/lib/archivematica/MCPServer %{buildroot}/etc/archivematica/MCPServer/
 
-cp -rf  %{_sourcedir}/%{venv_name}/src/MCPServer/etc/* %{buildroot}/etc/
-cp -rf  %{_sourcedir}/%{venv_name}/src/MCPServer/init/* %{buildroot}/init/
-cp -rf  %{_sourcedir}/%{venv_name}/src/MCPServer/init.d/* %{buildroot}/init.d/
+
+cp -rf  %{_sourcedir}/%{venv_name}/src/MCPServer/etc/* %{buildroot}/etc/archivematica/MCPServer/
+cp -rf  %{_sourcedir}/%{venv_name}/src/MCPServer/init/* %{buildroot}/etc/init/
+cp -rf  %{_sourcedir}/%{venv_name}/src/MCPServer/init.d/* %{buildroot}/etc/init.d/
 mkdir -p %{buildroot}/usr/share/archivematica/
 cp -rf  %{_sourcedir}/%{venv_name}/src/MCPServer/share/* %{buildroot}/usr/share/archivematica/
 cp -rf  %{_sourcedir}/%{venv_name}/src/MCPServer/lib/* %{buildroot}/usr/lib/archivematica/MCPServer
@@ -48,9 +48,10 @@ rm -rf %{_sourcedir}/*
 rm -rf %{buildroot}/*
 mkdir -p %{buildroot}/%{venv_install_dir}
 mkdir -p %{buildroot}/
-#git clone --depth=1 --recurse-submodules --branch ${BRANCH} https://github.com/artefactual/archivematica.git %{_sourcedir}/%{venv_name}
+
 git clone -b stable/1.4.x --single-branch https://github.com/artefactual/archivematica %{_sourcedir}/%{venv_name}
 cd %{_sourcedir}/%{venv_name} && git submodule init && git submodule update
+
 %clean
 rm -rf %{buildroot}
 
@@ -76,6 +77,7 @@ chown -R archivematica:archivematica /var/archivematica/sharedDirectory/
 
 logdir=/var/log/archivematica/MCPServer
 sudo mkdir -p $logdir
+touch $logdir/MCPServer.log
 sudo chown -R archivematica:archivematica $logdir
 sudo chmod -R g+ws $logdir
 

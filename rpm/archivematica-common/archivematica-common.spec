@@ -25,15 +25,20 @@ AutoProv: No
 
 # Blocks
 %files
-/%{venv_install_dir}
 /usr/lib/archivematica/archivematicaCommon
+/usr/share/archivematica-common
+%config /etc/archivematica/archivematicaCommon/dbsettings
 
 %install
-%{venv_cmd} %{venv_dir}
-%{venv_pip} -r %{_sourcedir}/%{venv_name}/src/archivematicaCommon/requirements/production.txt
+#%{venv_cmd} %{venv_dir}
+#%{venv_pip} -r %{_sourcedir}/%{venv_name}/src/archivematicaCommon/requirements/production.txt
 
-mkdir -p %{buildroot}/usr/lib/archivematica/archivematicaCommon/
+mkdir -p %{buildroot}/usr/lib/archivematica/archivematicaCommon/ 
+mkdir -p %{buildroot}/usr/share/archivematica-common/
+mkdir -p %{buildroot}/etc/archivematica/archivematicaCommon/
+cp  %{_sourcedir}/%{venv_name}/src/archivematicaCommon/requirements/base.txt  %{buildroot}/usr/share/archivematica-common/requirements.txt
 cp -rf  %{_sourcedir}/%{venv_name}/src/archivematicaCommon/lib/* %{buildroot}/usr/lib/archivematica/archivematicaCommon/
+cp -rf  %{_sourcedir}/%{venv_name}/src/archivematicaCommon/etc/* %{buildroot}/etc/archivematica/archivematicaCommon/
 
 
 %prep
@@ -41,13 +46,17 @@ rm -rf %{_sourcedir}/*
 rm -rf %{buildroot}/*
 mkdir -p %{buildroot}/%{venv_install_dir}
 mkdir -p %{buildroot}/
-#git clone --depth=1 --recurse-submodules --branch ${BRANCH} https://github.com/artefactual/archivematica.git %{_sourcedir}/%{venv_name}
+
 git clone -b stable/1.4.x --single-branch https://github.com/artefactual/archivematica %{_sourcedir}/%{venv_name}
 cd %{_sourcedir}/%{venv_name} && git submodule init && git submodule update
+
 %clean
 rm -rf %{buildroot}
 
 %post
+
+echo "Installing python packages"
+pip install -r /usr/share/archivematica-common/requirements.txt
 
 %description
 Common libraries for archivematica

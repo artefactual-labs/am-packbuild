@@ -18,8 +18,7 @@ BuildRoot: %(mktemp -ud %{_tmppath}/%{SOURCE0}-%{version}-%{release}-XXXXXX)
 Summary: archivematica-mcp-client
 Group: Application/System
 License: AGPLv3
-#Source0: https://github.com/artefactual/archivematica-mcp-client/archive/qa/0.x.tar.gz
-#Source0: 0.x.tar.gz
+Source0: https://github.com/artefactual/archivematica/
 Requires: sudo
 AutoReq: No
 AutoProv: No
@@ -33,6 +32,7 @@ AutoProv: No
 %config /etc/init.d/archivematica-mcp-clientd
 
 %install
+
 mkdir -p %{buildroot}/etc/archivematica/MCPClient %{buildroot}/etc/init/ %{buildroot}/etc/init.d/ %{buildroot}//usr/lib/archivematica/MCPClient
 
 cp  %{_sourcedir}/%{venv_name}/src/MCPClient/etc/archivematicaClientModules %{buildroot}/etc/archivematica/MCPClient/
@@ -41,15 +41,14 @@ cp -rf  %{_sourcedir}/%{venv_name}/src/MCPClient/init/* %{buildroot}/etc/init/
 cp -rf  %{_sourcedir}/%{venv_name}/src/MCPClient/init.d/* %{buildroot}/etc/init.d/
 cp -rf  %{_sourcedir}/%{venv_name}/src/MCPClient/lib/* %{buildroot}/usr/lib/archivematica/MCPClient
 
-
 %prep
 rm -rf %{_sourcedir}/*
 rm -rf %{buildroot}/*
 mkdir -p %{buildroot}/%{venv_install_dir}
-mkdir -p %{buildroot}/
-#git clone --depth=1 --recurse-submodules --branch ${BRANCH} https://github.com/artefactual/archivematica.git %{_sourcedir}/%{venv_name}
+
 git clone -b stable/1.4.x --single-branch https://github.com/artefactual/archivematica %{_sourcedir}/%{venv_name}
 cd %{_sourcedir}/%{venv_name} && git submodule init && git submodule update
+
 %clean
 rm -rf %{buildroot}
 
