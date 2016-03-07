@@ -7,7 +7,7 @@ DOCKER_IMAGE = "rpmbuild-$(NAME)-$(VERSION)"
 
 .PHONY: rpm-clean common storage-service
 
-all: rpm-clean common storage-service mcp-server mcp-client dashboard
+all: common storage-service mcp-server mcp-client dashboard
 
 storage-service:
 	@echo "==> archivematica-storage-service rpm."
