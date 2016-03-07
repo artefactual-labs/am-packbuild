@@ -19,7 +19,7 @@ Summary: archivematica-mcp-client
 Group: Application/System
 License: AGPLv3
 Source0: https://github.com/artefactual/archivematica/
-Requires: sudo, tesseract, p7zip, ImageMagick, ghostscript, perl-Image-ExifTool, inkscape
+Requires: sudo, tesseract, p7zip, ImageMagick, ghostscript, perl-Image-ExifTool, inkscape, python-unidecode, clamav-server clamav-data clamav-update clamav-filesystem clamav clamav-scanner-systemd clamav-devel clamav-lib clamav-server-systemd
 AutoReq: No
 AutoProv: No
 
