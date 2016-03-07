@@ -93,6 +93,7 @@ sed -i "s/<replace-with-key>/\"$KEYCMD\"/g" /var/archivematica/.storage-service
 echo "creating log directories"
 mkdir -p /var/log/archivematica/storage-service
 touch /var/log/archivematica/storage-service/storage_service.log
+touch /var/log/archivematica/storage-service/storage_service_debug.log
 echo "configuring django database and static files"
 #/usr/share/python/archivematica-storage-service/bin/python manage.py syncdb
 #/usr/share/python/archivematica-storage-service/bin/python manage.py migrate
