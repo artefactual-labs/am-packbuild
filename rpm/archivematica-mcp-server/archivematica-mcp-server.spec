@@ -27,6 +27,7 @@ AutoProv: No
 %files
 /usr/share/archivematica/
 /usr/lib/archivematica/MCPServer
+/usr/lib/systemd/system/archivematica-mcp-server.service
 %config /etc/archivematica/MCPServer/serverConfig.conf
 %config /etc/init.d/archivematica-mcp-serverd
 %config /etc/init/archivematica-mcp-server.conf
@@ -42,6 +43,19 @@ mkdir -p %{buildroot}/usr/share/archivematica/
 cp -rf  %{_sourcedir}/%{venv_name}/src/MCPServer/share/* %{buildroot}/usr/share/archivematica/
 cp -rf  %{_sourcedir}/%{venv_name}/src/MCPServer/lib/* %{buildroot}/usr/lib/archivematica/MCPServer
 
+mkdir -p %{buildroot}/usr/lib/systemd/system/
+cat << EOF > %{buildroot}/usr/lib/systemd/system/archivematica-mcp-server.service  
+[Unit]
+Description=Archivematica MCP Server
+After=syslog.target network.target
+
+[Service]
+User=archivematica
+ExecStart=/usr/bin/python /usr/lib/archivematica/MCPServer/archivematicaMCP.py
+
+[Install]
+WantedBy=multi-user.target
+EOF
 
 %prep
 rm -rf %{_sourcedir}/*
