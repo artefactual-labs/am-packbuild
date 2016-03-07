@@ -19,13 +19,14 @@ Summary: archivematica-mcp-client
 Group: Application/System
 License: AGPLv3
 Source0: https://github.com/artefactual/archivematica/
-Requires: sudo
+Requires: sudo, tesseract, p7zip, ImageMagick, ghostscript, perl-Image-ExifTool, inkscape
 AutoReq: No
 AutoProv: No
 
 # Blocks
 %files
 /usr/lib/archivematica/MCPClient/
+/usr/lib/systemd/system/archivematica-mcp-client.service
 %config /etc/archivematica/MCPClient/archivematicaClientModules
 %config /etc/archivematica/MCPClient/clientConfig.conf
 %config /etc/init/archivematica-mcp-client.conf
@@ -40,6 +41,21 @@ cp  %{_sourcedir}/%{venv_name}/src/MCPClient/etc/clientConfig.conf %{buildroot}/
 cp -rf  %{_sourcedir}/%{venv_name}/src/MCPClient/init/* %{buildroot}/etc/init/
 cp -rf  %{_sourcedir}/%{venv_name}/src/MCPClient/init.d/* %{buildroot}/etc/init.d/
 cp -rf  %{_sourcedir}/%{venv_name}/src/MCPClient/lib/* %{buildroot}/usr/lib/archivematica/MCPClient
+
+mkdir -p %{buildroot}/usr/lib/systemd/system/
+cat << EOF > %{buildroot}/usr/lib/systemd/system/archivematica-mcp-client.service
+[Unit]
+Description=Archivematica MCP Client
+After=syslog.target network.target
+
+[Service]
+User=archivematica
+ExecStart=/usr/bin/python /usr/lib/archivematica/MCPClient/archivematicaClient.py
+
+[Install]
+WantedBy=multi-user.target
+
+EOF
 
 %prep
 rm -rf %{_sourcedir}/*
