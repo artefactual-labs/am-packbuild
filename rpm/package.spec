@@ -41,7 +41,7 @@ virtualenv /usr/share/archivematica-storage-service/
 sed -i 's/sword2/sword2>=0/g' %{_sourcedir}/%{venv_name}/requirements/base.txt
 
 /usr/share/archivematica-storage-service/bin/pip install -r %{_sourcedir}/%{name}/requirements/production.txt
-/usr/share/archivematica-storage-service/bin/pip install %{_sourcedir}/%{name}
+#/usr/share/archivematica-storage-service/bin/pip install %{_sourcedir}/%{name}
 
 virtualenv --relocatable /usr/share/archivematica-storage-service/
 cp -rf /usr/share/archivematica-storage-service/* %{buildroot}/usr/share/archivematica-storage-service/
@@ -52,8 +52,7 @@ mkdir -p  %{buildroot}/etc/sysconfig/
 cp %{_sourcedir}/%{venv_name}/install/.storage-service  %{buildroot}/etc/sysconfig/archivematica-storage-service
 cp %{_sourcedir}/%{venv_name}/install/make_key.py  %{buildroot}/var/archivematica/storage-service/
 mkdir -p %{buildroot}/usr/share/archivematica-storage-service/storage_service/
-cp -rf %{_sourcedir}/%{venv_name}/storage_service/static  %{buildroot}/usr/share/archivematica-storage-service/storage_service/
-cp -rf %{_sourcedir}/%{venv_name}/storage_service/templates  %{buildroot}/usr/share/archivematica-storage-service/storage_service
+cp -rf %{_sourcedir}/%{venv_name}/storage_service/*  %{buildroot}/usr/share/archivematica-storage-service/storage_service/
 
 #Create systemd script
 mkdir -p %{buildroot}/usr/lib/systemd/system/
@@ -68,7 +67,7 @@ PIDFile=/run/gunicorn/pid
 User=archivematica
 Group=archivematica
 EnvironmentFile=-/etc/sysconfig/archivematica-storage-service
-WorkingDirectory=/usr/share/archivematica-storage-service/lib/python2.7/site-packages/storage_service/
+WorkingDirectory=/usr/share/archivematica-storage-service/storage_service/
 ExecStart=/usr/share/archivematica-storage-service/bin/gunicorn  --workers 2 --timeout 120 --access-logfile /var/log/archivematica/storage-service/gunicorn.log --error-logfile /var/log/archivematica/storage-service/gunicorn_error.log --log-level error --bind 0.0.0.0:8000 storage_service.wsgi:application
 ExecReload=/bin/kill -s HUP $MAINPID
 ExecStop=/bin/kill -s TERM $MAINPID
