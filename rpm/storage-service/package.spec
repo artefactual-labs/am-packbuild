@@ -5,17 +5,17 @@
 Name: archivematica-storage-service
 Version: 0.6.1
 Release: 1
-Summary: Archivematica storage service
+Summary: Archivematica Storage Service
 Group: Application/System
 License: AGPLv3
 Source0: https://github.com/artefactual/archivematica-storage-service/
 BuildRequires: git, gcc, libffi-devel, openssl-devel, libxslt-devel,python-virtualenv, python-pip
-Requires: unar
+Requires: unar, rsync
 AutoReq: No
 AutoProv: No
 
 %description
-Django webapp for managing storage in an Archivematica
+The Storage Service is the mechanism by which Archivematica is able to store packages and manage file locations, such as transfer source locations.
 
 # Blocks
 %files
@@ -31,7 +31,7 @@ Django webapp for managing storage in an Archivematica
 mkdir -p %{buildroot}/usr/share/archivematica/storage-service/
 mkdir -p %{buildroot}/usr/lib/archivematica/storage-service/
 
-#We build the virtualenv in place, and then move it
+# We build the virtualenv in place, and then move it
 # This avoids problems with the buildpath found inside .so files
 virtualenv /usr/lib/archivematica/storage-service
 
@@ -53,21 +53,21 @@ cp %{_sourcedir}/%{name}/install/.storage-service  %{buildroot}/etc/sysconfig/ar
 sed -i '/^alias/d' %{buildroot}/etc/sysconfig/archivematica-storage-service
 sed -i 's/export //g' %{buildroot}/etc/sysconfig/archivematica-storage-service
 
-#Create systemd script
+# Create systemd script
 mkdir -p %{buildroot}/usr/lib/systemd/system/
 cat << EOF > %{buildroot}/usr/lib/systemd/system/archivematica-storage-service.service
 [Unit]
-Description=archivematica storage daemon
+Description=Archivematica Storage Service
 After=network.target
 
 [Service]
 
-PIDFile=/run/gunicorn/pid
+PIDFile=/run/archivematica-storage-service_gunicorn.pid
 User=archivematica
 Group=archivematica
 EnvironmentFile=-/etc/sysconfig/archivematica-storage-service
 WorkingDirectory=/usr/share/archivematica/storage-service/
-ExecStart=/usr/lib/archivematica/storage-service/bin/gunicorn  --workers 2 --timeout 120 --access-logfile /var/log/archivematica/storage-service/gunicorn.log --error-logfile /var/log/archivematica/storage-service/gunicorn_error.log --log-level error --bind localhost:7500 storage_service.wsgi:application
+ExecStart=/usr/lib/archivematica/storage-service/bin/gunicorn --workers 2 --timeout 120 --access-logfile /var/log/archivematica/storage-service/gunicorn.log --error-logfile /var/log/archivematica/storage-service/gunicorn_error.log --log-level error --bind localhost:7500 storage_service.wsgi:application
 ExecReload=/bin/kill -s HUP $MAINPID
 ExecStop=/bin/kill -s TERM $MAINPID
 PrivateTmp=true
@@ -93,34 +93,29 @@ rm -rf %{buildroot}
 %post
 
 
-echo "creating archivematica user"
+echo "Creating archivematica user"
 userID=`id -u archivematica`
 
 if [ "${userID}" = 333 ]; then
   echo "User archivematica exists"
 else
-  useradd --uid 333 -U --home /var/lib/archivematica/ archivematica
+  useradd --uid 333 --user-group --home /var/lib/archivematica/ archivematica
 fi
 
 
-echo "creating django secret key"
+echo "Creating django secret key"
 KEYCMD=$(python /var/archivematica/storage-service/make_key.py 2>&1)
 echo $KEYCMD
 
 sed -i "s/<replace-with-key>/\"$KEYCMD\"/g" /etc/sysconfig/archivematica-storage-service
 
 
-echo "creating log directories"
+echo "Creating log directories"
 mkdir -p /var/log/archivematica/storage-service
 touch /var/log/archivematica/storage-service/storage_service.log
 touch /var/log/archivematica/storage-service/storage_service_debug.log
 
-#echo "configuring django database and static files"
-#/usr/share/python/archivematica-storage-service/bin/python manage.py syncdb
-#/usr/share/python/archivematica-storage-service/bin/python manage.py migrate
-#/usr/share/python/archivematica-storage-service/bin/python manage.py collectstatic --noinput
-
-echo "create /var/archivematica/storage_service directory"
+echo "Create /var/archivematica/storage_service directory"
 mkdir -p /var/archivematica/storage_service
 
 echo "updating directory permissions"
@@ -131,6 +126,3 @@ chmod 750 /var/lib/archivematica/
 chown -R archivematica:archivematica /var/lib/archivematica/
 
 rm -f /tmp/storage_service.log
-
-
-

@@ -33,4 +33,4 @@ rpm-clean:
 
 
 test-version:
-	@docker run --volume="$(shell pwd):/src" centos:7 bash -c "rpm -i /src/$(NAME)-$(VERSION)*.rpm && sf -version"
+	@docker run --rm --volume="$(shell pwd):/src" centos:7 bash -c "yum install -y epel-release && yum localinstall -y --nogpgcheck /src/$(NAME)-$(VERSION)*.rpm "
