@@ -132,6 +132,8 @@ echo "updating directory permissions"
 chown -R archivematica:archivematica /var/archivematica/storage-service
 chown -R archivematica:archivematica /var/log/archivematica/storage-service
 chown -R archivematica:archivematica /usr/share/archivematica/storage-service
+chmod 750 /var/lib/archivematica/
+chown -R archivematica:archivematica /var/lib/archivematica/
 
 rm -f /tmp/storage_service.log
 
