@@ -1,0 +1,26 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+
+  config.vm.box = "centos/7"
+
+  # config.vm.network "forwarded_port", guest: 80, host: 8080
+  # config.vm.network "private_network", ip: "192.168.33.66"
+  config.vm.network "public_network"
+
+  # VirtualBox Guest Additions not installed in "centos/7" box
+  config.vm.synced_folder "../", "/am-packbuild", type: "rsync", rsync__enclude: ".git/"
+  config.vm.synced_folder ".", "/home/vagrant/sync", disabled: true
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "1024"
+  end
+
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo yum install -y epel-release
+    sudo yum localinstall -y --nogpgcheck /am-packbuild/rpm/storage-service/archivematica-storage-service-*.x86_64.rpm
+    sudo yum localinstall -y --nogpgcheck /am-packbuild/rpm/siegfried/siegfried-*.x86_64.rpm
+  SHELL
+
+end
