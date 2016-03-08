@@ -19,7 +19,7 @@ build-docker-image:
 
 build:
 	@echo "==> Building RPM."
-	@docker run --volume "$(shell pwd):/src" ${DOCKER_IMAGE} make -C /src rpm-build
+	@docker run --rm --volume "$(shell pwd):/src" ${DOCKER_IMAGE} make -C /src rpm-build
 
 rpm-build: rpm-clean
 	yum-builddep -y /src/package.spec
