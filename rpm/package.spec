@@ -19,12 +19,16 @@ Requires: rsync, python-pip, python-virtualenv, unar
 AutoReq: No
 AutoProv: No
 
+%description
+Django webapp for managing storage in an Archivematica
+
 # Blocks
 %files
 /usr/share/archivematica-storage-service/
 /var/archivematica/*
 /var/archivematica/storage-service/*
-/var/archivematica/.storage-service
+/usr/lib/systemd/system/archivematica-storage-service.service
+%config /etc/sysconfig/archivematica-storage-service
 
 %install
 
@@ -44,12 +48,35 @@ cp -rf /usr/share/archivematica-storage-service/* %{buildroot}/usr/share/archive
 
 
 mkdir -p  %{buildroot}/var/archivematica/storage-service/
-
-cp %{_sourcedir}/%{venv_name}/install/.storage-service  %{buildroot}/var/archivematica/
+mkdir -p  %{buildroot}/etc/sysconfig/
+cp %{_sourcedir}/%{venv_name}/install/.storage-service  %{buildroot}/etc/sysconfig/archivematica-storage-service
 cp %{_sourcedir}/%{venv_name}/install/make_key.py  %{buildroot}/var/archivematica/storage-service/
 mkdir -p %{buildroot}/usr/share/archivematica-storage-service/storage_service/
 cp -rf %{_sourcedir}/%{venv_name}/storage_service/static  %{buildroot}/usr/share/archivematica-storage-service/storage_service/
 cp -rf %{_sourcedir}/%{venv_name}/storage_service/templates  %{buildroot}/usr/share/archivematica-storage-service/storage_service
+
+#Create systemd script
+mkdir -p %{buildroot}/usr/lib/systemd/system/
+cat << EOF > %{buildroot}/usr/lib/systemd/system/archivematica-storage-service.service
+[Unit]
+Description=archivematica storage daemon
+After=network.target
+
+[Service]
+
+PIDFile=/run/gunicorn/pid
+User=archivematica
+Group=archivematica
+EnvironmentFile=-/etc/sysconfig/archivematica-storage-service
+WorkingDirectory=/usr/share/archivematica-storage-service/lib/python2.7/site-packages/storage_service/
+ExecStart=/usr/share/archivematica-storage-service/bin/gunicorn  --workers 2 --timeout 120 --access-logfile /var/log/archivematica/storage-service/gunicorn.log --error-logfile /var/log/archivematica/storage-service/gunicorn_error.log --log-level error --bind 0.0.0.0:8000 storage_service.wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+EOF
 
 %prep
 rm -rf /usr/share/archivematica-storage-service
@@ -86,15 +113,16 @@ echo "creating django secret key"
 KEYCMD=$(python /var/archivematica/storage-service/make_key.py 2>&1)
 echo $KEYCMD
 
-sed -i "s/<replace-with-key>/\"$KEYCMD\"/g" /var/archivematica/.storage-service
+sed -i "s/<replace-with-key>/\"$KEYCMD\"/g" /etc/sysconfig/archivematica-storage-service
+sed -i "s/export //g" /etc/sysconfig/archivematica-storage-service
 
-. /var/archivematica/.storage-service
 
 echo "creating log directories"
 mkdir -p /var/log/archivematica/storage-service
 touch /var/log/archivematica/storage-service/storage_service.log
 touch /var/log/archivematica/storage-service/storage_service_debug.log
-echo "configuring django database and static files"
+
+#echo "configuring django database and static files"
 #/usr/share/python/archivematica-storage-service/bin/python manage.py syncdb
 #/usr/share/python/archivematica-storage-service/bin/python manage.py migrate
 #/usr/share/python/archivematica-storage-service/bin/python manage.py collectstatic --noinput
@@ -104,13 +132,9 @@ mkdir -p /var/archivematica/storage_service
 
 echo "updating directory permissions"
 chown -R archivematica:archivematica /var/archivematica/storage-service
-chown -R archivematica:archivematica /var/archivematica/storage_service
-chown -R archivematica:archivematica /var/archivematica/.storage-service
 chown -R archivematica:archivematica /var/log/archivematica/storage-service
 
 rm -f /tmp/storage_service.log
 
 
-%description
-Django webapp for managing storage in an Archivematica
 
