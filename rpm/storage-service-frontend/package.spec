@@ -1,6 +1,6 @@
 # Tags
 Name: archivematica-storage-service-frontend
-Version: 0.0.1
+Version: 0.8.0
 Release: 1
 Summary: Nginx configuration file for archivematica storage service
 Group: Application/System

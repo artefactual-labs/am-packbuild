@@ -32,7 +32,3 @@ rm -rf $RPM_BUILD_ROOT
 # Ideally, should the signature be saved somewhere else?
 %defattr(0644, 1000, 1000, 0755)
 /usr/share/siegfried
-
-%changelog
-* Tue Mar 1 2016 Jesús García Crespo <jesus@sevein.com>
-See https://github.com/richardlehane/siegfried/releases

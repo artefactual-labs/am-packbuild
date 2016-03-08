@@ -39,7 +39,7 @@ rpm-build: rpm-clean
 	@echo "==> Running rpmbuild."
 	rpmbuild $(RPMBUILD_ARGS) -ba --clean $(RPM_TOPDIR)/package.spec
 
-	@echo "==> Copying rpm."
+	@echo "==> Copying RPM files."
 	cp -p $(RPM_TOPDIR)/RPMS/x86_64/$(NAME)-$(VERSION)*.x86_64.rpm $(DOCKER_VOLUME)/
 	cp -p $(RPM_TOPDIR)/SRPMS/$(NAME)-$(VERSION)*.src.rpm $(DOCKER_VOLUME)/
 

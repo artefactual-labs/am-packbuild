@@ -18,9 +18,18 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.provision "shell", inline: <<-SHELL
-    sudo yum install -y epel-release
-    sudo yum localinstall -y --nogpgcheck /am-packbuild/rpm/storage-service/archivematica-storage-service-*.x86_64.rpm
-    sudo yum localinstall -y --nogpgcheck /am-packbuild/rpm/siegfried/siegfried-*.x86_64.rpm
+
+    # Remote repository
+    wget https://bintray.com/artefactual/rpm/rpm -O bintray-artefactual-rpm.repo
+    sudo mv bintray-artefactual-rpm.repo /etc/yum.repos.d/
+    sudo yum update -y
+    sudo yum install -y epel-release siegfried archivematica-storage-service archivematica-storage-service-frontend
+
+    # Local packages
+    # sudo yum localinstall -y --nogpgcheck /am-packbuild/rpm/storage-service/archivematica-storage-service-*.x86_64.rpm
+    # sudo yum localinstall -y --nogpgcheck /am-packbuild/rpm/storage-service/archivematica-storage-service-frontend-*.x86_64.rpm
+    # sudo yum localinstall -y --nogpgcheck /am-packbuild/rpm/siegfried/siegfried-*.x86_64.rpm
+
   SHELL
 
 end

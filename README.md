@@ -15,3 +15,8 @@ For release package (include -b flag):
 ### RPM
 
 The `rpm/` directory contains the files that we use to build our RPM packages.
+Use the Makefiles to build the packages. You need Docker installed and running
+but it works if the Docker daemon is running a remote machine.
+
+The `rpm-testing` directory contains our Vagrant environment to test the RPM
+packages.

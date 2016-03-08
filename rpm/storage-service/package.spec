@@ -3,13 +3,13 @@
 
 # Tags
 Name: archivematica-storage-service
-Version: 0.6.1
+Version: 0.8.0
 Release: 1
 Summary: Archivematica Storage Service
 Group: Application/System
 License: AGPLv3
 Source0: https://github.com/artefactual/archivematica-storage-service/
-BuildRequires: git, gcc, libffi-devel, openssl-devel, libxslt-devel,python-virtualenv, python-pip
+BuildRequires: git, gcc, libffi-devel, openssl-devel, libxslt-devel, python-virtualenv, python-pip
 Requires: unar, rsync
 AutoReq: No
 AutoProv: No
