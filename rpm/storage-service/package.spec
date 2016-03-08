@@ -43,8 +43,6 @@ virtualenv --relocatable /usr/lib/archivematica/storage-service/
 cp -rf /usr/lib/archivematica/storage-service/* %{buildroot}/usr/lib/archivematica/storage-service/
 cp -rf %{_sourcedir}/%{name}/storage_service/*  %{buildroot}/usr/share/archivematica/storage-service
 
-
-
 mkdir -p  %{buildroot}/var/archivematica/storage-service/
 cp %{_sourcedir}/%{name}/install/make_key.py  %{buildroot}/var/archivematica/storage-service/
 
@@ -83,7 +81,7 @@ rm -rf %{_sourcedir}/*
 rm -rf %{buildroot}/*
 mkdir -p %{buildroot}/%{install_dir}
 
-git clone -b qa/0.x --single-branch https://github.com/artefactual/archivematica-storage-service %{_sourcedir}/%{name}
+git clone --branch qa/0.x --depth 1 --single-branch https://github.com/artefactual/archivematica-storage-service %{_sourcedir}/%{name}
 
 cd %{_sourcedir}/%{name} && git submodule init && git submodule update
 
@@ -91,8 +89,6 @@ cd %{_sourcedir}/%{name} && git submodule init && git submodule update
 rm -rf %{buildroot}
 
 %post
-
-
 echo "Creating archivematica user"
 userID=`id -u archivematica`
 
@@ -102,13 +98,11 @@ else
   useradd --uid 333 --user-group --home /var/lib/archivematica/ archivematica
 fi
 
-
 echo "Creating django secret key"
 KEYCMD=$(python /var/archivematica/storage-service/make_key.py 2>&1)
 echo $KEYCMD
 
 sed -i "s/<replace-with-key>/\"$KEYCMD\"/g" /etc/sysconfig/archivematica-storage-service
-
 
 echo "Creating log directories"
 mkdir -p /var/log/archivematica/storage-service
@@ -118,11 +112,15 @@ touch /var/log/archivematica/storage-service/storage_service_debug.log
 echo "Create /var/archivematica/storage_service directory"
 mkdir -p /var/archivematica/storage_service
 
-echo "updating directory permissions"
+echo "Updating directory permissions"
 chown -R archivematica:archivematica /var/archivematica/storage-service
 chown -R archivematica:archivematica /var/log/archivematica/storage-service
 chown -R archivematica:archivematica /usr/share/archivematica/storage-service
 chmod 750 /var/lib/archivematica/
 chown -R archivematica:archivematica /var/lib/archivematica/
+
+echo "Fix for sword2 python package: create sword2_logging.conf"
+touch /usr/share/archivematica/storage-service/sword2_logging.conf
+chown archivematica:archivematica /usr/share/archivematica/storage-service/sword2_logging.conf
 
 rm -f /tmp/storage_service.log
