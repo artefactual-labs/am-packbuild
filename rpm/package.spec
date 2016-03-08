@@ -48,11 +48,14 @@ cp -rf /usr/share/archivematica-storage-service/* %{buildroot}/usr/share/archive
 
 
 mkdir -p  %{buildroot}/var/archivematica/storage-service/
-mkdir -p  %{buildroot}/etc/sysconfig/
-cp %{_sourcedir}/%{venv_name}/install/.storage-service  %{buildroot}/etc/sysconfig/archivematica-storage-service
 cp %{_sourcedir}/%{venv_name}/install/make_key.py  %{buildroot}/var/archivematica/storage-service/
 mkdir -p %{buildroot}/usr/share/archivematica-storage-service/storage_service/
 cp -rf %{_sourcedir}/%{venv_name}/storage_service/*  %{buildroot}/usr/share/archivematica-storage-service/storage_service/
+
+mkdir -p  %{buildroot}/etc/sysconfig/
+cp %{_sourcedir}/%{venv_name}/install/.storage-service  %{buildroot}/etc/sysconfig/archivematica-storage-service
+sed -i '/^alias/d' %{buildroot}/etc/sysconfig/archivematica-storage-service
+sed -i 's/export //g' %{buildroot}/etc/sysconfig/archivematica-storage-service
 
 #Create systemd script
 mkdir -p %{buildroot}/usr/lib/systemd/system/
@@ -113,7 +116,6 @@ KEYCMD=$(python /var/archivematica/storage-service/make_key.py 2>&1)
 echo $KEYCMD
 
 sed -i "s/<replace-with-key>/\"$KEYCMD\"/g" /etc/sysconfig/archivematica-storage-service
-sed -i "s/export //g" /etc/sysconfig/archivematica-storage-service
 
 
 echo "creating log directories"
