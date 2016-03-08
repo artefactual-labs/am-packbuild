@@ -23,6 +23,7 @@ build:
 
 rpm-build: rpm-clean
 	yum-builddep -y /src/package.spec
+	chown root.root /src/package.spec
 	rpmbuild $(RPMBUILD_ARGS) -ba --clean /src/package.spec
 	cp -p $(RPM_TOPDIR)/RPMS/x86_64/$(NAME)-$(VERSION)*.x86_64.rpm /src/
 
