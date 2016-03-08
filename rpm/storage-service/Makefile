@@ -9,7 +9,7 @@ RPMBUILD_ARGS := \
 	--define "name $(NAME)" \
 	--define "version $(VERSION)"
 
-.PHONY: build-docker-image build rpm-build rpm-clean test-version
+.PHONY: build-docker-image build rpm-build rpm-clean rpm-test
 
 all: build-docker-image build
 
@@ -22,9 +22,10 @@ build:
 	@docker run --rm --volume "$(shell pwd):/src" ${DOCKER_IMAGE} make -C /src rpm-build
 
 rpm-build: rpm-clean
-	yum-builddep -y /src/package.spec
-	chown root.root /src/package.spec
-	rpmbuild $(RPMBUILD_ARGS) -ba --clean /src/package.spec
+	mkdir -p $(RPM_TOPDIR)
+	cp /src/package.spec $(RPM_TOPDIR)/package.spec
+	yum-builddep -y $(RPM_TOPDIR)/package.spec
+	rpmbuild $(RPMBUILD_ARGS) -ba --clean $(RPM_TOPDIR)/package.spec
 	cp -p $(RPM_TOPDIR)/RPMS/x86_64/$(NAME)-$(VERSION)*.x86_64.rpm /src/
 
 rpm-clean:
@@ -32,5 +33,5 @@ rpm-clean:
 	@rm -rf $(RPM_TOPDIR)
 
 
-test-version:
-	@docker run --rm --volume="$(shell pwd):/src" centos:7 bash -c "yum install -y epel-release && yum localinstall -y --nogpgcheck /src/$(NAME)-$(VERSION)*.rpm "
+rpm-test:
+	@docker run --rm --volume="$(shell pwd):/src" centos:7 bash -c "yum install -y epel-release && yum localinstall -y --nogpgcheck /src/$(NAME)-$(VERSION)*.rpm"
