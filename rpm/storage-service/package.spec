@@ -24,7 +24,8 @@ Django webapp for managing storage in an Archivematica
 
 # Blocks
 %files
-/usr/share/archivematica-storage-service/
+/usr/share/archivematica/storage-service/
+/usr/lib/archivematica/storage-service/
 /var/archivematica/*
 /var/archivematica/storage-service/*
 /usr/lib/systemd/system/archivematica-storage-service.service
@@ -32,25 +33,25 @@ Django webapp for managing storage in an Archivematica
 
 %install
 
-mkdir -p %{buildroot}/usr/share/archivematica-storage-service/
+mkdir -p %{buildroot}/usr/share/archivematica/storage-service/
+mkdir -p %{buildroot}/usr/lib/archivematica/storage-service/
 
 #We build the virtualenv in place, and then move it
 # This avoids problems with the buildpath found inside .so files
-virtualenv /usr/share/archivematica-storage-service/
+virtualenv /usr/lib/archivematica/storage-service
 
-sed -i 's/sword2/sword2>=0/g' %{_sourcedir}/%{venv_name}/requirements/base.txt
+/usr/lib/archivematica/storage-service/bin/pip install --upgrade pip
 
-/usr/share/archivematica-storage-service/bin/pip install -r %{_sourcedir}/%{name}/requirements/production.txt
-#/usr/share/archivematica-storage-service/bin/pip install %{_sourcedir}/%{name}
+/usr/lib/archivematica/storage-service/bin/pip install -r %{_sourcedir}/%{name}/requirements/production.txt
 
-virtualenv --relocatable /usr/share/archivematica-storage-service/
-cp -rf /usr/share/archivematica-storage-service/* %{buildroot}/usr/share/archivematica-storage-service/
+virtualenv --relocatable /usr/lib/archivematica/storage-service/
+cp -rf /usr/lib/archivematica/storage-service/* %{buildroot}/usr/lib/archivematica/storage-service/
+cp -rf %{_sourcedir}/%{venv_name}/storage_service/*  %{buildroot}/usr/share/archivematica/storage-service
+
 
 
 mkdir -p  %{buildroot}/var/archivematica/storage-service/
 cp %{_sourcedir}/%{venv_name}/install/make_key.py  %{buildroot}/var/archivematica/storage-service/
-mkdir -p %{buildroot}/usr/share/archivematica-storage-service/storage_service/
-cp -rf %{_sourcedir}/%{venv_name}/storage_service/*  %{buildroot}/usr/share/archivematica-storage-service/storage_service/
 
 mkdir -p  %{buildroot}/etc/sysconfig/
 cp %{_sourcedir}/%{venv_name}/install/.storage-service  %{buildroot}/etc/sysconfig/archivematica-storage-service
@@ -70,8 +71,8 @@ PIDFile=/run/gunicorn/pid
 User=archivematica
 Group=archivematica
 EnvironmentFile=-/etc/sysconfig/archivematica-storage-service
-WorkingDirectory=/usr/share/archivematica-storage-service/storage_service/
-ExecStart=/usr/share/archivematica-storage-service/bin/gunicorn  --workers 2 --timeout 120 --access-logfile /var/log/archivematica/storage-service/gunicorn.log --error-logfile /var/log/archivematica/storage-service/gunicorn_error.log --log-level error --bind localhost:7500 storage_service.wsgi:application
+WorkingDirectory=/usr/share/archivematica/storage-service/
+ExecStart=/usr/lib/archivematica/storage-service/bin/gunicorn  --workers 2 --timeout 120 --access-logfile /var/log/archivematica/storage-service/gunicorn.log --error-logfile /var/log/archivematica/storage-service/gunicorn_error.log --log-level error --bind localhost:7500 storage_service.wsgi:application
 ExecReload=/bin/kill -s HUP $MAINPID
 ExecStop=/bin/kill -s TERM $MAINPID
 PrivateTmp=true
@@ -81,7 +82,8 @@ WantedBy=multi-user.target
 EOF
 
 %prep
-rm -rf /usr/share/archivematica-storage-service
+rm -rf /usr/share/archivematica
+rm -rf /usr/lib/archivematica
 rm -rf %{_sourcedir}/*
 rm -rf %{buildroot}/*
 mkdir -p %{buildroot}/%{venv_install_dir}
@@ -89,11 +91,6 @@ mkdir -p %{buildroot}/%{venv_install_dir}
 git clone -b qa/0.x --single-branch https://github.com/artefactual/archivematica-storage-service %{_sourcedir}/%{venv_name}
 
 cd %{_sourcedir}/%{venv_name} && git submodule init && git submodule update
-
-## Problems with symbolic links, we remove the link and put the file in place
-#rm storage_service/storage_service/static/js/vendor/base64.js
-#cp storage_service/storage_service/external/base64-helpers/base64-helpers.js storage_service/static/js/vendor/base64.js
-
 
 %clean
 rm -rf %{buildroot}
@@ -134,6 +131,7 @@ mkdir -p /var/archivematica/storage_service
 echo "updating directory permissions"
 chown -R archivematica:archivematica /var/archivematica/storage-service
 chown -R archivematica:archivematica /var/log/archivematica/storage-service
+chown -R archivematica:archivematica /usr/share/archivematica/storage-service
 
 rm -f /tmp/storage_service.log
 
