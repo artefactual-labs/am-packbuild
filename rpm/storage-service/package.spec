@@ -4,7 +4,7 @@
 # Tags
 Name: archivematica-storage-service
 Version: 0.8.0
-Release: 1
+Release: 2
 Summary: Archivematica Storage Service
 Group: Application/System
 License: AGPLv3
@@ -50,6 +50,7 @@ mkdir -p  %{buildroot}/etc/sysconfig/
 cp %{_sourcedir}/%{name}/install/.storage-service  %{buildroot}/etc/sysconfig/archivematica-storage-service
 sed -i '/^alias/d' %{buildroot}/etc/sysconfig/archivematica-storage-service
 sed -i 's/export //g' %{buildroot}/etc/sysconfig/archivematica-storage-service
+sed -i 's%/var/archivematica/storage-service/assets%/usr/share/archivematica/storage-service/assets%g' %{buildroot}/etc/sysconfig/archivematica-storage-service
 echo 'PYTHONPATH=/usr/share/archivematica/storage-service' >> %{buildroot}/etc/sysconfig/archivematica-storage-service
 
 # Create systemd script
