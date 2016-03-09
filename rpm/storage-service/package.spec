@@ -50,6 +50,7 @@ mkdir -p  %{buildroot}/etc/sysconfig/
 cp %{_sourcedir}/%{name}/install/.storage-service  %{buildroot}/etc/sysconfig/archivematica-storage-service
 sed -i '/^alias/d' %{buildroot}/etc/sysconfig/archivematica-storage-service
 sed -i 's/export //g' %{buildroot}/etc/sysconfig/archivematica-storage-service
+echo 'PYTHONPATH=/usr/share/archivematica/storage-service' >> %{buildroot}/etc/sysconfig/archivematica-storage-service
 
 # Create systemd script
 mkdir -p %{buildroot}/usr/lib/systemd/system/
@@ -119,14 +120,9 @@ chown -R archivematica:archivematica /usr/share/archivematica/storage-service
 chmod 750 /var/lib/archivematica/
 chown -R archivematica:archivematica /var/lib/archivematica/
 
-echo "Fix for sword2 python package: create sword2_logging.conf"
-touch /usr/share/archivematica/storage-service/sword2_logging.conf
-chown archivematica:archivematica /usr/share/archivematica/storage-service/sword2_logging.conf
-
-echo "Update selinux policies"
-if [ x$(semanage port -l | grep http_port_t | grep 7500 | wc -l) == x0 ]
-        then
-        semanage port -a -t http_port_t  -p tcp 7500
+echo "Update SELinux policies"
+if [ x$(semanage port -l | grep http_port_t | grep 7500 | wc -l) == x0 ]; then
+  semanage port -a -t http_port_t -p tcp 7500
 fi
 
 rm -f /tmp/storage_service.log
