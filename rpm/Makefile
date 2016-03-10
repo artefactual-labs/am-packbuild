@@ -6,6 +6,7 @@ build:
 	make -C ./siegfried
 	make -C ./storage-service
 	make -C ./storage-service-frontend
+	make -C ./common
 
 createrepo: cleanrepo
 	mkdir -p $(YUM_REPOSITORY) || true
