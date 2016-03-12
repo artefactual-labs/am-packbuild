@@ -1,0 +1,17 @@
+[Unit]
+Description=Archivematica dashboard
+After=syslog.target network.target
+
+[Service]
+PIDFile=/run/archivematica-dashboard_gunicorn.pid
+User=archivematica
+Group=archivematica
+EnvironmentFile=-/etc/sysconfig/archivematica-dashboard
+WorkingDirectory=/usr/share/archivematica/dashboard/
+ExecStart=/usr/lib/python2.7/archivematica/dashboard/bin/gunicorn --workers 2 --timeout 120 --access-logfile /var/log/archivematica/dashboard/gunicorn.log --error-logfile /var/log/archivematica/dashboard/gunicorn_error.log --log-level error --bind localhost:7400 wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

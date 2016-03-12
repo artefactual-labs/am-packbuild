@@ -19,25 +19,61 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.provision "shell", inline: <<-SHELL
+
+    # Configure yum repository
     sudo cp /am-packbuild/rpm-testing/archivematica.repo /etc/yum.repos.d
+
+    # Install packages
     sudo yum --enablerepo=archivematica clean metadata
     sudo yum update -y
-    sudo yum install -y epel-release python-pip
-    sudo yum install -y siegfried archivematica-storage-service archivematica-storage-service-frontend
-    systemctl enable archivematica-storage-service
-    systemctl enable nginx
-    systemctl start archivematica-storage-service
-    systemctl start nginx
+    sudo yum install -y epel-release
+    sudo yum install -y python-pip mariadb-server gearmand java-1.8.0-openjdk-headless
+    sudo yum install -y archivematica-storage-service archivematica-storage-service-frontend archivematica-common archivematica-mcp-client archivematica-mcp-server archivematica-dashboard
+
+    # Enable services
+    sudo systemctl enable mariadb
+    sudo systemctl start mariadb
+    sudo systemctl enable gearmand
+    sudo systemctl start gearmand
+    sudo systemctl enable archivematica-storage-service
+    sudo systemctl enable archivematica-dashboard
+    sudo systemctl enable archivematica-mcp-server
+    sudo systemctl enable archivematica-mcp-client
+    sudo systemctl enable nginx
+
   SHELL
 
   config.vm.provision "shell", inline: <<-SHELL
-    # Not working yet! As archivematica user...
+
+    # YOU HAVE TO DO THIS MANUALLY FOR NOW! :)
+
+    # sudo -i -u archivematica
+
     # export $(cat /etc/sysconfig/archivematica-storage-service)
     # cd /usr/share/archivematica/storage-service
-    # /usr/lib/archivematica/storage-service/bin/python manage.py migrate
-    # /usr/lib/archivematica/storage-service/bin/python manage.py collectstatic --noinput
+    # sudo /usr/lib/archivematica/storage-service/bin/python manage.py migrate
+    # sudo /usr/lib/archivematica/storage-service/bin/python manage.py collectstatic --noinpu
 
+    # mysql -hlocalhost -uroot -e "CREATE DATABASE MCP CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+    # mysql -hlocalhost -uroot -e "CREATE USER 'archivematica'@'localhost' IDENTIFIED BY 'demo';"
+    # mysql -hlocalhost -uroot -e "GRANT ALL ON MCP.* TO 'archivematica'@'localhost';"
+    # mysql -hlocalhost -uroot MCP < /usr/share/archivematica/MCPServer/mysql
+
+    # export $(cat /etc/sysconfig/archivematica-dashboard)
+    # cd /usr/share/archivematica/dashboard
+    # /usr/lib/python2.7/archivematica/dashboard/bin/python manage.py syncdb --noinput
+    # /usr/share/archivematica/MCPServer/mysql_dev .sh MCP
+
+    # exit
+
+    # sudo systemctl start archivematica-mcp-server
+    # sudo systemctl restart archivematica-mcp-client
+    # sudo systemctl start archivematica-dashboard
+    # sudo cp /usr/bin/clamscan /usr/bin/clamdscan
+
+    # Print IP address after provisioning
     ip addr | grep "dynamic eth1"
+
   SHELL
 
 end

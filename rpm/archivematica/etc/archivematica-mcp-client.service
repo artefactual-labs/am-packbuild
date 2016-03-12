@@ -1,0 +1,11 @@
+[Unit]
+Description=Archivematica MCP client
+After=syslog.target network.target
+
+[Service]
+User=archivematica
+EnvironmentFile=-/etc/sysconfig/archivematica-mcp-client
+ExecStart=/usr/lib/python2.7/archivematica/MCPClient/bin/python /usr/lib/archivematica/MCPClient/archivematicaClient.py
+
+[Install]
+WantedBy=multi-user.target
