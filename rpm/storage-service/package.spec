@@ -21,7 +21,7 @@ The Storage Service is the mechanism by which Archivematica is able to store pac
 %files
 /usr/lib/archivematica/storage-service/
 /usr/lib/python2.7/archivematica/storage-service/
-/var/archivematica/storage-service/*
+/var/archivematica/storage_service
 /usr/lib/systemd/system/archivematica-storage-service.service
 %config /etc/sysconfig/archivematica-storage-service
 
@@ -43,6 +43,7 @@ cp -rf /usr/lib/python2.7/archivematica/storage-service/* %{buildroot}/usr/lib/p
 cp -rf %{_sourcedir}/%{name}/storage_service/*  %{buildroot}/usr/lib/archivematica/storage-service
 
 mkdir -p  %{buildroot}/var/archivematica/storage-service/
+mkdir -p  %{buildroot}/var/archivematica/storage_service/
 cp %{_sourcedir}/%{name}/install/make_key.py  %{buildroot}/var/archivematica/storage-service/
 
 mkdir -p  %{buildroot}/etc/sysconfig/
@@ -115,6 +116,8 @@ mkdir -p /var/archivematica/storage_service
 
 echo "Updating directory permissions"
 chown -R archivematica:archivematica /var/archivematica/storage-service
+chown -R archivematica:archivematica /var/archivematica/storage_service
+chmod 770 /var/archivematica/storage_service -R
 chown -R archivematica:archivematica /var/log/archivematica/storage-service
 chown -R archivematica:archivematica /usr/lib/archivematica/storage-service
 chmod 750 /var/lib/archivematica/
