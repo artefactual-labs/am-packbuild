@@ -19,29 +19,28 @@ The Storage Service is the mechanism by which Archivematica is able to store pac
 
 # Blocks
 %files
-/usr/share/archivematica/storage-service/
 /usr/lib/archivematica/storage-service/
-/var/archivematica/*
+/usr/lib/python2.7/archivematica/storage-service/
 /var/archivematica/storage-service/*
 /usr/lib/systemd/system/archivematica-storage-service.service
 %config /etc/sysconfig/archivematica-storage-service
 
 %install
 
-mkdir -p %{buildroot}/usr/share/archivematica/storage-service/
 mkdir -p %{buildroot}/usr/lib/archivematica/storage-service/
+mkdir -p %{buildroot}/usr/lib/python2.7/archivematica/storage-service/
 
 # We build the virtualenv in place, and then move it
 # This avoids problems with the buildpath found inside .so files
-virtualenv /usr/lib/archivematica/storage-service
+virtualenv /usr/lib/python2.7/archivematica/storage-service
 
-/usr/lib/archivematica/storage-service/bin/pip install --upgrade pip
+/usr/lib/python2.7/archivematica/storage-service/bin/pip install --upgrade pip
 
-/usr/lib/archivematica/storage-service/bin/pip install -r %{_sourcedir}/%{name}/requirements/production.txt
+/usr/lib/python2.7/archivematica/storage-service/bin/pip install -r %{_sourcedir}/%{name}/requirements/production.txt
 
-virtualenv --relocatable /usr/lib/archivematica/storage-service/
-cp -rf /usr/lib/archivematica/storage-service/* %{buildroot}/usr/lib/archivematica/storage-service/
-cp -rf %{_sourcedir}/%{name}/storage_service/*  %{buildroot}/usr/share/archivematica/storage-service
+virtualenv --relocatable /usr/lib/python2.7/archivematica/storage-service/
+cp -rf /usr/lib/python2.7/archivematica/storage-service/* %{buildroot}/usr/lib/python2.7/archivematica/storage-service/
+cp -rf %{_sourcedir}/%{name}/storage_service/*  %{buildroot}/usr/lib/archivematica/storage-service
 
 mkdir -p  %{buildroot}/var/archivematica/storage-service/
 cp %{_sourcedir}/%{name}/install/make_key.py  %{buildroot}/var/archivematica/storage-service/
@@ -50,8 +49,8 @@ mkdir -p  %{buildroot}/etc/sysconfig/
 cp %{_sourcedir}/%{name}/install/.storage-service  %{buildroot}/etc/sysconfig/archivematica-storage-service
 sed -i '/^alias/d' %{buildroot}/etc/sysconfig/archivematica-storage-service
 sed -i 's/export //g' %{buildroot}/etc/sysconfig/archivematica-storage-service
-sed -i 's%/var/archivematica/storage-service/assets%/usr/share/archivematica/storage-service/assets%g' %{buildroot}/etc/sysconfig/archivematica-storage-service
-echo 'PYTHONPATH=/usr/share/archivematica/storage-service' >> %{buildroot}/etc/sysconfig/archivematica-storage-service
+sed -i 's%/var/archivematica/storage-service/assets%/usr/lib/archivematica/storage-service/assets%g' %{buildroot}/etc/sysconfig/archivematica-storage-service
+echo 'PYTHONPATH=/usr/lib/archivematica/storage-service' >> %{buildroot}/etc/sysconfig/archivematica-storage-service
 
 # Create systemd script
 mkdir -p %{buildroot}/usr/lib/systemd/system/
@@ -66,8 +65,8 @@ PIDFile=/run/archivematica-storage-service_gunicorn.pid
 User=archivematica
 Group=archivematica
 EnvironmentFile=-/etc/sysconfig/archivematica-storage-service
-WorkingDirectory=/usr/share/archivematica/storage-service/
-ExecStart=/usr/lib/archivematica/storage-service/bin/gunicorn --workers 2 --timeout 120 --access-logfile /var/log/archivematica/storage-service/gunicorn.log --error-logfile /var/log/archivematica/storage-service/gunicorn_error.log --log-level error --bind localhost:7500 storage_service.wsgi:application
+WorkingDirectory=/usr/lib/archivematica/storage-service/
+ExecStart=/usr/lib/python2.7/archivematica/storage-service/bin/gunicorn --workers 2 --timeout 120 --access-logfile /var/log/archivematica/storage-service/gunicorn.log --error-logfile /var/log/archivematica/storage-service/gunicorn_error.log --log-level error --bind localhost:7500 storage_service.wsgi:application
 ExecReload=/bin/kill -s HUP $MAINPID
 ExecStop=/bin/kill -s TERM $MAINPID
 PrivateTmp=true
@@ -77,7 +76,7 @@ WantedBy=multi-user.target
 EOF
 
 %prep
-rm -rf /usr/share/archivematica
+rm -rf /usr/lib/python2.7/archivematica/storage-service
 rm -rf /usr/lib/archivematica
 rm -rf %{_sourcedir}/*
 rm -rf %{buildroot}/*
@@ -117,7 +116,7 @@ mkdir -p /var/archivematica/storage_service
 echo "Updating directory permissions"
 chown -R archivematica:archivematica /var/archivematica/storage-service
 chown -R archivematica:archivematica /var/log/archivematica/storage-service
-chown -R archivematica:archivematica /usr/share/archivematica/storage-service
+chown -R archivematica:archivematica /usr/lib/archivematica/storage-service
 chmod 750 /var/lib/archivematica/
 chown -R archivematica:archivematica /var/lib/archivematica/
 
