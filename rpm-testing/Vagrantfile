@@ -20,56 +20,68 @@ Vagrant.configure(2) do |config|
 
   config.vm.provision "shell", inline: <<-SHELL
 
-    # Configure yum repository
-    sudo cp /am-packbuild/rpm-testing/archivematica.repo /etc/yum.repos.d
+    #
+    # Configure local yum repository
+    #
 
-    # Install packages
-    sudo yum --enablerepo=archivematica clean metadata
-    sudo yum update -y
-    sudo yum install -y epel-release
-    sudo yum install -y python-pip mariadb-server gearmand java-1.8.0-openjdk-headless
-    sudo yum install -y archivematica-storage-service archivematica-storage-service-frontend archivematica-common archivematica-mcp-client archivematica-mcp-server archivematica-dashboard
+    sudo -u root cp /am-packbuild/rpm-testing/archivematica.repo /etc/yum.repos.d
+    sudo -u root yum --enablerepo=archivematica clean metadata
+    sudo -u root yum update -y
+    sudo -u root yum install -y epel-release
 
-    # Enable services
-    sudo systemctl enable mariadb
-    sudo systemctl start mariadb
-    sudo systemctl enable gearmand
-    sudo systemctl start gearmand
-    sudo systemctl enable archivematica-storage-service
-    sudo systemctl enable archivematica-dashboard
-    sudo systemctl enable archivematica-mcp-server
-    sudo systemctl enable archivematica-mcp-client
-    sudo systemctl enable nginx
+    #
+    # Archivematica Storage Service
+    #
 
-  SHELL
+    sudo -u root yum install -y python-pip archivematica-storage-service
 
-  config.vm.provision "shell", inline: <<-SHELL
+    sudo -u archivematica bash -c " \
+      set -a -e -x
+      source /etc/sysconfig/archivematica-storage-service
+      cd /usr/share/archivematica/storage-service
+      /usr/lib/python2.7/archivematica/storage-service/bin/python manage.py migrate
+      /usr/lib/python2.7/archivematica/storage-service/bin/python manage.py collectstatic --noinput
+    ";
 
-    # YOU HAVE TO DO THIS MANUALLY FOR NOW! :)
+    sudo -u root systemctl enable archivematica-storage-service
+    sudo -u root systemctl start archivematica-storage-service
+    sudo -u root systemctl enable nginx
+    sudo -u root systemctl start nginx
 
-    # sudo -i -u archivematica
+    #
+    # Archivematica
+    #
 
-    # export $(cat /etc/sysconfig/archivematica-storage-service)
-    # cd /usr/share/archivematica/storage-service
-    # sudo /usr/lib/archivematica/storage-service/bin/python manage.py migrate
-    # sudo /usr/lib/archivematica/storage-service/bin/python manage.py collectstatic --noinpu
+    sudo -u root yum install -y mariadb-server gearmand java-1.8.0-openjdk-headless
+    sudo -u root yum install -y archivematica-common archivematica-mcp-server archivematica-mcp-client archivematica-dashboard
 
-    # mysql -hlocalhost -uroot -e "CREATE DATABASE MCP CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
-    # mysql -hlocalhost -uroot -e "CREATE USER 'archivematica'@'localhost' IDENTIFIED BY 'demo';"
-    # mysql -hlocalhost -uroot -e "GRANT ALL ON MCP.* TO 'archivematica'@'localhost';"
-    # mysql -hlocalhost -uroot MCP < /usr/share/archivematica/MCPServer/mysql
+    sudo -H -u root mysql -hlocalhost -uroot -e "CREATE DATABASE MCP CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+    sudo -H -u root mysql -hlocalhost -uroot -e "CREATE USER 'archivematica'@'localhost' IDENTIFIED BY 'demo';"
+    sudo -H -u root mysql -hlocalhost -uroot -e "GRANT ALL ON MCP.* TO 'archivematica'@'localhost';"
+    sudo -H -u root mysql -hlocalhost -uroot MCP < /usr/share/archivematica/MCPServer/mysql
 
-    # export $(cat /etc/sysconfig/archivematica-dashboard)
-    # cd /usr/share/archivematica/dashboard
-    # /usr/lib/python2.7/archivematica/dashboard/bin/python manage.py syncdb --noinput
-    # /usr/share/archivematica/MCPServer/mysql_dev .sh MCP
+    sudo -u archivematica bash -c " \
+      set -a -e -x
+      source /etc/sysconfig/archivematica-dashboard
+      cd /usr/share/archivematica/dashboard
+      /usr/lib/python2.7/archivematica/dashboard/bin/python manage.py syncdb --noinput
+      /usr/share/archivematica/MCPServer/mysql_dev.sh MCP
+    ";
 
-    # exit
+    sudo -u root systemctl enable mariadb
+    sudo -u root systemctl start mariadb
+    sudo -u root systemctl enable gearmand
+    sudo -u root systemctl start gearmand
+    sudo -u root systemctl enable archivematica-mcp-server
+    sudo -u root systemctl start archivematica-mcp-server
+    sudo -u root systemctl enable archivematica-mcp-client
+    sudo -u root systemctl start archivematica-mcp-client
+    sudo -u root systemctl enable archivematica-dashboard
+    sudo -u root systemctl start archivematica-dashboard
+    sudo -u root systemctl reload nginx
 
-    # sudo systemctl start archivematica-mcp-server
-    # sudo systemctl restart archivematica-mcp-client
-    # sudo systemctl start archivematica-dashboard
-    # sudo cp /usr/bin/clamscan /usr/bin/clamdscan
+    # TEMPORARY HACK!
+    sudo cp /usr/bin/clamscan /usr/bin/clamdscan
 
     # Print IP address after provisioning
     ip addr | grep "dynamic eth1"
