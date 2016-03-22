@@ -5,7 +5,6 @@ all: build createrepo
 build:
 	make -C ./siegfried
 	make -C ./storage-service
-	make -C ./storage-service-frontend
 	make -C ./archivematica
 
 createrepo: cleanrepo
