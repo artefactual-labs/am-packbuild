@@ -6,6 +6,7 @@ DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
 
 RPMBUILD_ARGS := \
 	--define "_topdir $(RPM_TOPDIR)" \
+	--define "_etcdir $(DOCKER_VOLUME)/etc" \
 	--define "name $(NAME)" \
 	--define "version $(VERSION)"
 
