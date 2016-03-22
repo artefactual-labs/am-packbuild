@@ -40,7 +40,7 @@ Archivematica MCP client.
 
 %package dashboard
 Summary: Archivematica dashboard
-Requires: nginx
+Requires: nginx, policycoreutils-python
 %description dashboard
 Archivematica dashboard with Nginx + gunicorn.
 
@@ -229,11 +229,12 @@ chown -R archivematica:archivematica /var/log/archivematica/MCPClient
 
 # Dashboard
 %post dashboard
-echo "Update SELinux policies"
-if [ x$(semanage port -l | grep http_port_t | grep 7400 | wc -l) == x0 ]; then
-  semanage port -a -t http_port_t -p tcp 7400
-fi
 mkdir -p /var/log/archivematica/dashboard
 touch /var/log/archivematica/dashboard/dashboard.log
 touch /var/log/archivematica/dashboard/dashboard_debug.log
 chown -R archivematica:archivematica /var/log/archivematica/dashboard
+
+# Update SELinux policy
+if [ x$(semanage port -l | grep http_port_t | grep 7400 | wc -l) == x0 ]; then
+  semanage port -a -t http_port_t -p tcp 7400
+fi
