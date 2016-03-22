@@ -3,7 +3,7 @@
 
 Name: archivematica-storage-service
 Version: 0.8.0
-Release: 3
+Release: 4
 Summary: Archivematica Storage Service
 Group: Application/System
 License: AGPLv3
@@ -82,7 +82,7 @@ fi
 mkdir -p /var/log/archivematica/storage-service /var/archivematica/storage-service /var/archivematica/storage_service
 touch /var/log/archivematica/storage-service/storage_service.log
 touch /var/log/archivematica/storage-service/storage_service_debug.log
-chown -R archivematica:archivematica /var/archivematica/storage-service /var/log/archivematica/storage-service /usr/share/archivematica/storage-service /var/lib/archivematica/
+chown -R archivematica:archivematica /var/archivematica/storage_service /var/log/archivematica/storage-service /usr/share/archivematica/storage-service /var/lib/archivematica
 chmod 770 /var/archivematica/storage-service/
 chmod 750 /var/lib/archivematica/
 
