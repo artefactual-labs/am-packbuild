@@ -30,11 +30,28 @@ Vagrant.configure(2) do |config|
     sudo -u root yum install -y epel-release
 
     #
+    # Install OpenJDK 8 and Elasticsearch 1.7
+    #
+
+    sudo -u root rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
+    sudo -u root bash -c 'cat << EOF > /etc/yum.repos.d/elasticsearch.repo
+[elasticsearch-1.7]
+name=Elasticsearch repository for 1.7 packages
+baseurl=https://packages.elastic.co/elasticsearch/1.7/centos
+gpgcheck=1
+gpgkey=https://packages.elastic.co/GPG-KEY-elasticsearch
+enabled=1
+EOF'
+    sudo -u root yum install -y java-1.8.0-openjdk elasticsearch
+    sudo -u root systemctl enable elasticsearch
+    sudo -u root systemctl start elasticsearch
+
+
+    #
     # Archivematica Storage Service
     #
 
     sudo -u root yum install -y python-pip archivematica-storage-service
-
     sudo -u archivematica bash -c " \
       set -a -e -x
       source /etc/sysconfig/archivematica-storage-service
