@@ -6,6 +6,7 @@ build:
 	make -C ./siegfried
 	make -C ./storage-service
 	make -C ./archivematica
+	make -C ./nailgun
 
 createrepo: cleanrepo
 	mkdir -p $(YUM_REPOSITORY) || true
