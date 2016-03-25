@@ -8,6 +8,7 @@ build:
 	make -C ./archivematica
 	make -C ./nailgun
 	make -C ./fits
+	make -C ./bagit
 
 createrepo: cleanrepo
 	mkdir -p $(YUM_REPOSITORY) || true
