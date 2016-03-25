@@ -7,11 +7,11 @@
 
 Name: archivematica
 Version: 1.6.0
-Release: 0.beta.1
+Release: 0.beta.2
 Summary: Archivematica digital preservation system
 Group: Application/System
 License: AGPLv3
-Source0: https://github.com/artefactual/archivematica/
+Source0: https://github.com/artefactual/archivematica
 BuildRequires: git, gcc, openssl-devel, python-virtualenv, python-pip, mariadb-devel, libxslt-devel, python-devel, libffi-devel, openssl-devel
 Requires: archivematica-common
 AutoReq: No
@@ -32,7 +32,7 @@ Archivematica MCP server.
 
 %package mcp-client
 Summary: Archivematica MCP client
-Requires: archivematica-common, sudo, tesseract, p7zip, ImageMagick, ghostscript, perl-Image-ExifTool, inkscape, clamav-server, clamav-data, clamav-update, clamav-filesystem, clamav, clamav-scanner-systemd, clamav-devel, clamav-lib, clamav-server-systemd, siegfried
+Requires: archivematica-common, sudo, tesseract, p7zip, ImageMagick, ghostscript, perl-Image-ExifTool, inkscape, clamav-server, clamav-data, clamav-update, clamav-filesystem, clamav, clamav-scanner-systemd, clamav-devel, clamav-lib, clamav-server-systemd, siegfried, fits
 AutoReq: No
 AutoProv: No
 %description mcp-client
