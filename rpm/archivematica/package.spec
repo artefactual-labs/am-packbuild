@@ -7,7 +7,7 @@
 
 Name: archivematica
 Version: 1.6.0
-Release: 0.beta.4
+Release: 0.beta.5
 Summary: Archivematica digital preservation system
 Group: Application/System
 License: AGPLv3
@@ -32,7 +32,7 @@ Archivematica MCP server.
 
 %package mcp-client
 Summary: Archivematica MCP client
-Requires: archivematica-common, sudo, tesseract, p7zip, ImageMagick, ghostscript, perl-Image-ExifTool, inkscape, clamav-server, clamav-data, clamav-update, clamav-filesystem, clamav, clamav-scanner-systemd, clamav-devel, clamav-lib, clamav-server-systemd, siegfried, fits, bagit, atool
+Requires: archivematica-common, sudo, tesseract, p7zip, ImageMagick, ghostscript, perl-Image-ExifTool, inkscape, clamav-server, clamav-data, clamav-update, clamav-filesystem, clamav, clamav-scanner-systemd, clamav-devel, clamav-lib, clamav-server-systemd, siegfried, fits, bagit, atool, jhove
 AutoReq: No
 AutoProv: No
 %description mcp-client

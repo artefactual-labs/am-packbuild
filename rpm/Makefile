@@ -10,6 +10,7 @@ build:
 	make -C ./fits
 	make -C ./bagit
 	make -C ./atool
+	make -C ./jhove
 
 createrepo: cleanrepo
 	mkdir -p $(YUM_REPOSITORY) || true
