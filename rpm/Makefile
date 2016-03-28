@@ -9,6 +9,7 @@ build:
 	make -C ./nailgun
 	make -C ./fits
 	make -C ./bagit
+	make -C ./atool
 
 createrepo: cleanrepo
 	mkdir -p $(YUM_REPOSITORY) || true
