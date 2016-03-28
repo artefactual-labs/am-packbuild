@@ -32,7 +32,28 @@ Archivematica MCP server.
 
 %package mcp-client
 Summary: Archivematica MCP client
-Requires: archivematica-common, sudo, tesseract, p7zip, ImageMagick, ghostscript, perl-Image-ExifTool, inkscape, clamav-server, clamav-data, clamav-update, clamav-filesystem, clamav, clamav-scanner-systemd, clamav-devel, clamav-lib, clamav-server-systemd, siegfried, fits, bagit, atool, jhove
+Requires: archivematica-common
+Requires: sudo
+Requires: tesseract
+Requires: p7zip
+Requires: ImageMagick
+Requires: ghostscript
+Requires: perl-Image-ExifTool
+Requires: inkscape
+Requires: clamav-server
+Requires: clamav-data
+Requires: clamav-update
+Requires: clamav-filesystem
+Requires: clamav
+Requires: clamav-scanner-systemd
+Requires: clamav-devel
+Requires: clamav-lib
+Requires: clamav-server-systemd
+Requires: siegfried
+Requires: fits
+Requires: bagit
+Requires: atool
+Requires: jhove
 AutoReq: No
 AutoProv: No
 %description mcp-client
