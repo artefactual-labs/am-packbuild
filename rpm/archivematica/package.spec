@@ -49,6 +49,14 @@ Requires: clamav-scanner-systemd
 Requires: clamav-devel
 Requires: clamav-lib
 Requires: clamav-server-systemd
+Requires: fido
+Requires: libvpx
+Requires: libraw1394
+Requires: python-unidecode
+Requires: libpst
+Requires: openjpeg
+Requires: mediainfo
+# Packages from Archivematica repo
 Requires: siegfried
 Requires: fits
 Requires: bagit-java
@@ -60,7 +68,6 @@ Requires: sleuthkit
 Requires: libewf
 # Packages from Nux repo
 Requires: ffmpeg
-Requires: mediainfo
 Requires: ufraw
 
 AutoReq: No
