@@ -30,9 +30,11 @@ Vagrant.configure(2) do |config|
     sudo -u root yum install -y epel-release
 
     #
-    # Install OpenJDK 8, Elasticsearch 1.7, MariaDB and Gearman
+    # Install additional repos
     #
 
+    sudo -u root rpm -Uvh https://forensics.cert.org/cert-forensics-tools-release-el7.rpm
+    sudo -u root rpm -Uvh https://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm
     sudo -u root rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
     sudo -u root bash -c 'cat << EOF > /etc/yum.repos.d/elasticsearch.repo
 [elasticsearch-1.7]
@@ -42,6 +44,12 @@ gpgcheck=1
 gpgkey=https://packages.elastic.co/GPG-KEY-elasticsearch
 enabled=1
 EOF'
+
+
+    #
+    # Install OpenJDK 8, Elasticsearch 1.7, MariaDB and Gearman
+    #
+
     sudo -u root yum install -y java-1.8.0-openjdk-headless elasticsearch mariadb-server gearmand
     sudo -u root systemctl enable elasticsearch
     sudo -u root systemctl start elasticsearch

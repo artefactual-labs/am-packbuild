@@ -51,9 +51,18 @@ Requires: clamav-lib
 Requires: clamav-server-systemd
 Requires: siegfried
 Requires: fits
-Requires: bagit
+Requires: bagit-java
 Requires: atool
 Requires: jhove
+# Packages from https://forensics.cert.org/
+Requires: bulk_extractor
+Requires: sleuthkit
+Requires: libewf
+# Packages from Nux repo
+Requires: ffmpeg
+Requires: mediainfo
+Requires: ufraw
+
 AutoReq: No
 AutoProv: No
 %description mcp-client
