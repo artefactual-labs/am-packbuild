@@ -101,10 +101,13 @@ EOF'
     sudo -u root systemctl start archivematica-mcp-client
     sudo -u root systemctl enable archivematica-dashboard
     sudo -u root systemctl start archivematica-dashboard
+    sudo -u root systemctl enable fits-nailgun
+    sudo -u root systemctl start fits-nailgun
     sudo -u root systemctl reload nginx
 
     # TEMPORARY HACK!
     sudo cp /usr/bin/clamscan /usr/bin/clamdscan
+    sudo ln -s /usr/bin/7za /usr/bin/7z
 
     # Print IP address after provisioning
     ip addr | grep "dynamic eth1"
