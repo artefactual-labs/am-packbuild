@@ -1,9 +1,9 @@
-Name:    %{name}
+Name: %{name}
 Version: %{version}
 Release: 1%{?dist}
 Summary: Siegfried is a signature-based file format identification tool.
-URL:     http://www.itforarchivists.com/siegfried
-Group:   Application/SystemTools
+URL: http://www.itforarchivists.com/siegfried
+Group: Application/SystemTools
 License: Apache License, Version 2.0
 Source0: %{name}-%{version}.tar.gz
 
