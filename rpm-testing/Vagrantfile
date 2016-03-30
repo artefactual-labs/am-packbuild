@@ -1,6 +1,17 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+#
+# Environment variables
+#
+
+repofile = ENV.fetch('REPOSITORY_CONFIG_FILE', 'archivematica-official.repo')
+
+
+#
+# Vagrant configuration
+#
+
 Vagrant.configure(2) do |config|
 
   config.vm.box = "centos/7"
@@ -24,8 +35,8 @@ Vagrant.configure(2) do |config|
     # Configure local yum repository
     #
 
-    sudo -u root cp /am-packbuild/rpm-testing/archivematica.repo /etc/yum.repos.d
-    sudo -u root yum --enablerepo=archivematica clean metadata
+    sudo -u root rm -f /etc/yum.repos.d/archivematica-*.repo
+    sudo -u root cp /am-packbuild/rpm-testing/#{repofile} /etc/yum.repos.d
     sudo -u root yum update -y
     sudo -u root yum install -y epel-release
 

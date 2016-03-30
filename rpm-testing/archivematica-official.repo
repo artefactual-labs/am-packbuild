@@ -1,0 +1,5 @@
+[archivematica]
+name=archivematica
+baseurl=https://packages.archivematica.org/1.x/centos
+gpgcheck=0
+enabled=1

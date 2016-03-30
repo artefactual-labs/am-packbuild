@@ -1,9 +1,21 @@
 This Vagrant environment is based on the official CentOS 7 Vagrant box
-`centos/7` which does not include the VirtualBox Guest Additions yet. While the
-figure that out we are using the `rsync` mechanism provided by Vagrant to share
-files with the virtual machine and giving it network access via
-`public_network`.
+`centos/7` which does not include the VirtualBox Guest Additions yet. We will
+be using `rsync` file sharing and `public_network` connectivity for now.
 
-The default behavior is to use the yum repo created in the `../rpm` directory
-which needs to be previously built. This is set up inside the `Vagrantfile`
-under the provisioning area. Alternatively, you can make use of our [public yum repository](https://docs.google.com/document/d/14VvpaMq0687BKqZnTUZC6ozHUXEFGMP1o0DXc59eosg/edit).
+You can provision the Vagrant box using the local yum repository in `../rpm`
+that needs to be previously built or our official repository.
+
+### Instructions
+
+Provision the Vagrant box using our official repository:
+
+```
+$ vagrant up
+```
+
+Alternatively, provision the box using the local repository (`../rpm`), which
+needs to be previously built:
+
+```
+$ REPOSITORY_CONFIG_FILE="archivematica-local.repo" vagrant up
+```
