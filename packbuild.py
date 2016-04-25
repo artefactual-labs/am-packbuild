@@ -107,6 +107,7 @@ def main():
             # dict: distribution -> numeric version
             distronum_dic = { "precise":"12.04",
                               "trusty":"14.04",
+                              "xenial":"16.04"
                             }
 
 
@@ -212,15 +213,9 @@ def main():
             #     run_subprocess(command_string, cwd=repo_dir)
 
             logging.info("Copying files to lib")
-            src_dir = os.path.join(os.path.dirname(__file__), "files", "ss-lib")
-            dst_dir = os.path.join(repo_dir, "lib")
-            logging.info("src_dir: %s", src_dir)
-            logging.info("dst_dir: %s", dst_dir)
-            filelist = glob.glob(os.path.join(src_dir, '*.*'))
-            logging.info("filelist: %s", filelist)
-            for file in filelist:
-                shutil.copy2(file, dst_dir)
-
+            #requires pip >= 8
+            command_string = "pip download -d lib --no-binary all -r requirements.txt"
+            run_subprocess(command_string, cwd=repo_dir)
 
             #check the latest commit
             command_string = 'git rev-parse HEAD'
@@ -243,6 +238,7 @@ def main():
             # dict: distribution -> numeric version
             distronum_dic = { "precise":"12.04",
                               "trusty":"14.04",
+                              "xenial":"16.04"
                             }
 
             # lines for the changelog
