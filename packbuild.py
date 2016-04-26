@@ -150,7 +150,7 @@ def main():
                     run_subprocess(command_string, cwd=package_dir)
 
                     # dput
-                    if args.dput:
+                    if args.ppa:
                         dput_dir = os.path.join(repo_dir, "src")
                         dput_filename = "{0}_{1}~{2}_source.changes".format(p, package_ver_string_noepoch, distronum_dic[d])
                         command_string = 'dput ppa:{0} {1}'.format(args.ppa, dput_filename)
