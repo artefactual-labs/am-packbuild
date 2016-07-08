@@ -1,7 +1,7 @@
 FROM centos:7
 
 # Environmnet variables needed during build
-ENV GOVERSION 1.6
+ENV GOVERSION 1.7.5
 ENV GOOS linux
 ENV GOARCH amd64
 
