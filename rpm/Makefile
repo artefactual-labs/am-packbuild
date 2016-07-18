@@ -11,6 +11,9 @@ build:
 	make -C ./bagit
 	make -C ./atool
 	make -C ./jhove
+	make -C ./six
+	make -C ./olefile
+	make -C ./fido
 
 createrepo: cleanrepo
 	mkdir -p $(YUM_REPOSITORY) || true
