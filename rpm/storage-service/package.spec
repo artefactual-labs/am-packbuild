@@ -94,7 +94,15 @@ if [ x$(semanage port -l | grep http_port_t | grep 8001 | wc -l) == x0 ]; then
   semanage port -a -t http_port_t -p tcp 8001
 fi
 
-# Create Django secret key
-KEYCMD=$(python /var/archivematica/storage-service/make_key.py 2>&1)
-echo $KEYCMD
-sed -i "s/<replace-with-key>/\"$KEYCMD\"/g" /etc/sysconfig/archivematica-storage-service
+if $(grep replace-with-key /etc/sysconfig/archivematica-storage-service > /dev/null )
+then
+  # First install, create Django secret key
+  KEYCMD=$(python /var/archivematica/storage-service/make_key.py 2>&1)
+  echo $KEYCMD
+  sed -i "s/<replace-with-key>/\"$KEYCMD\"/g" /etc/sysconfig/archivematica-storage-service
+else
+  # Storage-service is installed, backfill api keys just in case
+  export $(cat /etc/sysconfig/archivematica-storage-service)
+  cd /usr/share/archivematica/storage-service && \
+   /usr/lib/python2.7/archivematica/storage-service/bin/python manage.py backfill_api_keys
+fi
