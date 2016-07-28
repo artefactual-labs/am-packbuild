@@ -2,8 +2,8 @@
 
 
 Name: archivematica-storage-service
-Version: 0.8.0
-Release: 1
+Version: %{rpmversion}
+Release: %{rpmrelease}
 Summary: Archivematica Storage Service
 Group: Application/System
 License: AGPLv3
@@ -35,7 +35,7 @@ mkdir -p %{buildroot}/%{install_dir}
 
 git clone \
   --quiet \
-  --branch stable/0.8.x \
+  --branch %{branch} \
   --depth 1 \
   --single-branch \
   --recurse-submodules \
