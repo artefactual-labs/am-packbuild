@@ -6,8 +6,8 @@
 #
 
 Name: archivematica
-Version: 1.5.0
-Release: 0
+Version: %{rpmversion}
+Release: %{rpmrelease}
 Summary: Archivematica digital preservation system
 Group: Application/System
 License: AGPLv3
@@ -135,7 +135,7 @@ mkdir -p %{buildroot}/%{install_dir}
 
 git clone \
   --quiet \
-  --branch dev/rpm-packaging \
+  --branch %{branch} \
   --depth 1 \
   --single-branch \
   --recurse-submodules \
