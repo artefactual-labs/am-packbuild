@@ -40,7 +40,7 @@ def main():
     parser.add_argument("-r", "--repository", help="repository (am or ss)", required=True, choices=['am','ss'])
     parser.add_argument("-v", "--version", help="current version", required=True)
     parser.add_argument("-c", "--checkout", help="branch/commit/tag to checkout", required=True)
-    parser.add_argument("-p", "--ppa", help="ppa to upload", required=True)
+    parser.add_argument("-p", "--ppa", help="ppa to upload", required=False)
     parser.add_argument("-k", "--key", help="key for package signing", required=True)
     parser.add_argument("-b", "--build", help="build number. If this option is present, will build a release package")
 
@@ -107,6 +107,7 @@ def main():
             # dict: distribution -> numeric version
             distronum_dic = { "precise":"12.04",
                               "trusty":"14.04",
+                              "xenial":"16.04"
                             }
 
 
@@ -149,10 +150,15 @@ def main():
                     run_subprocess(command_string, cwd=package_dir)
 
                     # dput
-                    dput_dir = os.path.join(repo_dir, "src")
-                    dput_filename = "{0}_{1}~{2}_source.changes".format(p, package_ver_string_noepoch, distronum_dic[d])
-                    command_string = 'dput ppa:{0} {1}'.format(args.ppa, dput_filename)
-                    run_subprocess(command_string, cwd=dput_dir)
+                    if args.ppa:
+                        dput_dir = os.path.join(repo_dir, "src")
+                        dput_filename = "{0}_{1}~{2}_source.changes".format(p, package_ver_string_noepoch, distronum_dic[d])
+                        command_string = 'dput ppa:{0} {1}'.format(args.ppa, dput_filename)
+                        run_subprocess(command_string, cwd=dput_dir)
+                    else:
+                        command_string = 'debuild --no-tgz-check -b -k{0} -I'.format(args.key)
+                        run_subprocess(command_string, cwd=package_dir)
+
 
 
 
@@ -212,15 +218,9 @@ def main():
             #     run_subprocess(command_string, cwd=repo_dir)
 
             logging.info("Copying files to lib")
-            src_dir = os.path.join(os.path.dirname(__file__), "files", "ss-lib")
-            dst_dir = os.path.join(repo_dir, "lib")
-            logging.info("src_dir: %s", src_dir)
-            logging.info("dst_dir: %s", dst_dir)
-            filelist = glob.glob(os.path.join(src_dir, '*.*'))
-            logging.info("filelist: %s", filelist)
-            for file in filelist:
-                shutil.copy2(file, dst_dir)
-
+            #requires pip >= 8
+            command_string = "pip download -d lib --no-binary all -r requirements.txt"
+            run_subprocess(command_string, cwd=repo_dir)
 
             #check the latest commit
             command_string = 'git rev-parse HEAD'
@@ -243,6 +243,7 @@ def main():
             # dict: distribution -> numeric version
             distronum_dic = { "precise":"12.04",
                               "trusty":"14.04",
+                              "xenial":"16.04"
                             }
 
             # lines for the changelog
@@ -281,10 +282,16 @@ def main():
                 run_subprocess(command_string, cwd=repo_dir)
 
                 # dput
-                dput_dir = working_dir
-                dput_filename = "{0}_{1}~{2}_source.changes".format(p, package_ver_string_noepoch, distronum_dic[d])
-                command_string = 'dput ppa:{0} {1}'.format(args.ppa, dput_filename)
-                run_subprocess(command_string, cwd=dput_dir)
+                if args.ppa:
+                    dput_dir = working_dir
+                    dput_filename = "{0}_{1}~{2}_source.changes".format(p, package_ver_string_noepoch, distronum_dic[d])
+                    command_string = 'dput ppa:{0} {1}'.format(args.ppa, dput_filename)
+                    run_subprocess(command_string, cwd=dput_dir)
+                else:
+                    command_string = 'debuild --no-tgz-check -b -k{0} -I'.format(args.key)
+                    run_subprocess(command_string, cwd=repo_dir)
+
+
 
 
 
