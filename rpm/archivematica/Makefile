@@ -1,5 +1,7 @@
 NAME          = archivematica
 VERSION       = 1.5.0
+RELEASE       = rc0
+BRANCH        = qa/1.x
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
@@ -8,7 +10,9 @@ RPMBUILD_ARGS := \
 	--define "_topdir $(RPM_TOPDIR)" \
 	--define "_etcdir $(DOCKER_VOLUME)/etc" \
 	--define "name $(NAME)" \
-	--define "version $(VERSION)"
+	--define "rpmversion $(VERSION)" \
+	--define "rpmrelease $(RELEASE)" \
+	--define "branch $(BRANCH)"
 
 .PHONY: build-docker-image build rpm-build rpm-clean rpm-test
 
