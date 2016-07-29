@@ -22,7 +22,8 @@ Vagrant.configure(2) do |config|
   config.vm.network "public_network"
 
   # VirtualBox Guest Additions not installed in "centos/7" box, using rsync for now!
-  config.vm.synced_folder "../", "/am-packbuild", type: "rsync", rsync__enclude: ".git/"
+  config.vm.synced_folder "../rpm/_yum_repository", "/am-packbuild/_yum_repository", type: "rsync", rsync__enclude: ".git/"
+  config.vm.synced_folder "./", "/am-packbuild/rpm-testing", type: "rsync", rsync__enclude: ".git/"
   config.vm.synced_folder ".", "/home/vagrant/sync", disabled: true
 
   config.vm.provider "virtualbox" do |vb|
