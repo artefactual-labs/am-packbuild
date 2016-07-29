@@ -1,5 +1,10 @@
 [archivematica]
 name=archivematica
-baseurl=https://packages.archivematica.org/1.x/centos
+baseurl=https://packages.archivematica.org/1.5.x/centos
+gpgcheck=0
+enabled=1
+[archivematica-extras]
+name=archivematica
+baseurl=https://packages.archivematica.org/1.5.x/centos-extras
 gpgcheck=0
 enabled=1
