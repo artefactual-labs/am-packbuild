@@ -51,5 +51,12 @@ RUN git clone https://github.com/artefactual/archivematica-sampledata /home/arch
 ADD supervisord/* /etc/supervisor/conf.d/
 ADD run.sh /
 RUN chmod 755 /run.sh
+RUN apt-get install -y git python-virtualenv && \
+	git clone https://github.com/artefactual/automation-tools /usr/lib/archivematica/automation-tools 
+RUN        virtualenv /usr/share/python/automation-tools 
+RUN /bin/bash -c "cd /usr/lib/archivematica/automation-tools/ && \
+	source /usr/share/python/automation-tools/bin/activate && \
+        pip install -r requirements.txt "
+
+
 #ENTRYPOINT "/run.sh"
-#RUN freshclam
