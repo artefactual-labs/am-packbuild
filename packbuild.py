@@ -171,7 +171,7 @@ def main():
     elif args.repository == "ss":
         try:        
             #git clone 
-            command_string = 'git clone git@git.artefactual.com:archivematica-storage-service.git'
+            command_string = 'git clone https://github.com/artefactual/archivematica-storage-service'
             run_subprocess(command_string, cwd=working_dir)
 
             #git checkout
