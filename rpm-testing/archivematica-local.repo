@@ -1,5 +1,5 @@
 [archivematica]
 name=archivematica
-baseurl=file:///am-packbuild/rpm/_yum_repository/
+baseurl=file:///am-packbuild/_yum_repository/
 enabled=1
 gpgcheck=0

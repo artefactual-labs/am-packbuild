@@ -1,7 +1,6 @@
-NAME          = archivematica
-VERSION       = 1.5.0
-RELEASE       = rc0
-BRANCH        = qa/1.x
+NAME          = olefile
+VERSION       = 0.43
+RELEASE	      = 1
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
@@ -10,9 +9,7 @@ RPMBUILD_ARGS := \
 	--define "_topdir $(RPM_TOPDIR)" \
 	--define "_etcdir $(DOCKER_VOLUME)/etc" \
 	--define "name $(NAME)" \
-	--define "rpmversion $(VERSION)" \
-	--define "rpmrelease $(RELEASE)" \
-	--define "branch $(BRANCH)"
+	--define "version $(VERSION)"
 
 .PHONY: build-docker-image build rpm-build rpm-clean rpm-test
 
@@ -28,14 +25,15 @@ build:
 
 rpm-build: rpm-clean
 	@echo "==> Preparing environment for rpmbuild."
-	mkdir -p $(RPM_TOPDIR)
+	mkdir -p $(RPM_TOPDIR)/SOURCES
 	cp $(DOCKER_VOLUME)/package.spec $(RPM_TOPDIR)/package.spec
+	wget -O $(RPM_TOPDIR)/SOURCES/$(NAME)-$(VERSION).tar.gz https://bitbucket.org/decalage/olefileio_pl/downloads/$(NAME)-$(VERSION).tar.gz
 	yum-builddep -y $(RPM_TOPDIR)/package.spec
 	rpmbuild $(RPMBUILD_ARGS) -ba --clean $(RPM_TOPDIR)/package.spec
 
 	@echo "==> Copying RPM files."
-	cp -p $(RPM_TOPDIR)/RPMS/x86_64/$(NAME)-*.x86_64.rpm $(DOCKER_VOLUME)
-	cp -p $(RPM_TOPDIR)/SRPMS/$(NAME)-*.src.rpm $(DOCKER_VOLUME)
+	cp -p $(RPM_TOPDIR)/RPMS/noarch/python-$(NAME)-*.noarch.rpm $(DOCKER_VOLUME)
+	cp -p $(RPM_TOPDIR)/SRPMS/python-$(NAME)-*.src.rpm $(DOCKER_VOLUME)
 
 rpm-clean:
 	@echo "==> Cleaning up previous RPMs builds."
