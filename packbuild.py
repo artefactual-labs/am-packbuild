@@ -219,7 +219,7 @@ def main():
 
             logging.info("Copying files to lib")
             #requires pip >= 8
-            command_string = "pip download -d lib --no-binary all -r requirements.txt"
+            command_string = "pip download -d lib --no-binary :all: -r requirements.txt"
             run_subprocess(command_string, cwd=repo_dir)
 
             #check the latest commit
