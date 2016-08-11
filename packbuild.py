@@ -146,7 +146,7 @@ def main():
                     f.close()
 
                     # debuild
-                    command_string = 'debuild --no-tgz-check -S -k{0} -I'.format(args.key)
+                    command_string = 'echo debuild --no-tgz-check -S -k{0} -I'.format(args.key)
                     run_subprocess(command_string, cwd=package_dir)
 
                     # dput
@@ -156,7 +156,7 @@ def main():
                         command_string = 'dput ppa:{0} {1}'.format(args.ppa, dput_filename)
                         run_subprocess(command_string, cwd=dput_dir)
                     else:
-                        command_string = 'debuild --no-tgz-check -b -k{0} -I'.format(args.key)
+                        command_string = 'echo debuild --no-tgz-check -b -k{0} -I'.format(args.key)
                         run_subprocess(command_string, cwd=package_dir)
 
 
@@ -278,7 +278,7 @@ def main():
                 f.close()
 
                 # debuild
-                command_string = 'debuild --no-tgz-check -S -k{0} -I'.format(args.key)
+                command_string = 'echo debuild --no-tgz-check -S -k{0} -I'.format(args.key)
                 run_subprocess(command_string, cwd=repo_dir)
 
                 # dput
@@ -288,7 +288,7 @@ def main():
                     command_string = 'dput ppa:{0} {1}'.format(args.ppa, dput_filename)
                     run_subprocess(command_string, cwd=dput_dir)
                 else:
-                    command_string = 'debuild --no-tgz-check -b -k{0} -I'.format(args.key)
+                    command_string = 'echo debuild --no-tgz-check -b -k{0} -I'.format(args.key)
                     run_subprocess(command_string, cwd=repo_dir)
 
 
