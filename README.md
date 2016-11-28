@@ -12,6 +12,8 @@ For release package (include -b flag):
 
     ./packbuild.py -r ss -v 0.6.1 -c stable/0.6.x -p archivematica/packbuild-test -k 7F0699A0 -b 1
 
+If the -p option is not present, the binary packages will be built locally.
+
 ### RPM
 
 The `rpm/` directory contains the files that we use to build our RPM packages.
