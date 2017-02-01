@@ -110,7 +110,7 @@ Archivematica dashboard with Nginx + gunicorn.
 /usr/lib/archivematica/MCPClient/
 /usr/lib/systemd/system/archivematica-mcp-client.service
 %config /etc/sysconfig/archivematica-mcp-client
-%config /etc/archivematica/MCPClient/archivematicaClientModules
+#%config /etc/archivematica/MCPClient/archivematicaClientModules
 %config /etc/archivematica/MCPClient/clientConfig.conf
 
 # Dashboard
@@ -195,7 +195,7 @@ virtualenv --relocatable /usr/lib/python2.7/archivematica/MCPClient
 cp -rf /usr/lib/python2.7/archivematica/MCPClient/* %{buildroot}/usr/lib/python2.7/archivematica/MCPClient/
 
 cp -rf %{_sourcedir}/%{name}/src/MCPClient/lib/* %{buildroot}/usr/lib/archivematica/MCPClient
-cp %{_sourcedir}/%{name}/src/MCPClient/etc/archivematicaClientModules %{buildroot}/etc/archivematica/MCPClient/
+#cp %{_sourcedir}/%{name}/src/MCPClient/etc/archivematicaClientModules %{buildroot}/etc/archivematica/MCPClient/
 cp %{_sourcedir}/%{name}/src/MCPClient/etc/clientConfig.conf %{buildroot}/etc/archivematica/MCPClient/
 cp %{_etcdir}/archivematica-mcp-client.service %{buildroot}/usr/lib/systemd/system/archivematica-mcp-client.service
 cp %{_etcdir}/archivematica-mcp-client.env %{buildroot}/etc/sysconfig/archivematica-mcp-client
