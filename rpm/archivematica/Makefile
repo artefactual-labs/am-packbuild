@@ -1,7 +1,7 @@
 NAME          = archivematica
-VERSION       = 1.5.0
-RELEASE       = rc0
-BRANCH        = qa/1.x
+VERSION       = 1.6.0
+RELEASE       = rc2
+BRANCH        = v1.6.0-rc2
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
