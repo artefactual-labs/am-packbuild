@@ -1,6 +1,6 @@
 NAME          = fido
-VERSION       = 1.3.4
-RELEASE	      = 84
+VERSION       = 1.3.5
+RELEASE	      = 88
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
@@ -8,8 +8,8 @@ DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
 RPMBUILD_ARGS := \
 	--define "_topdir $(RPM_TOPDIR)" \
 	--define "_etcdir $(DOCKER_VOLUME)/etc" \
-	--define "name $(NAME)" \
-	--define "version $(VERSION)"
+	--define "rpmversion $(VERSION)" \
+	--define "rpmrelease $(RELEASE)" 
 
 .PHONY: build-docker-image build rpm-build rpm-clean rpm-test
 
@@ -27,7 +27,7 @@ rpm-build: rpm-clean
 	@echo "==> Preparing environment for rpmbuild."
 	mkdir -p $(RPM_TOPDIR)/SOURCES
 	cp $(DOCKER_VOLUME)/package.spec $(RPM_TOPDIR)/package.spec
-	wget -O $(RPM_TOPDIR)/SOURCES/fido-$(VERSION)-$(RELEASE).tar.gz https://github.com/openpreserve/fido/archive/$(VERSION)-$(RELEASE).tar.gz
+	wget -O $(RPM_TOPDIR)/SOURCES/fido-$(VERSION)-$(RELEASE).tar.gz https://github.com/openpreserve/fido/archive/v$(VERSION)-$(RELEASE).tar.gz
 	yum-builddep -y $(RPM_TOPDIR)/package.spec
 	rpmbuild $(RPMBUILD_ARGS) -ba --clean $(RPM_TOPDIR)/package.spec
 
