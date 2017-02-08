@@ -27,8 +27,11 @@ rm -rf $RPM_BUILD_ROOT
 %files
 /usr/bin/roy
 /usr/bin/sf
+/usr/share/siegfried/
 
-# Needed so sf can update the signature file.
-# Ideally, should the signature be saved somewhere else?
-%defattr(0644, 1000, 1000, 0755)
-/usr/share/siegfried
+%post
+userID=`id -u archivematica 2>/dev/null`
+if [ "${userID}" != 333 ]; then
+  useradd --uid 333 --user-group --home /var/lib/archivematica archivematica
+fi
+chown -R archivematica:archivematica /usr/share/siegfried

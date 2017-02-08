@@ -1,5 +1,5 @@
 NAME          = siegfried
-VERSION       = 1.5.0
+VERSION       = 1.6.7
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
@@ -27,7 +27,7 @@ rpm-build: rpm-clean
 	cd /go/src/github.com/richardlehane/siegfried && git checkout v$(VERSION)
 
 	@echo "==> Building sources."
-	go install -tags archivematica -v github.com/richardlehane/siegfried/...
+	go install -tags archivematica -v github.com/richardlehane/siegfried/cmd/...
 
 	@echo "==> Preparing environment for rpmbuild."
 	mkdir -p $(RPM_TOPDIR)/{BUILD,RPMS,SRPMS}
