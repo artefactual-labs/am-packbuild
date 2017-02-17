@@ -1,13 +1,13 @@
 NAME          = am-packbuild
-AM_BRANCH     = dev/update-1.6-dependencies
+AM_BRANCH     = v1.6.0-rc3
 AM_VERSION     = 1.6.0
-RELEASE	      = 2
+RELEASE	      = rc3
 GIT_URL	      = https://github.com/artefactual-labs/am-packbuild
-GIT_BRANCH    = dev/packaging-1.6
+GIT_BRANCH    = dev/packaging-1.6-docker
 DEB_TOPDIR    = "/debbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "debbuild-$(NAME)-$(AM_VERSION)"
-
+GPG_ID	      = 0F4A4D31
 .PHONY: build-docker-image build deb-build deb-clean deb-test update-changelog
 
 all: build-docker-image build
@@ -23,7 +23,7 @@ build:
 deb-build: deb-clean
 	@echo "==> Install dependencies."
 	#cd /debbuild/$(NAME) && find . -iname control 
-	cd /debbuild/$(NAME) && ./packbuild.py -r am -v $(AM_VERSION) -c $(AM_BRANCH) -k0F4A4D31
+	cd /debbuild/$(NAME) && ./packbuild.py -r am -v $(AM_VERSION) -c $(AM_BRANCH) -b $(RELEASE) -k$(GPG_ID)
 	@echo "==> Build package."
 	#cd /debbuild/$(NAME) && dpkg-buildpackage -us -uc -k
 	@echo "==> Copying RPM files."
