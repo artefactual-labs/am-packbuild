@@ -15,7 +15,6 @@ RUN mkdir -p /debbuild/ && cd /debbuild && \
 	cd $PACKAGE && \
 	git checkout $GIT_BRANCH
 
-ADD debian /debbuild/$PACKAGE/debian
 ADD GPG-KEYS-REPOS /root/key.gpg
 RUN gpg --import /root/key.gpg
 
