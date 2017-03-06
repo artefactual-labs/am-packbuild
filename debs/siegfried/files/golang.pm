@@ -160,7 +160,7 @@ sub build {
     if (exists($ENV{DH_GOLANG_GO_GENERATE}) && $ENV{DH_GOLANG_GO_GENERATE} == 1) {
         $this->doit_in_builddir("go", "generate", "-v", @_, get_targets());
     }
-    $this->doit_in_builddir("go", "install", "-v", @_, get_targets());
+    $this->doit_in_builddir("go", "install", "-v","-tags","archivematica", @_, get_targets());
 }
 
 sub test {

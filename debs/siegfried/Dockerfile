@@ -19,6 +19,9 @@ RUN mkdir -p /debbuild/ && cd /debbuild && \
 
 ADD debian /debbuild/siegfried/debian
 
+ADD GPG-KEYS-REPOS /root/key.gpg
+RUN gpg --import /root/key.gpg
+
 # Install build dependencies
 ENV GOPATH /usr/share/go-1.6/
 RUN go get -u -v golang.org/x/tools/go/loader
