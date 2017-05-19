@@ -27,7 +27,7 @@ rpm-build: rpm-clean
 	mkdir -p $(RPM_TOPDIR)
 	cp $(DOCKER_VOLUME)/package.spec $(RPM_TOPDIR)/package.spec
 	mkdir -p $(RPM_TOPDIR)/SOURCES/
-	wget -O  $(RPM_TOPDIR)/SOURCES/v$(VERSION).zip https://github.com/harvard-lts/fits/archive/$(VERSION).zip
+	wget -q -O  $(RPM_TOPDIR)/SOURCES/v$(VERSION).zip https://github.com/harvard-lts/fits/archive/$(VERSION).zip
 	cp files/* $(RPM_TOPDIR)/SOURCES/
 	rpmbuild $(RPMBUILD_ARGS) -ba --clean $(RPM_TOPDIR)/package.spec
 

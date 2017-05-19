@@ -1,11 +1,12 @@
 Name: %{name}
 Version: %{version}
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: File Information Tool Set (FITS)
 Buildrequires: ant, gcc
 Source: https://github.com/harvard-lts/fits/archive/v%{version}.zip
 Patch: fits-home.patch
 Patch1: fits-log4j.patch
+Patch2: fits-enable-toolOutput.patch
 Requires: mediainfo, libzen, perl-Image-ExifTool, nailgun
 License: GPLv3
 
@@ -27,10 +28,10 @@ rm -rf %{buildroot}/*
 %setup
 %patch
 %patch1
+%patch2
 
 
 %install
-bash -i
 ANT_OPTS=-Dfile.encoding=UTF8 ant clean-compile-jar
 mkdir -p \
 	%{buildroot}/usr/bin/ \
