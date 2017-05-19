@@ -3,11 +3,15 @@ Version: %{version}
 Release: 2%{?dist}
 Summary: File Information Tool Set (FITS)
 Buildrequires: ant, gcc
+BuildRequires: systemd-devel
 Source: https://github.com/harvard-lts/fits/archive/v%{version}.zip
 Patch: fits-home.patch
 Patch1: fits-log4j.patch
 Patch2: fits-enable-toolOutput.patch
 Requires: mediainfo, libzen, perl-Image-ExifTool, nailgun
+Requires(preun): systemd-units
+Requires(postun): systemd-units
+Requires(post): systemd-units
 License: GPLv3
 
 
@@ -52,3 +56,11 @@ cp -rf tools/droid  %{buildroot}/usr/share/fits/tools/
 %post
 touch /var/log/archivematica/fits.log
 chown archivematica.archivematica /var/log/archivematica/fits.log
+%systemd_post fits-nailgun.service
+
+%preun
+%systemd_preun fits-nailgun.service
+
+%postun
+%systemd_postun_with_restart fits-nailgun.service
+
