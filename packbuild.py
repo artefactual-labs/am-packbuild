@@ -86,15 +86,19 @@ def main():
             # need to convert output from byte to string
             commit_hash_str = commit_hash.decode("utf-8").strip()
 
+            command_string = 'debuild --no-tgz-check -I '
+            if args.key:
+                command_string = command_string + '-k{0}'.format(args.key) 
+            else:
+                command_string = command_string + '-us -uc'
+
             # package version string
             if args.build:
                 package_ver_string = "1:{0}-{1}".format(args.version, args.build)
                 package_ver_string_noepoch = "{0}-{1}".format(args.version, args.build)
-                command_string = 'debuild --no-tgz-check -S -k{0} -I'.format(args.key)
             else:
                 package_ver_string = "1:{0}+1SNAPSHOT{1}-{2}-{3}".format(args.version, utctime, commit_hash_str[:6], checkout_alphanum)
                 package_ver_string_noepoch = "{0}+1SNAPSHOT{1}-{2}-{3}".format(args.version, utctime, commit_hash_str[:6], checkout_alphanum)
-                command_string = 'debuild --no-tgz-check -S -us -uc -I'.format(args.key)
             logging.info("package version: %s", package_ver_string)
 
             # dict: package_name -> directory
@@ -262,7 +266,7 @@ def main():
                 f.close()
 
                 # debuild
-                command_string = 'echo debuild --no-tgz-check -S -k{0} -I'.format(args.key)
+                command_string = 'echo debuild --no-tgz-check -k{0} -I'.format(args.key)
                 run_subprocess(command_string, cwd=repo_dir)
 
                 # dput

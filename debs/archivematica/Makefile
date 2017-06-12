@@ -1,30 +1,42 @@
 NAME          = am-packbuild
-AM_BRANCH     ?= stable/1.6.x
-AM_VERSION     ?= 1.6.0
-RELEASE	      ?= 1
-GIT_URL	      = https://github.com/artefactual-labs/am-packbuild
-GIT_BRANCH    = dev/packaging-1.6-docker
 DEB_TOPDIR    = "/debbuild"
 DOCKER_VOLUME = "/src"
-DOCKER_IMAGE  = "debbuild-$(NAME)-$(AM_VERSION)"
-PACKBUILD_PARMS ?= 
-#PACKBUILD_PARMS ?= "-b 1 -k05236CA08"
+DOCKER_IMAGE  = "debbuild-$(NAME)-$(VERSION)"
+GPG_ID ?= 0F4A4D31
+PACKBUILD_EXTRA_ARGS ?= 
+#PACKBUILD_EXTRA_ARGS ?= "-b 1"
+CURRENT_DIR=$(shell basename `pwd`)
+
+
+ifeq ($(CURRENT_DIR),archivematica)
+BRANCH     ?= stable/1.6.x
+VERSION     ?= 1.6.0
+RELEASE       ?= 1
+PACKAGE         ?= am
+else 
+BRANCH     ?= stable/0.10.x
+VERSION     ?= 0.10.0
+RELEASE       ?= 1
+PACKAGE         ?= ss
+endif
+
 .PHONY: build-docker-image build deb-build deb-clean deb-test update-changelog
 
 all: build-docker-image build
 
 build-docker-image: update-changelog
 	@echo "==> Building Docker image with build environment."
-	@docker build --rm --tag "$(DOCKER_IMAGE)" --build-arg GIT_URL="$(GIT_URL)" --build-arg GIT_BRANCH="$(GIT_BRANCH)" --build-arg PACKAGE="$(NAME)" .
+	@docker build --rm --tag "$(DOCKER_IMAGE)" .
 
-                #--volume "$(shell cd ../../ && echo $(PWD))":/debbuild/am-packbuild \		
 build:
 	@echo "==> Building deb."
 	@docker run \
-                -e AM_BRANCH=$(AM_BRANCH) \
-		-e AM_VERSION=$(AM_VERSION) \
-		-e AM_RELEASE=$(AM_RELEASE) \
-		-e PACKBUILD_PARMS="$(PACKBUILD_PARMS)" \
+                -e BRANCH=$(BRANCH) \
+		-e VERSION=$(VERSION) \
+		-e RELEASE=$(RELEASE) \
+                -e PACKAGE=$(PACKAGE) \
+                -e GPG_ID=$(GPG_ID) \
+		-e PACKBUILD_EXTRA_ARGS="$(PACKBUILD_EXTRA_ARGS)" \
  		--rm \
                 --volume "$(shell cd ../../ && pwd):$(DEB_TOPDIR)/$(NAME)" \
 		--volume "$(shell pwd):$(DOCKER_VOLUME)" \
@@ -33,13 +45,10 @@ build:
 
 deb-build: deb-clean
 	@echo "==> Install dependencies."
-	#cd /debbuild/$(NAME) && find . -iname control 
-	if [ -f "$(DOCKER_VOLUME)/GPG-KEYS-REPOS" ]; then gpg --import $(DOCKER_VOLUME)/GPG-KEYS-REPOS; fi
-	cd /debbuild/$(NAME) && ./packbuild.py -r am -v $(AM_VERSION) -c $(AM_BRANCH) $(PACKBUILD_PARMS) 
-	#cd /debbuild/$(NAME) && ./packbuild.py -r ss -v $(AM_VERSION) -c $(AM_BRANCH) -b $(RELEASE) -k$(GPG_ID)
-	@echo "==> Build package."
-	#cd /debbuild/$(NAME) && dpkg-buildpackage -us -uc -k
-	@echo "==> Copying RPM files."
+	# Add GPG if available
+	@if [ -f "$(DOCKER_VOLUME)/GPG-KEY" ]; then gpg --import $(DOCKER_VOLUME)/GPG-KEY; fi
+	@cd /debbuild/$(NAME) && ./packbuild.py -r $(PACKAGE) -v $(VERSION) -c $(BRANCH) -k$(GPG_ID) $(PACKBUILD_EXTRA_ARGS) 
+	@echo "==> Copying deb files."
 	mkdir -p $(DOCKER_VOLUME)/build/
 	cp -rf /tmp/ampackbuilder/* $(DOCKER_VOLUME)/build/
 	cd $(DOCKER_VOLUME)/build/ && dpkg-scanpackages . | gzip > Packages.gz
