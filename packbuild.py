@@ -41,7 +41,7 @@ def main():
     parser.add_argument("-v", "--version", help="current version", required=True)
     parser.add_argument("-c", "--checkout", help="branch/commit/tag to checkout", required=True)
     parser.add_argument("-p", "--ppa", help="ppa to upload", required=False)
-    parser.add_argument("-k", "--key", help="key for package signing", required=True)
+    parser.add_argument("-k", "--key", help="key for package signing", required=False)
     parser.add_argument("-b", "--build", help="build number. If this option is present, will build a release package")
 
     args = parser.parse_args()
@@ -90,10 +90,11 @@ def main():
             if args.build:
                 package_ver_string = "1:{0}-{1}".format(args.version, args.build)
                 package_ver_string_noepoch = "{0}-{1}".format(args.version, args.build)
+                command_string = 'debuild --no-tgz-check -S -k{0} -I'.format(args.key)
             else:
                 package_ver_string = "1:{0}+1SNAPSHOT{1}-{2}-{3}".format(args.version, utctime, commit_hash_str[:6], checkout_alphanum)
                 package_ver_string_noepoch = "{0}+1SNAPSHOT{1}-{2}-{3}".format(args.version, utctime, commit_hash_str[:6], checkout_alphanum)
-
+                command_string = 'debuild --no-tgz-check -S -us -uc -I'.format(args.key)
             logging.info("package version: %s", package_ver_string)
 
             # dict: package_name -> directory
@@ -144,20 +145,7 @@ def main():
                     f.close()
 
                     # debuild
-                    command_string = 'debuild --no-tgz-check -S -k{0} -I'.format(args.key)
                     run_subprocess(command_string, cwd=package_dir)
-
-                    # dput
-                    if args.ppa:
-                        dput_dir = os.path.join(repo_dir, "src")
-                        dput_filename = "{0}_{1}~{2}_source.changes".format(p, package_ver_string_noepoch, distronum_dic[d])
-                        command_string = 'dput ppa:{0} {1}'.format(args.ppa, dput_filename)
-                        run_subprocess(command_string, cwd=dput_dir)
-                    else:
-                        command_string = 'debuild --no-tgz-check -b -k{0} -I'.format(args.key)
-                        run_subprocess(command_string, cwd=package_dir)
-
-
 
 
         except subprocess.CalledProcessError as e:
@@ -274,7 +262,7 @@ def main():
                 f.close()
 
                 # debuild
-                command_string = 'debuild --no-tgz-check -S -k{0} -I'.format(args.key)
+                command_string = 'echo debuild --no-tgz-check -S -k{0} -I'.format(args.key)
                 run_subprocess(command_string, cwd=repo_dir)
 
                 # dput
