@@ -273,7 +273,6 @@ def main():
                 f.close()
 
                 # debuild
-                command_string = 'echo debuild --no-tgz-check -k{0} -I'.format(args.key)
                 run_subprocess(command_string, cwd=repo_dir)
 
 
