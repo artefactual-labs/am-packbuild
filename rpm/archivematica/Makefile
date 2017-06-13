@@ -1,10 +1,10 @@
-NAME          = archivematica
-VERSION       = 1.6.0
-RELEASE       = rc2
-BRANCH        = v1.6.0-rc2
+NAME          ?= archivematica
+VERSION       ?= 1.6.0
+RELEASE       ?= rc2
+BRANCH        ?= v1.6.0-rc2
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
-DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
+DOCKER_IMAGE  ?= "rpmbuild-$(NAME)-$(VERSION)"
 
 RPMBUILD_ARGS := \
 	--define "_topdir $(RPM_TOPDIR)" \
@@ -24,7 +24,14 @@ build-docker-image:
 
 build:
 	@echo "==> Building RPM."
-	@docker run --rm --volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) make -C $(DOCKER_VOLUME) rpm-build
+	@docker run \
+                -e RPM_TOPDIR="$(RPM_TOPDIR)" \
+		-e DOCKER_VOLUME="$(DOCKER_VOLUME)/etc" \
+		-e NAME="$(NAME)" \
+		-e VERSION="$(VERSION)" \
+		-e RELEASE="$(RELEASE)" \
+		-e BRANCH="$(BRANCH)" \
+		--rm --volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) make -C $(DOCKER_VOLUME) rpm-build
 
 rpm-build: rpm-clean
 	@echo "==> Preparing environment for rpmbuild."
