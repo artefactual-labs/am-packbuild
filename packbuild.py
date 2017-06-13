@@ -94,8 +94,8 @@ def main():
 
             # package version string
             if args.build:
-                package_ver_string = "1:{0}-{1}".format(args.version, args.build)
-                package_ver_string_noepoch = "{0}-{1}".format(args.version, args.build)
+                package_ver_string = "1:{0}{1}".format(args.version, args.build)
+                package_ver_string_noepoch = "{0}{1}".format(args.version, args.build)
             else:
                 package_ver_string = "1:{0}+1SNAPSHOT{1}-{2}-{3}".format(args.version, utctime, commit_hash_str[:6], checkout_alphanum)
                 package_ver_string_noepoch = "{0}+1SNAPSHOT{1}-{2}-{3}".format(args.version, utctime, commit_hash_str[:6], checkout_alphanum)
@@ -220,8 +220,8 @@ def main():
 
             # package version string
             if args.build:
-                package_ver_string = "1:{0}-{1}".format(args.version, args.build)
-                package_ver_string_noepoch = "{0}-{1}".format(args.version, args.build)
+                package_ver_string = "1:{0}{1}".format(args.version, args.build)
+                package_ver_string_noepoch = "{0}{1}".format(args.version, args.build)
             else:
                 package_ver_string = "1:{0}+1SNAPSHOT{1}-{2}-{3}".format(args.version, utctime, commit_hash_str[:6], checkout_alphanum)
                 package_ver_string_noepoch = "{0}+1SNAPSHOT{1}-{2}-{3}".format(args.version, utctime, commit_hash_str[:6], checkout_alphanum)
