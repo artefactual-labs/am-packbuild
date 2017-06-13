@@ -1,15 +1,25 @@
-NAME          ?= archivematica
-VERSION       ?= 1.6.0
-RELEASE       ?= rc2
-BRANCH        ?= v1.6.0-rc2
+
+CURRENT_DIR=$(shell basename `pwd`)
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
-DOCKER_IMAGE  ?= "rpmbuild-$(NAME)-$(VERSION)"
+DOCKER_IMAGE  ?= "rpmbuild-$(PACKAGE)-$(VERSION)"
+
+ifeq ($(CURRENT_DIR),archivematica)
+BRANCH     ?= stable/1.6.x
+VERSION     ?= 1.6.0
+RELEASE       ?= 1
+PACKAGE         ?= archivematica
+else
+BRANCH     ?= stable/0.10.x
+VERSION     ?= 0.10.0
+RELEASE       ?= 1
+PACKAGE         ?= archivematica-storage-service
+endif
 
 RPMBUILD_ARGS := \
 	--define "_topdir $(RPM_TOPDIR)" \
 	--define "_etcdir $(DOCKER_VOLUME)/etc" \
-	--define "name $(NAME)" \
+	--define "name $(PACKAGE)" \
 	--define "rpmversion $(VERSION)" \
 	--define "rpmrelease $(RELEASE)" \
 	--define "branch $(BRANCH)"
@@ -27,7 +37,7 @@ build:
 	@docker run \
                 -e RPM_TOPDIR="$(RPM_TOPDIR)" \
 		-e DOCKER_VOLUME="$(DOCKER_VOLUME)/etc" \
-		-e NAME="$(NAME)" \
+		-e PACKAGE="$(PACKAGE)" \
 		-e VERSION="$(VERSION)" \
 		-e RELEASE="$(RELEASE)" \
 		-e BRANCH="$(BRANCH)" \
@@ -36,17 +46,17 @@ build:
 rpm-build: rpm-clean
 	@echo "==> Preparing environment for rpmbuild."
 	mkdir -p $(RPM_TOPDIR)
-	cp $(DOCKER_VOLUME)/package.spec $(RPM_TOPDIR)/package.spec
+	cp $(DOCKER_VOLUME)/$(PACKAGE).spec $(RPM_TOPDIR)/package.spec
 	yum-builddep -y $(RPM_TOPDIR)/package.spec
 	rpmbuild $(RPMBUILD_ARGS) -ba --clean $(RPM_TOPDIR)/package.spec
 
 	@echo "==> Copying RPM files."
-	cp -p $(RPM_TOPDIR)/RPMS/x86_64/$(NAME)-*.x86_64.rpm $(DOCKER_VOLUME)
-	cp -p $(RPM_TOPDIR)/SRPMS/$(NAME)-*.src.rpm $(DOCKER_VOLUME)
+	cp -p $(RPM_TOPDIR)/RPMS/x86_64/$(PACKAGE)-*.x86_64.rpm $(DOCKER_VOLUME)
+	cp -p $(RPM_TOPDIR)/SRPMS/$(PACKAGE)-*.src.rpm $(DOCKER_VOLUME)
 
 rpm-clean:
 	@echo "==> Cleaning up previous RPMs builds."
 	@rm -rf $(RPM_TOPDIR)
 
 rpm-test:
-	@docker run --rm --volume="$(shell pwd):$(DOCKER_VOLUME)" centos:7 bash -c "yum install -y epel-release && yum localinstall -y --nogpgcheck $(DOCKER_VOLUME)/$(NAME)-$(VERSION)*.rpm"
+	@docker run --rm --volume="$(shell pwd):$(DOCKER_VOLUME)" centos:7 bash -c "yum install -y epel-release && yum localinstall -y --nogpgcheck $(DOCKER_VOLUME)/$(PACKAGE)-$(VERSION)*.rpm"
