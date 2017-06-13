@@ -1,19 +1,16 @@
-
-CURRENT_DIR=$(shell basename `pwd`)
+PACKAGE     ?= archivematica
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  ?= "rpmbuild-$(PACKAGE)-$(VERSION)"
 
-ifeq ($(CURRENT_DIR),archivematica)
+ifeq ($(PACKAGE),archivematica)
 BRANCH     ?= stable/1.6.x
 VERSION     ?= 1.6.0
 RELEASE       ?= 1
-PACKAGE         ?= archivematica
 else
 BRANCH     ?= stable/0.10.x
 VERSION     ?= 0.10.0
 RELEASE       ?= 1
-PACKAGE         ?= archivematica-storage-service
 endif
 
 RPMBUILD_ARGS := \

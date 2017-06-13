@@ -1,23 +1,23 @@
 NAME          = am-packbuild
+PACKAGE	      ?= archivematica
 DEB_TOPDIR    = "/debbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "debbuild-$(NAME)-$(VERSION)"
 GPG_ID ?= 0F4A4D31
 PACKBUILD_EXTRA_ARGS ?= 
 #PACKBUILD_EXTRA_ARGS ?= "-b 1"
-CURRENT_DIR=$(shell basename `pwd`)
 
 
-ifeq ($(CURRENT_DIR),archivematica)
+ifeq ($(PACKAGE),archivematica)
 BRANCH     ?= stable/1.6.x
 VERSION     ?= 1.6.0
 RELEASE       ?= 1
-PACKAGE         ?= am
+BUILD_TYPE         ?= am
 else 
 BRANCH     ?= stable/0.10.x
 VERSION     ?= 0.10.0
 RELEASE       ?= 1
-PACKAGE         ?= ss
+BUILD_TYPE         ?= ss
 endif
 
 .PHONY: build-docker-image build deb-build deb-clean deb-test update-changelog
@@ -34,7 +34,7 @@ build:
                 -e BRANCH=$(BRANCH) \
 		-e VERSION=$(VERSION) \
 		-e RELEASE=$(RELEASE) \
-                -e PACKAGE=$(PACKAGE) \
+                -e BUILD_TYPE=$(BUILD_TYPE) \
                 -e GPG_ID=$(GPG_ID) \
 		-e PACKBUILD_EXTRA_ARGS="$(PACKBUILD_EXTRA_ARGS)" \
  		--rm \
@@ -47,7 +47,7 @@ deb-build: deb-clean
 	@echo "==> Install dependencies."
 	# Add GPG if available
 	@if [ -f "$(DOCKER_VOLUME)/GPG-KEY" ]; then gpg --import $(DOCKER_VOLUME)/GPG-KEY; fi
-	@cd /debbuild/$(NAME) && ./packbuild.py -r $(PACKAGE) -v $(VERSION) -c $(BRANCH) -k$(GPG_ID) $(PACKBUILD_EXTRA_ARGS) 
+	@cd /debbuild/$(NAME) && ./packbuild.py -r $(BUILD_TYPE) -v $(VERSION) -c $(BRANCH) -k$(GPG_ID) $(PACKBUILD_EXTRA_ARGS) 
 	@echo "==> Copying deb files."
 	mkdir -p $(DOCKER_VOLUME)/build/
 	cp -rf /tmp/ampackbuilder/* $(DOCKER_VOLUME)/build/
