@@ -106,3 +106,9 @@ else
   cd /usr/share/archivematica/storage-service && \
    /usr/lib/python2.7/archivematica/storage-service/bin/python manage.py backfill_api_keys
 fi
+
+%changelog 
+%(date +"* %a %b %d %Y Artefactual Systems <sysadmin@artefactual.com>")
+- commit: %(git --git-dir %{_sourcedir}/%{name}/.git rev-parse HEAD)
+- checkout: %{branch}
+

@@ -276,3 +276,9 @@ chown -R archivematica:archivematica /var/log/archivematica/dashboard
 if [ x$(semanage port -l | grep http_port_t | grep 7400 | wc -l) == x0 ]; then
   semanage port -a -t http_port_t -p tcp 7400
 fi
+
+%changelog 
+%(date +"* %a %b %d %Y Artefactual Systems <sysadmin@artefactual.com>")
+- commit: %(git --git-dir %{_sourcedir}/%{name}/.git rev-parse HEAD)
+- checkout: %{branch}
+
