@@ -218,6 +218,13 @@ def main():
             # need to convert output from byte to string
             commit_hash_str = commit_hash.decode("utf-8").strip()
 
+            command_string = 'debuild --no-tgz-check -I '
+            if args.key:
+                command_string = command_string + '-k{0}'.format(args.key) 
+            else:
+                command_string = command_string + '-us -uc'
+
+ 
             # package version string
             if args.build:
                 package_ver_string = "1:{0}{1}".format(args.version, args.build)
@@ -268,19 +275,6 @@ def main():
                 # debuild
                 command_string = 'echo debuild --no-tgz-check -k{0} -I'.format(args.key)
                 run_subprocess(command_string, cwd=repo_dir)
-
-                # dput
-                if args.ppa:
-                    dput_dir = working_dir
-                    dput_filename = "{0}_{1}~{2}_source.changes".format(p, package_ver_string_noepoch, distronum_dic[d])
-                    command_string = 'dput ppa:{0} {1}'.format(args.ppa, dput_filename)
-                    run_subprocess(command_string, cwd=dput_dir)
-                else:
-                    command_string = 'debuild --no-tgz-check -b -k{0} -I'.format(args.key)
-                    run_subprocess(command_string, cwd=repo_dir)
-
-
-
 
 
         except subprocess.CalledProcessError as e:
