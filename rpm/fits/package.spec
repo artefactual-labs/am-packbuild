@@ -2,8 +2,7 @@ Name: %{name}
 Version: %{version}
 Release: 2%{?dist}
 Summary: File Information Tool Set (FITS)
-Buildrequires: ant, gcc
-BuildRequires: systemd-devel
+Buildrequires: ant, gcc, systemd-devel
 Source: https://github.com/harvard-lts/fits/archive/v%{version}.zip
 Patch: fits-home.patch
 Patch1: fits-log4j.patch
