@@ -110,7 +110,8 @@ def main():
  
 
             # dict: distribution -> numeric version
-            distronum_dic = { "trusty":"14.04"
+            distronum_dic = { "trusty":"14.04",
+                              "xenial":"16.06"
                             }
 
 
@@ -238,7 +239,8 @@ def main():
  
 
             # dict: distribution -> numeric version
-            distronum_dic = { "trusty":"14.04"
+            distronum_dic = { "trusty":"14.04",
+                              "xenial":"16.06"
                             }
 
             # lines for the changelog
