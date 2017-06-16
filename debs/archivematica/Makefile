@@ -36,6 +36,7 @@ build:
 		-e RELEASE=$(RELEASE) \
                 -e BUILD_TYPE=$(BUILD_TYPE) \
                 -e GPG_ID=$(GPG_ID) \
+		-e GPG_KEY \
 		-e PACKBUILD_EXTRA_ARGS="$(PACKBUILD_EXTRA_ARGS)" \
  		--rm \
                 --volume "$(shell cd ../../ && pwd):$(DEB_TOPDIR)/$(NAME)" \
@@ -47,6 +48,7 @@ deb-build: deb-clean
 	@echo "==> Install dependencies."
 	# Add GPG if available
 	@if [ -f "$(DOCKER_VOLUME)/GPG-KEY" ]; then gpg --import $(DOCKER_VOLUME)/GPG-KEY; fi
+	@if [ x"$$GPG_KEY" != x ]; then echo "$$GPG_KEY" | gpg --import - ; fi
 	@cd /debbuild/$(NAME) && ./packbuild.py -r $(BUILD_TYPE) -v $(VERSION) -c $(BRANCH) -k$(GPG_ID) $(PACKBUILD_EXTRA_ARGS) 
 	@echo "==> Copying deb files."
 	mkdir -p $(DOCKER_VOLUME)/build/
