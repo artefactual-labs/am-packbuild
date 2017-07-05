@@ -15,3 +15,6 @@ ADD files/golang.pm /usr/share/perl5/Debian/Debhelper/Buildsystem/golang.pm
 # Install build dependencies
 ENV GOPATH /usr/share/go-1.7/
 RUN GOPATH=/usr/share/go-1.7/ /usr/lib/go-1.7/bin/go get -u -v golang.org/x/tools/go/loader
+ENV DEBFULLNAME "Artefactual Systems"
+ENV DEBEMAIL "sysadmin@artefactual.com"
+

@@ -10,7 +10,7 @@ DOCKER_IMAGE  = "debbuild-$(NAME)-$(VERSION)"
 GPG_ID        ?= 0F4A4D31
 .PHONY: build-docker-image build deb-build deb-clean deb-test
 
-all: build-docker-image build
+all: build-docker-image get-code build
 
 build-docker-image:
 	@echo "==> Building Docker image with build environment."
@@ -28,27 +28,17 @@ build:
                 -e GPG_KEY \
 		--volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) make -C $(DOCKER_VOLUME) deb-build
 
-deb-build: deb-clean
+deb-build: 
 	@echo "==> Install gpg keys."
 	@if [ -f "$(DOCKER_VOLUME)/GPG-KEY" ]; then gpg --import $(DOCKER_VOLUME)/GPG-KEY; fi
 	@if [ x"$$GPG_KEY" != x ]; then echo "$$GPG_KEY" | gpg --import - ; fi
 	@echo "==> Clone code"
 	@echo nomkdir -p /debbuild/$(NAME)
 	@echo nocd /debbuild/$(NAME)
-	@mkdir -p src/
-	rm -rf src/$(PACKAGE)
-	git clone \
-          --quiet \
-          --branch ${BRANCH} \
-          --recurse-submodules $(GIT_URL) \
-	  src/$(PACKAGE)
 	# Update debian/folder and changelog, and install dependencies
-	# TODO: Debug problems when passing vars from command line
 	@cp debian src/$(PACKAGE) -rf
-	git --git-dir=/src/src/siegfried/.git rev-parse HEAD
-	COMMIT=$(shell git --git-dir=/src/src/siegfried/.git rev-parse HEAD)
 	@cd src/$(PACKAGE) && \
-	dch -v ${VERSION}-${RELEASE} Commit $(shell cat /src/src/$(PACKAGE)/.git/HEAD) && \
+	dch -v ${VERSION}-${RELEASE} Commit $(shell cat src/$(PACKAGE)/.git/HEAD) && \
 	dch -r --distribution trusty --urgency medium ignored && \
 	yes | mk-build-deps --install debian/control 
 	@echo "==> Build package."
@@ -57,9 +47,16 @@ deb-build: deb-clean
 	mkdir -p repo
 	cp src/$(PACKAGE)_* repo/
 
-deb-clean:
-	@echo "==> Cleaning up previous RPMs builds."
-	#@rm -rf $(DEB_TOPDIR)
+get-code:
+	@echo "==> Get code."
+	@mkdir -p src/
+	@docker run --rm \
+		--volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) rm -rf $(DOCKER_VOLUME)/src/$(PACKAGE) 
+	@git clone \
+          --quiet \
+          --branch ${BRANCH} \
+          --recurse-submodules $(GIT_URL) \
+	  src/$(PACKAGE)
 
 deb-test:
 	@docker run --rm --volume="$(shell pwd):$(DOCKER_VOLUME)" ubuntu:trusty echo "Create repo and install package"
