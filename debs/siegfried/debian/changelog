@@ -1,0 +1,6 @@
+siegfried (1.6.7-2) trusty; urgency=medium
+
+  * Build version v1.6.7-2, with custom archivematica configuration
+
+ -- Santiago Rodriguez <scollazo@artefactual.com>  Mon, 6 Mar 2017 16:50:00 +0000
+
