@@ -1,0 +1,4 @@
+lib/* /usr/share/fits/lib/
+tools/* /usr/share/fits/tools/
+xml/* /usr/share/fits/xml/
+fits*.sh /usr/bin/
