@@ -1,0 +1,13 @@
+Index: bagit-4.9.0/conf/log4j.properties
+===================================================================
+--- bagit-4.9.0.orig/src/assembly/conf/log4j.properties	2014-07-31 16:56:50.905140944 -0700
++++ bagit-4.9.0/src/assembly/conf/log4j.properties	2014-07-31 16:57:50.541139079 -0700
+@@ -3,7 +3,7 @@
+ 
+ #File
+ log4j.appender.R=org.apache.log4j.FileAppender
+-log4j.appender.R.File=${app.home}/logs/bagit.log
++log4j.appender.R.File=/tmp/bag-${log.timestamp}.log
+ log4j.appender.R.layout=org.apache.log4j.PatternLayout
+ log4j.appender.R.layout.ConversionPattern=%d [%t] %-5p %C{1} : %m%n
+ 
