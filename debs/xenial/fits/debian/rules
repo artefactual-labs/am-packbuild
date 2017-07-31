@@ -17,3 +17,8 @@ override_dh_shlibdeps:
 
 %:
 	dh  $@
+
+override_dh_auto_build:
+	dh_auto_build -- compile-create-jar
+
+override_dh_strip_nondeterminism:

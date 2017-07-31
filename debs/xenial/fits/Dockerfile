@@ -7,7 +7,7 @@ ARG PACKAGE
 
 RUN apt-get update && \
     apt-get install -y dpkg-dev git build-essential wget debhelper \
-    devscripts equivs
+    devscripts equivs quilt
 
 
 RUN mkdir -p /debbuild/ && cd /debbuild && \
