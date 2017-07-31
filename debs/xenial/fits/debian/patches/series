@@ -1,2 +1,2 @@
-archivematica-config.diff
-changehome.diff
+fix-fits-home.patch
+archivematica-config.patch

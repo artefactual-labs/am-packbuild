@@ -15,10 +15,7 @@
 # Since this will never be *executed*, we can safely skip this step.
 override_dh_shlibdeps:
 
+override_dh_strip_nondeterminism:
+
 %:
 	dh  $@
-
-override_dh_auto_build:
-	dh_auto_build -- compile-create-jar
-
-override_dh_strip_nondeterminism:

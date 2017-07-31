@@ -11,9 +11,9 @@ RUN apt-get update && \
 
 
 RUN mkdir -p /debbuild/ && cd /debbuild && \
-	git clone $GIT_URL && \
-	cd $PACKAGE && \
-	git checkout $GIT_BRANCH
+	wget "https://launchpad.net/~archivematica/+archive/ubuntu/1.4/+files/fits_0.8.4-1~14.04.tar.gz" && \
+	mkdir fits && \
+	tar zxvf fits_0.8.4-1~14.04.tar.gz -C fits --strip-components=1
 
 ADD debian /debbuild/$PACKAGE/debian
 

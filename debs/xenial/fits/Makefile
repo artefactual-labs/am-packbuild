@@ -1,5 +1,5 @@
 NAME          = fits
-VERSION       ?= 1.1.0
+VERSION       ?= 0.8.4
 RELEASE	      ?= 1~16.04
 GIT_URL	      = https://github.com/harvard-lts/fits
 GPG_ID        ?= 5236CA08
@@ -31,7 +31,7 @@ deb-build: deb-clean
 	if [ -f "$(DOCKER_VOLUME)/GPG-KEY" ]; then gpg --import $(DOCKER_VOLUME)/GPG-KEY; fi
 	if [ x"$$GPG_KEY" != x ]; then echo "$$GPG_KEY" | gpg --import - ; fi
 	@echo "==> Apply patches."
-	cd /debbuild/$(NAME) && QUILT_PATCHES=debian/patches/ quilt push -a 
+	cd /debbuild/$(NAME) && QUILT_PATCHES=debian/patches/ quilt push -a || true
 	@echo "==> Install dependencies."
 	cd /debbuild/$(NAME) && yes | mk-build-deps --install debian/control
 	@echo "==> Update changelog."
