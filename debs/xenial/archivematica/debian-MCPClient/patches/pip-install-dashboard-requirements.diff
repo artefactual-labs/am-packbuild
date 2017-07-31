@@ -1,0 +1,36 @@
+Index: MCPClient/requirements/base.txt
+===================================================================
+--- MCPClient.orig/requirements/base.txt
++++ MCPClient/requirements/base.txt
+@@ -10,3 +10,31 @@ metsrw==0.1.0
+ requests==2.7.0
+ unidecode==0.04.19
+ opf-fido==1.3.6
++# Base requirements - for all installations
++agentarchives==0.4.0
++Django>=1.8,<1.9
++django-braces==1.0.0
++django-model-utils==1.3.1
++logutils==0.3.3
++django-tastypie==0.13.2
++django-extensions==1.1.1
++django-annoying==0.7.7
++elasticsearch>=1.0.0,<2.0.0
++gearman==2.0.2
++gunicorn==19.4.5
++lazy-paged-sequence
++metsrw==0.1.0
++# Required by storage-service component
++slumber==0.6.0
++pytz
++pyopenssl
++python-dateutil==2.4.2
++ndg-httpsclient
++pyasn1
++requests==2.7.0
++lxml==3.5.0
++django-forms-bootstrap>=3.0.0,<4.0.0
++
++# fpr-admin needs this. fpr-admin has its own requirements but not until AM 1.7
++# the fpr-admin was installed as a Python package.
++django-autoslug==1.9.3
