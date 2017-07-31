@@ -5,3 +5,5 @@
 
 override_dh_virtualenv:
 	dh_virtualenv --skip-install 
+override_dh_strip:
+
