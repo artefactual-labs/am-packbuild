@@ -1,5 +1,5 @@
 NAME          = siegfried
-VERSION       = 1.5.0
+VERSION       = 1.7.3
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
@@ -23,6 +23,7 @@ build:
 
 rpm-build: rpm-clean
 	@echo "==> Downloading siegfried."
+	go get -u -v golang.org/x/tools/go/loader
 	go get -v github.com/richardlehane/siegfried
 	cd /go/src/github.com/richardlehane/siegfried && git checkout v$(VERSION)
 
