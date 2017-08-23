@@ -1,6 +1,6 @@
 Name: %{name}
 Version: %{version}
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Siegfried is a signature-based file format identification tool.
 URL: http://www.itforarchivists.com/siegfried
 Group: Application/SystemTools
@@ -30,5 +30,5 @@ rm -rf $RPM_BUILD_ROOT
 
 # Needed so sf can update the signature file.
 # Ideally, should the signature be saved somewhere else?
-%defattr(0644, 1000, 1000, 0755)
+%defattr(0644, root, root, 0755)
 /usr/share/siegfried
