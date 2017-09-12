@@ -8,7 +8,11 @@
       "ssh_wait_timeout": "30s",
       "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now",
       "vrdp_bind_address": "0.0.0.0",
-      "headless": "true"
+      "headless": "true",
+      "vboxmanage": [
+        ["modifyvm", "{{.Name}}", "--memory", "2048"],
+        ["modifyvm", "{{.Name}}", "--cpus", "2"]
+      ]
     }
   ],
   "post-processors": [
