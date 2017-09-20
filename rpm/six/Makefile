@@ -1,5 +1,6 @@
-NAME          = fits
-VERSION       = 0.10.1
+NAME          = six
+VERSION       = 1.10.0
+RELEASE	      = 1
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
@@ -20,20 +21,19 @@ build-docker-image:
 
 build:
 	@echo "==> Building RPM."
-	@docker run --rm --volume "$(shell pwd):/src" $(DOCKER_IMAGE) make -C /src rpm-build
+	@docker run --rm --volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) make -C $(DOCKER_VOLUME) rpm-build
 
 rpm-build: rpm-clean
 	@echo "==> Preparing environment for rpmbuild."
-	mkdir -p $(RPM_TOPDIR)
+	mkdir -p $(RPM_TOPDIR)/SOURCES
 	cp $(DOCKER_VOLUME)/package.spec $(RPM_TOPDIR)/package.spec
-	mkdir -p $(RPM_TOPDIR)/SOURCES/
-	wget -q -O  $(RPM_TOPDIR)/SOURCES/v$(VERSION).zip https://github.com/harvard-lts/fits/archive/$(VERSION).zip
-	cp files/* $(RPM_TOPDIR)/SOURCES/
+	wget -O $(RPM_TOPDIR)/SOURCES/$(NAME)-$(VERSION).tar.gz http://pypi.python.org/packages/source/s/$(NAME)/$(NAME)-$(VERSION).tar.gz
+	yum-builddep -y $(RPM_TOPDIR)/package.spec
 	rpmbuild $(RPMBUILD_ARGS) -ba --clean $(RPM_TOPDIR)/package.spec
 
 	@echo "==> Copying RPM files."
-	cp -p $(RPM_TOPDIR)/RPMS/x86_64/$(NAME)-$(VERSION)*.x86_64.rpm $(DOCKER_VOLUME)
-	cp -p $(RPM_TOPDIR)/SRPMS/$(NAME)-$(VERSION)*.src.rpm $(DOCKER_VOLUME)
+	cp -p $(RPM_TOPDIR)/RPMS/noarch/python-$(NAME)-*.noarch.rpm $(DOCKER_VOLUME)
+	cp -p $(RPM_TOPDIR)/SRPMS/python-$(NAME)-*.src.rpm $(DOCKER_VOLUME)
 
 rpm-clean:
 	@echo "==> Cleaning up previous RPMs builds."

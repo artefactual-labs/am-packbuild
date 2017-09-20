@@ -1,5 +1,6 @@
-NAME          = archivematica-storage-service
-VERSION       = 0.8.0
+NAME          = fido
+VERSION       = 1.3.5
+RELEASE	      = 88
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
@@ -7,8 +8,8 @@ DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
 RPMBUILD_ARGS := \
 	--define "_topdir $(RPM_TOPDIR)" \
 	--define "_etcdir $(DOCKER_VOLUME)/etc" \
-	--define "name $(NAME)" \
-	--define "version $(VERSION)"
+	--define "rpmversion $(VERSION)" \
+	--define "rpmrelease $(RELEASE)" 
 
 .PHONY: build-docker-image build rpm-build rpm-clean rpm-test
 
@@ -20,18 +21,19 @@ build-docker-image:
 
 build:
 	@echo "==> Building RPM."
-	@docker run --rm --volume "$(shell pwd):/src" $(DOCKER_IMAGE) make -C /src rpm-build
+	@docker run --rm --volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) make -C $(DOCKER_VOLUME) rpm-build
 
 rpm-build: rpm-clean
 	@echo "==> Preparing environment for rpmbuild."
-	mkdir -p $(RPM_TOPDIR)
+	mkdir -p $(RPM_TOPDIR)/SOURCES
 	cp $(DOCKER_VOLUME)/package.spec $(RPM_TOPDIR)/package.spec
+	wget -O $(RPM_TOPDIR)/SOURCES/fido-$(VERSION)-$(RELEASE).tar.gz https://github.com/openpreserve/fido/archive/v$(VERSION)-$(RELEASE).tar.gz
 	yum-builddep -y $(RPM_TOPDIR)/package.spec
 	rpmbuild $(RPMBUILD_ARGS) -ba --clean $(RPM_TOPDIR)/package.spec
 
 	@echo "==> Copying RPM files."
-	cp -p $(RPM_TOPDIR)/RPMS/x86_64/$(NAME)-$(VERSION)*.x86_64.rpm $(DOCKER_VOLUME)
-	cp -p $(RPM_TOPDIR)/SRPMS/$(NAME)-$(VERSION)*.src.rpm $(DOCKER_VOLUME)
+	cp -p $(RPM_TOPDIR)/RPMS/noarch/$(NAME)-*.noarch.rpm $(DOCKER_VOLUME)
+	cp -p $(RPM_TOPDIR)/SRPMS/$(NAME)-*.src.rpm $(DOCKER_VOLUME)
 
 rpm-clean:
 	@echo "==> Cleaning up previous RPMs builds."

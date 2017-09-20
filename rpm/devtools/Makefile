@@ -1,5 +1,7 @@
-NAME          = fits
-VERSION       = 0.10.1
+NAME          = archivematica-devtools
+VERSION       = 1.6.0
+RELEASE       = 1
+BRANCH        = master
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
@@ -8,7 +10,9 @@ RPMBUILD_ARGS := \
 	--define "_topdir $(RPM_TOPDIR)" \
 	--define "_etcdir $(DOCKER_VOLUME)/etc" \
 	--define "name $(NAME)" \
-	--define "version $(VERSION)"
+	--define "rpmversion $(VERSION)" \
+	--define "rpmrelease $(RELEASE)" \
+	--define "branch $(BRANCH)" 
 
 .PHONY: build-docker-image build rpm-build rpm-clean rpm-test
 
@@ -20,14 +24,14 @@ build-docker-image:
 
 build:
 	@echo "==> Building RPM."
-	@docker run --rm --volume "$(shell pwd):/src" $(DOCKER_IMAGE) make -C /src rpm-build
+	@docker run --rm --volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) make -C $(DOCKER_VOLUME) rpm-build
 
 rpm-build: rpm-clean
 	@echo "==> Preparing environment for rpmbuild."
 	mkdir -p $(RPM_TOPDIR)
 	cp $(DOCKER_VOLUME)/package.spec $(RPM_TOPDIR)/package.spec
+	yum-builddep -y $(RPM_TOPDIR)/package.spec
 	mkdir -p $(RPM_TOPDIR)/SOURCES/
-	wget -q -O  $(RPM_TOPDIR)/SOURCES/v$(VERSION).zip https://github.com/harvard-lts/fits/archive/$(VERSION).zip
 	cp files/* $(RPM_TOPDIR)/SOURCES/
 	rpmbuild $(RPMBUILD_ARGS) -ba --clean $(RPM_TOPDIR)/package.spec
 
