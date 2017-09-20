@@ -40,8 +40,8 @@ def main():
     parser.add_argument("-r", "--repository", help="repository (am or ss)", required=True, choices=['am','ss'])
     parser.add_argument("-v", "--version", help="current version", required=True)
     parser.add_argument("-c", "--checkout", help="branch/commit/tag to checkout", required=True)
-    parser.add_argument("-p", "--ppa", help="ppa to upload", required=True)
-    parser.add_argument("-k", "--key", help="key for package signing", required=True)
+    parser.add_argument("-p", "--ppa", help="ppa to upload", required=False)
+    parser.add_argument("-k", "--key", help="key for package signing", required=False)
     parser.add_argument("-b", "--build", help="build number. If this option is present, will build a release package")
 
     args = parser.parse_args()
@@ -86,14 +86,19 @@ def main():
             # need to convert output from byte to string
             commit_hash_str = commit_hash.decode("utf-8").strip()
 
+            command_string = 'debuild --no-tgz-check -I '
+            if args.key:
+                command_string = command_string + '-k{0}'.format(args.key) 
+            else:
+                command_string = command_string + '-us -uc'
+
             # package version string
             if args.build:
-                package_ver_string = "1:{0}-{1}".format(args.version, args.build)
-                package_ver_string_noepoch = "{0}-{1}".format(args.version, args.build)
+                package_ver_string = "1:{0}{1}".format(args.version, args.build)
+                package_ver_string_noepoch = "{0}{1}".format(args.version, args.build)
             else:
                 package_ver_string = "1:{0}+1SNAPSHOT{1}-{2}-{3}".format(args.version, utctime, commit_hash_str[:6], checkout_alphanum)
                 package_ver_string_noepoch = "{0}+1SNAPSHOT{1}-{2}-{3}".format(args.version, utctime, commit_hash_str[:6], checkout_alphanum)
-
             logging.info("package version: %s", package_ver_string)
 
             # dict: package_name -> directory
@@ -105,8 +110,7 @@ def main():
  
 
             # dict: distribution -> numeric version
-            distronum_dic = { "precise":"12.04",
-                              "trusty":"14.04",
+            distronum_dic = { "trusty":"14.04"
                             }
 
 
@@ -145,15 +149,7 @@ def main():
                     f.close()
 
                     # debuild
-                    command_string = 'debuild --no-tgz-check -S -k{0} -I'.format(args.key)
                     run_subprocess(command_string, cwd=package_dir)
-
-                    # dput
-                    dput_dir = os.path.join(repo_dir, "src")
-                    dput_filename = "{0}_{1}~{2}_source.changes".format(p, package_ver_string_noepoch, distronum_dic[d])
-                    command_string = 'dput ppa:{0} {1}'.format(args.ppa, dput_filename)
-                    run_subprocess(command_string, cwd=dput_dir)
-
 
 
         except subprocess.CalledProcessError as e:
@@ -165,7 +161,7 @@ def main():
     elif args.repository == "ss":
         try:        
             #git clone 
-            command_string = 'git clone git@git.artefactual.com:archivematica-storage-service.git'
+            command_string = 'git clone https://github.com/artefactual/archivematica-storage-service'
             run_subprocess(command_string, cwd=working_dir)
 
             #git checkout
@@ -212,15 +208,9 @@ def main():
             #     run_subprocess(command_string, cwd=repo_dir)
 
             logging.info("Copying files to lib")
-            src_dir = os.path.join(os.path.dirname(__file__), "files", "ss-lib")
-            dst_dir = os.path.join(repo_dir, "lib")
-            logging.info("src_dir: %s", src_dir)
-            logging.info("dst_dir: %s", dst_dir)
-            filelist = glob.glob(os.path.join(src_dir, '*.*'))
-            logging.info("filelist: %s", filelist)
-            for file in filelist:
-                shutil.copy2(file, dst_dir)
-
+            #requires pip >= 8
+            command_string = "pip download -d lib --no-binary :all: -r requirements.txt"
+            run_subprocess(command_string, cwd=repo_dir)
 
             #check the latest commit
             command_string = 'git rev-parse HEAD'
@@ -228,10 +218,17 @@ def main():
             # need to convert output from byte to string
             commit_hash_str = commit_hash.decode("utf-8").strip()
 
+            command_string = 'debuild --no-tgz-check -I '
+            if args.key:
+                command_string = command_string + '-k{0}'.format(args.key) 
+            else:
+                command_string = command_string + '-us -uc'
+
+ 
             # package version string
             if args.build:
-                package_ver_string = "1:{0}-{1}".format(args.version, args.build)
-                package_ver_string_noepoch = "{0}-{1}".format(args.version, args.build)
+                package_ver_string = "1:{0}{1}".format(args.version, args.build)
+                package_ver_string_noepoch = "{0}{1}".format(args.version, args.build)
             else:
                 package_ver_string = "1:{0}+1SNAPSHOT{1}-{2}-{3}".format(args.version, utctime, commit_hash_str[:6], checkout_alphanum)
                 package_ver_string_noepoch = "{0}+1SNAPSHOT{1}-{2}-{3}".format(args.version, utctime, commit_hash_str[:6], checkout_alphanum)
@@ -241,8 +238,7 @@ def main():
  
 
             # dict: distribution -> numeric version
-            distronum_dic = { "precise":"12.04",
-                              "trusty":"14.04",
+            distronum_dic = { "trusty":"14.04"
                             }
 
             # lines for the changelog
@@ -277,15 +273,7 @@ def main():
                 f.close()
 
                 # debuild
-                command_string = 'debuild --no-tgz-check -S -k{0} -I'.format(args.key)
                 run_subprocess(command_string, cwd=repo_dir)
-
-                # dput
-                dput_dir = working_dir
-                dput_filename = "{0}_{1}~{2}_source.changes".format(p, package_ver_string_noepoch, distronum_dic[d])
-                command_string = 'dput ppa:{0} {1}'.format(args.ppa, dput_filename)
-                run_subprocess(command_string, cwd=dput_dir)
-
 
 
         except subprocess.CalledProcessError as e:
