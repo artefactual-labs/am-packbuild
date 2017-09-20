@@ -1,0 +1,13 @@
+Source: bagit
+Section: utils
+Priority: extra
+Maintainer: austin trask <austin@artefactual.com>
+Build-Depends: debhelper (>= 7), openjdk-8-jdk, libjsap-java, libcommons-compress-java, libhttpmime-java, libcommons-exec-java, liblog4j1.2-java, gradle-debian-helper, gradle
+Standards-Version: 3.8.3
+Homepage: <insert the upstream URL, if relevant>
+
+Package: bagit
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, openjdk-8-jre-headless
+Description: BagIt File Packager
+ BagIt is a hierarchical file packaging format for the exchange of generalized digital content. A "bag" has just enough structure to safely enclose descriptive "tags" and a "payload" but does not require any knowledge of the payload's internal semantics. This BagIt format should be suitable for disk-based or network-based storage and transfer.
