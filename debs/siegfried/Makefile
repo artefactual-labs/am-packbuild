@@ -1,8 +1,8 @@
 NAME          = siegfried
 PACKAGE       = siegfried
-VERSION       ?= 1.7.5
+VERSION       ?= 1.7.3
 RELEASE	      ?= 1
-BRANCH        ?= v1.7.5
+BRANCH        ?= v1.7.3
 GIT_URL	      = https://github.com/richardlehane/siegfried/
 DEB_TOPDIR    = "/debbuild"
 DOCKER_VOLUME = "/src"
@@ -33,8 +33,6 @@ deb-build:
 	@if [ -f "$(DOCKER_VOLUME)/GPG-KEY" ]; then gpg --import $(DOCKER_VOLUME)/GPG-KEY; fi
 	@if [ x"$$GPG_KEY" != x ]; then echo "$$GPG_KEY" | gpg --import - ; fi
 	@echo "==> Clone code"
-	@echo nomkdir -p /debbuild/$(NAME)
-	@echo nocd /debbuild/$(NAME)
 	# Update debian/folder and changelog, and install dependencies
 	@cp debian src/$(PACKAGE) -rf
 	@cd src/$(PACKAGE) && \
@@ -42,10 +40,10 @@ deb-build:
 	dch -r --distribution trusty --urgency medium ignored && \
 	yes | mk-build-deps --install debian/control 
 	@echo "==> Build package."
-	cd src/$(PACKAGE) && PATH=/usr/lib/go-1.7/bin:${PATH} GOPATH=/usr/share/go-1.7/ dpkg-buildpackage  -k${GPG_ID}
+	cd src/$(PACKAGE) && PATH=/usr/lib/go-1.9/bin:${PATH} GOPATH=/usr/share/go-1.9/ dpkg-buildpackage  -k${GPG_ID}
 	@echo "==> Copying DEB files."
-	mkdir -p repo
-	cp src/$(PACKAGE)_* repo/
+	mkdir -p build
+	cp src/$(PACKAGE)_* build/
 
 get-code:
 	@echo "==> Get code."
