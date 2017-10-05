@@ -8,7 +8,7 @@ Summary: Archivematica Storage Service
 Group: Application/System
 License: AGPLv3
 Source0: https://github.com/artefactual/archivematica-storage-service/
-BuildRequires: git, gcc, libffi-devel, openssl-devel, libxslt-devel, python-virtualenv, python-pip
+BuildRequires: git, gcc, libffi-devel, openssl-devel, libxslt-devel, python-virtualenv, python-pip, mariadb-devel, postgresql-devel, gcc-c++
 Requires: unar, rsync, nginx, policycoreutils-python
 AutoReq: No
 AutoProv: No
