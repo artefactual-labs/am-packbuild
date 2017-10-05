@@ -9,14 +9,14 @@ PACKBUILD_EXTRA_ARGS ?=
 
 
 ifeq ($(PACKAGE),archivematica)
-BRANCH     ?= stable/1.6.x
-VERSION     ?= 1.6.0
-RELEASE       ?= +3
+BRANCH     ?= qa/1.x
+VERSION     ?= 1.7.0
+RELEASE       ?= rc1
 BUILD_TYPE         ?= am
 else 
-BRANCH     ?= stable/0.10.x
-VERSION     ?= 0.10.0
-RELEASE       ?= 1
+BRANCH     ?= qa/0.x
+VERSION     ?= 0.11.0
+RELEASE       ?= rc1
 BUILD_TYPE         ?= ss
 endif
 
@@ -65,8 +65,6 @@ deb-build: deb-clean
 	cd src/$(PACKAGE) && git submodule init && \
 		git submodule update && \
 		cd ../../	
-	pwd 
-	find .
 	./build.sh
 	mkdir -p repo/
 	cp -rf src/archivematica/src/archivematica-* repo
