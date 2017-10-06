@@ -12,7 +12,7 @@ Summary: Archivematica digital preservation system
 Group: Application/System
 License: AGPLv3
 Source0: https://github.com/artefactual/archivematica
-BuildRequires: git, gcc, openssl-devel, python-virtualenv, python-pip, mariadb-devel, libxslt-devel, python-devel, libffi-devel, openssl-devel
+BuildRequires: git, gcc, openssl-devel, python-virtualenv, python-pip, mariadb-devel, libxslt-devel, python-devel, libffi-devel, openssl-devel, gcc-c++, postgresql-devel
 Requires: archivematica-common
 AutoReq: No
 AutoProv: No
@@ -93,7 +93,6 @@ Archivematica dashboard with Nginx + gunicorn.
 %files common
 /usr/lib/archivematica/archivematicaCommon/
 /var/archivematica/sharedDirectory/
-%config /etc/archivematica/archivematicaCommon/dbsettings
 
 # MCPServer
 %files mcp-server
@@ -102,7 +101,6 @@ Archivematica dashboard with Nginx + gunicorn.
 /usr/lib/systemd/system/archivematica-mcp-server.service
 /usr/share/archivematica/MCPServer/
 %config /etc/sysconfig/archivematica-mcp-server
-%config /etc/archivematica/MCPServer/serverConfig.conf
 
 # MCPClient
 %files mcp-client
@@ -110,8 +108,6 @@ Archivematica dashboard with Nginx + gunicorn.
 /usr/lib/archivematica/MCPClient/
 /usr/lib/systemd/system/archivematica-mcp-client.service
 %config /etc/sysconfig/archivematica-mcp-client
-%config /etc/archivematica/MCPClient/archivematicaClientModules
-%config /etc/archivematica/MCPClient/clientConfig.conf
 
 # Dashboard
 %files dashboard
@@ -149,9 +145,7 @@ git clone \
 
 %install
 mkdir -p \
-  %{buildroot}/etc/archivematica/MCPServer \
-  %{buildroot}/etc/archivematica/MCPClient \
-  %{buildroot}/etc/archivematica/archivematicaCommon \
+  %{buildroot}/etc/archivematica/ \
   %{buildroot}/usr/lib/archivematica/MCPServer \
   %{buildroot}/usr/lib/archivematica/MCPClient \
   %{buildroot}/usr/lib/archivematica/archivematicaCommon \
@@ -167,8 +161,6 @@ mkdir -p \
 
 # Common
 cp -rf %{_sourcedir}/%{name}/src/archivematicaCommon/lib/* %{buildroot}/usr/lib/archivematica/archivematicaCommon/
-cp -rf %{_sourcedir}/%{name}/src/archivematicaCommon/etc/* %{buildroot}/etc/archivematica/archivematicaCommon/
-cp -rf %{_sourcedir}/%{name}/src/MCPServer/share/sharedDirectoryStructure/* %{buildroot}/var/archivematica/sharedDirectory/
 
 # MCPServer
 virtualenv /usr/lib/python2.7/archivematica/MCPServer
@@ -178,10 +170,7 @@ virtualenv /usr/lib/python2.7/archivematica/MCPServer
 /usr/lib/python2.7/archivematica/MCPServer/bin/pip install -r %{_sourcedir}/%{name}/src/dashboard/src/requirements/production.txt
 virtualenv --relocatable /usr/lib/python2.7/archivematica/MCPServer
 cp -rf /usr/lib/python2.7/archivematica/MCPServer/* %{buildroot}/usr/lib/python2.7/archivematica/MCPServer/
-
 cp -rf %{_sourcedir}/%{name}/src/MCPServer/lib/* %{buildroot}/usr/lib/archivematica/MCPServer/
-cp -rf %{_sourcedir}/%{name}/src/MCPServer/share/* %{buildroot}/usr/share/archivematica/MCPServer/
-cp %{_sourcedir}/%{name}/src/MCPServer/etc/serverConfig.conf %{buildroot}/etc/archivematica/MCPServer/serverConfig.conf
 cp %{_etcdir}/archivematica-mcp-server.service %{buildroot}/usr/lib/systemd/system/archivematica-mcp-server.service
 cp %{_etcdir}/archivematica-mcp-server.env %{buildroot}/etc/sysconfig/archivematica-mcp-server
 
@@ -195,8 +184,6 @@ virtualenv --relocatable /usr/lib/python2.7/archivematica/MCPClient
 cp -rf /usr/lib/python2.7/archivematica/MCPClient/* %{buildroot}/usr/lib/python2.7/archivematica/MCPClient/
 
 cp -rf %{_sourcedir}/%{name}/src/MCPClient/lib/* %{buildroot}/usr/lib/archivematica/MCPClient
-cp %{_sourcedir}/%{name}/src/MCPClient/etc/archivematicaClientModules %{buildroot}/etc/archivematica/MCPClient/
-cp %{_sourcedir}/%{name}/src/MCPClient/etc/clientConfig.conf %{buildroot}/etc/archivematica/MCPClient/
 cp %{_etcdir}/archivematica-mcp-client.service %{buildroot}/usr/lib/systemd/system/archivematica-mcp-client.service
 cp %{_etcdir}/archivematica-mcp-client.env %{buildroot}/etc/sysconfig/archivematica-mcp-client
 
