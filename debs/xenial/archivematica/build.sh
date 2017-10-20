@@ -14,10 +14,10 @@ COMMIT=$(git rev-parse HEAD)
 for i in dashboard MCPClient MCPServer archivematicaCommon
 	do
 	cd "${SOURCE}/$i/"
+	cp -rf $BASE/debian-$i/* debian/
 	dch -v 1:${VERSION}${RELEASE} commit: $(echo $COMMIT)
 	dch -v 1:${VERSION}${RELEASE} checkout: $(echo $BRANCH) 
 	dch -r --distribution xenial --urgency high ignored		
-	cp -rf $BASE/debian-$i/* debian/
 	QUILT_PATCHES="debian/patches" quilt push -a || true
 	dpkg-buildpackage -us -uc
 	cd $SOURCE

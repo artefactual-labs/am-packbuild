@@ -6,19 +6,10 @@ DOCKER_IMAGE  = "debbuild-$(NAME)-$(VERSION)"
 GPG_ID ?= 0F4A4D31
 PACKBUILD_EXTRA_ARGS ?= 
 #PACKBUILD_EXTRA_ARGS ?= "-b 1"
-
-
-ifeq ($(PACKAGE),archivematica)
 BRANCH     ?= qa/1.x
 VERSION     ?= 1.7.0
-RELEASE       ?= rc1
+RELEASE       ?= +rc1~xenial
 BUILD_TYPE         ?= am
-else 
-BRANCH     ?= qa/0.x
-VERSION     ?= 0.11.0
-RELEASE       ?= rc1
-BUILD_TYPE         ?= ss
-endif
 
 .PHONY: build-docker-image build deb-build deb-clean deb-test update-changelog
 
