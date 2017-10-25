@@ -12,7 +12,7 @@ server {
     proxy_pass http://localhost:7500;
   }
   location /static {
-    alias /usr/share/archivematica/storage-service/static;
+    alias /usr/share/archivematica/storage-service/assets;
   }
   error_page 500 502 503 504 /500.html;
   location = /500.html {

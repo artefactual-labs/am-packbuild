@@ -4,9 +4,9 @@ DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  ?= "rpmbuild-$(PACKAGE)-$(VERSION)"
 
 ifeq ($(PACKAGE),archivematica)
-BRANCH     ?= stable/1.6.x
-VERSION     ?= 1.6.0
-RELEASE       ?= 1
+BRANCH     ?= qa/1.x
+VERSION     ?= 1.7.0
+RELEASE       ?= rc1
 else
 BRANCH     ?= stable/0.10.x
 VERSION     ?= 0.10.0
@@ -39,6 +39,18 @@ build:
 		-e RELEASE="$(RELEASE)" \
 		-e BRANCH="$(BRANCH)" \
 		--rm --volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) make -C $(DOCKER_VOLUME) rpm-build
+
+dev:
+	@echo "==> Building RPM."
+	@docker run -i -t \
+                -e RPM_TOPDIR="$(RPM_TOPDIR)" \
+		-e DOCKER_VOLUME="$(DOCKER_VOLUME)/etc" \
+		-e PACKAGE="$(PACKAGE)" \
+		-e VERSION="$(VERSION)" \
+		-e RELEASE="$(RELEASE)" \
+		-e BRANCH="$(BRANCH)" \
+		--rm --volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) /bin/bash
+
 
 rpm-build: rpm-clean
 	@echo "==> Preparing environment for rpmbuild."

@@ -6,13 +6,13 @@
 #
 
 Name: archivematica
-Version: 1.6.0
-Release: 0.beta.5
+Version: 1.7.0
+Release: rc1
 Summary: Archivematica digital preservation system
 Group: Application/System
 License: AGPLv3
 Source0: https://github.com/artefactual/archivematica
-BuildRequires: git, gcc, openssl-devel, python-virtualenv, python-pip, mariadb-devel, libxslt-devel, python-devel, libffi-devel, openssl-devel, gcc-c++, postgresql-devel
+BuildRequires: git, gcc, openldap-devel, openssl-devel, python-virtualenv, python-pip, mariadb-devel, libxslt-devel, python-devel, libffi-devel, openssl-devel, gcc-c++, postgresql-devel
 Requires: archivematica-common
 AutoReq: No
 AutoProv: No

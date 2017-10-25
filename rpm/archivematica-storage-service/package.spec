@@ -2,8 +2,8 @@
 
 
 Name: archivematica-storage-service
-Version: 0.8.0
-Release: 0.beta.1
+Version: 0.11.0
+Release: rc1
 Summary: Archivematica Storage Service
 Group: Application/System
 License: AGPLv3
