@@ -1,8 +1,7 @@
-# this file is managed by ansible
 
-export LANG="en_US.UTF-8"
-export LC_ALL="en_US.UTF-8"
-export LC_LANG="en_US.UTF-8"
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+export LC_LANG=en_US.UTF-8
 
 export SS_DB_NAME=/var/archivematica/storage-service/storage.db
 export DJANGO_ALLOWED_HOSTS=*

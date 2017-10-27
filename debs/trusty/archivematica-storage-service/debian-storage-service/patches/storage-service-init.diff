@@ -1,0 +1,17 @@
+Index: archivematica-storage-service/install/archivematica-storage-service.conf
+===================================================================
+--- archivematica-storage-service.orig/install/archivematica-storage-service.conf
++++ archivematica-storage-service/install/archivematica-storage-service.conf
+@@ -4,8 +4,7 @@ author "Artefactual Systems"
+ start on (runlevel [2345] and filesystem)
+ stop on runlevel [016]
+ 
+-env LANG="en_US.UTF-8"
+-env LC_ALL="en_US.UTF-8"
+-env LC_LANG="en_US.UTF-8"
+-
+-exec /usr/share/python/archivematica-storage-service/bin/gunicorn --config /etc/archivematica/storage-service.gunicorn-config.py storage_service.wsgi:application
++script
++  export $(cat /etc/default/archivematica-storage-service)
++  exec /usr/share/python/archivematica-storage-service/bin/gunicorn --config /etc/archivematica/storage-service.gunicorn-config.py storage_service.wsgi:application
++end script

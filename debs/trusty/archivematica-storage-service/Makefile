@@ -9,7 +9,7 @@ PACKBUILD_EXTRA_ARGS ?=
 PACKAGE = archivematica-storage-service
 BRANCH     ?= qa/0.x
 VERSION     ?= 0.11.0
-RELEASE       ?= +rc1~trusty3
+RELEASE       ?= +rc1
 BUILD_TYPE         ?= ss
 
 .PHONY: build-docker-image build deb-build deb-clean deb-test update-changelog
