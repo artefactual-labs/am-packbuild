@@ -1,0 +1,10 @@
+Index: MCPClient/requirements/base.txt
+===================================================================
+--- MCPClient.orig/requirements/base.txt
++++ MCPClient/requirements/base.txt
+@@ -1,4 +1,5 @@
+ git+https://github.com/artefactual-labs/ammcpc@v0.1.1#egg=ammcpc
++git+https://github.com/artefactual/archivematica-fpr-admin.git@v1.7.1#egg=archivematica-fpr-admin
+ bagit==1.5.2
+ clamd==1.0.2
+ Django>=1.8,<1.9

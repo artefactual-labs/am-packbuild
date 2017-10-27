@@ -1,0 +1,2 @@
+lib/* /usr/lib/archivematica/MCPServer/
+init/* /etc/init/

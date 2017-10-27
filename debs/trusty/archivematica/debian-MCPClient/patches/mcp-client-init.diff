@@ -1,0 +1,23 @@
+Index: MCPClient/init/archivematica-mcp-client.conf
+===================================================================
+--- MCPClient.orig/init/archivematica-mcp-client.conf
++++ MCPClient/init/archivematica-mcp-client.conf
+@@ -22,8 +22,7 @@ start on (net-device-up
+           and runlevel [2345])
+ stop on runlevel [016]
+ 
+-env CONF=/etc/archivematica/MCPClient
+-env LOCATION=/usr/lib/archivematica/MCPClient/archivematicaClient.py
++env LOCATION="/usr/share/python/archivematica-mcp-client/bin/python /usr/lib/archivematica/MCPClient/archivematicaClient.py"
+ 
+ setuid archivematica
+ setgid archivematica
+@@ -34,6 +33,8 @@ script
+     test -f /etc/default/locale && . /etc/default/locale || true
+     test -f /etc/environment && . /etc/environment || true
+ 
++    export $(cat /etc/default/archivematica-mcp-client)
++
+     LANG=$LANG $LOCATION
+ 
+ end script

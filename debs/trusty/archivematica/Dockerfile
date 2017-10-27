@@ -1,10 +1,15 @@
-FROM ubuntu:xenial
+FROM ubuntu:trusty
+
 
 RUN apt-get update && \
     apt-get install -y dpkg-dev git build-essential wget debhelper \
-    devscripts equivs
+    devscripts equivs quilt 
 
 RUN wget -O /tmp/pip.py https://bootstrap.pypa.io/get-pip.py && python /tmp/pip.py
 
-RUN apt-get install -y libffi-dev libssl-dev libxslt-dev dh-virtualenv python-dev
+RUN wget -O - "http://keyserver.ubuntu.com:11371/pks/lookup?op=get&search=0x36A76C6C49C29687" | apt-key add - 
+RUN echo deb http://ppa.launchpad.net/spotify-jyrki/dh-virtualenv/ubuntu trusty main >> /etc/apt/sources.list
+RUN apt-get update && apt-get install -y dh-virtualenv
+
+RUN apt-get update && apt-get install -y libffi-dev libssl-dev libxslt-dev python-dev libmysqlclient-dev libldap2-dev libsasl2-dev
 
