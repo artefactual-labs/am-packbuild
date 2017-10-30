@@ -11,5 +11,7 @@ RUN wget -O - "http://keyserver.ubuntu.com:11371/pks/lookup?op=get&search=0x36A7
 RUN echo deb http://ppa.launchpad.net/spotify-jyrki/dh-virtualenv/ubuntu trusty main >> /etc/apt/sources.list
 RUN apt-get update && apt-get install -y dh-virtualenv
 
-RUN apt-get update && apt-get install -y libffi-dev libssl-dev libxslt-dev python-dev libmysqlclient-dev libldap2-dev libsasl2-dev
+RUN apt-get update && apt-get install -y libffi-dev libssl-dev libxslt-dev python-dev libmysqlclient-dev libldap2-dev libsasl2-dev curl
+
+RUN curl -sL https://deb.nodesource.com/setup_8.x |  bash - && apt-get install -y nodejs
 

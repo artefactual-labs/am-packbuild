@@ -5,6 +5,12 @@ SOURCE=${BASE}/src/archivematica/src/
 export DEBFULLNAME="Artefactual Systems"
 export DEBEMAIL="sysadmin@artefactual.com"
 
+for j in transfer-browser appraisal-tab
+  do
+    cd $SOURCE/dashboard/frontend/$j/
+    npm install --unsafe-perm
+  done
+
 cd $SOURCE
 BRANCH="$(git branch | cut -d\  -f2-)"
 COMMIT=$(git rev-parse HEAD)
