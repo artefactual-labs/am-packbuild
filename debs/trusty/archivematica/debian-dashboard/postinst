@@ -44,4 +44,7 @@ fi
 
 # Run migrations
 /usr/share/archivematica/dashboard/manage.py migrate --settings='settings.production'
+# Collect static content
+/usr/share/archivematica/dashboard/manage.py collectstatic --noinput
+
 #DEBHELPER#
