@@ -20,7 +20,7 @@ sed -i "s/<replace-with-key>/\"$KEYCMD\"/g" /var/archivematica/.storage-service
 sed -i "s/<replace-with-key>/$KEYCMD/g" /etc/archivematica/storage-service.gunicorn-config.py
 
 . /var/archivematica/.storage-service
-. /etc/default/archivematica-storage-service
+export $(cat /etc/default/archivematica-storage-service)
 echo "creating symlink in /usr/lib/archivematica"
 rm -f /usr/lib/archivematica/storage-service
 ln -s -f /usr/share/python/archivematica-storage-service/lib/python2.7/site-packages/storage_service/ /usr/lib/archivematica/storage-service
