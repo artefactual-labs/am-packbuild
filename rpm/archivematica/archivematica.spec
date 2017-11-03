@@ -6,8 +6,8 @@
 #
 
 Name: archivematica
-Version: 1.7.0
-Release: rc1
+Version: %{rpmversion}
+Release: %{rpmrelease}
 Summary: Archivematica digital preservation system
 Group: Application/System
 License: AGPLv3

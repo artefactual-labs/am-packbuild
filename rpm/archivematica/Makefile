@@ -3,15 +3,9 @@ RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  ?= "rpmbuild-$(PACKAGE)-$(VERSION)"
 
-ifeq ($(PACKAGE),archivematica)
 BRANCH     ?= qa/1.x
 VERSION     ?= 1.7.0
 RELEASE       ?= rc1
-else
-BRANCH     ?= stable/0.10.x
-VERSION     ?= 0.10.0
-RELEASE       ?= 1
-endif
 
 RPMBUILD_ARGS := \
 	--define "_topdir $(RPM_TOPDIR)" \
