@@ -24,7 +24,7 @@ The Storage Service is the mechanism by which Archivematica is able to store pac
 /usr/lib/systemd/system/archivematica-storage-service.service
 %config /etc/sysconfig/archivematica-storage-service
 %config /etc/nginx/conf.d/archivematica-storage-service.conf
-
+%config /etc/archivematica/storage-service.gunicorn-config.py
 
 %prep
 rm -rf /usr/lib/python2.7/archivematica
@@ -50,6 +50,7 @@ mkdir -p \
   %{buildroot}/var/archivematica/storage-service/ \
   %{buildroot}/var/archivematica/storage_service/ \
   %{buildroot}/usr/lib/systemd/system \
+  %{buildroot}/etc/archivematica/ \
   %{buildroot}/etc/sysconfig/ \
   %{buildroot}/etc/nginx/conf.d
 
@@ -61,7 +62,7 @@ cp -rf /usr/lib/python2.7/archivematica/storage-service/* %{buildroot}/usr/lib/p
 
 cp -rf %{_sourcedir}/%{name}/storage_service/* %{buildroot}/usr/share/archivematica/storage-service/
 cp %{_sourcedir}/%{name}/install/make_key.py %{buildroot}/var/archivematica/storage-service/
-
+cp %{_sourcedir}/%{name}/install/storage-service.gunicorn-config.py %{buildroot}/etc/archivematica/storage-service.gunicorn-config.py 
 cp %{_etcdir}/archivematica-storage-service.service %{buildroot}/usr/lib/systemd/system/archivematica-storage-service.service
 cp %{_etcdir}/archivematica-storage-service.env %{buildroot}/etc/sysconfig/archivematica-storage-service
 cp %{_etcdir}/archivematica-storage-service.nginx %{buildroot}/etc/nginx/conf.d/archivematica-storage-service.conf
