@@ -11,11 +11,8 @@ server {
     proxy_read_timeout 120;
     proxy_pass http://localhost:7500;
   }
-  location /static {
-    alias /usr/share/archivematica/storage-service/assets;
-  }
   error_page 500 502 503 504 /500.html;
   location = /500.html {
-    root /usr/share/archivematica/storage-service/templates;
+    root /usr/lib/archivematica/storage-service/templates;
   }
 }

@@ -17,8 +17,8 @@ The Storage Service is the mechanism by which Archivematica is able to store pac
 
 
 %files
-/usr/lib/python2.7/archivematica/storage-service/
-/usr/share/archivematica/storage-service/
+/usr/share/python/archivematica-storage-service/
+/usr/lib/archivematica/storage-service/
 /var/archivematica/storage-service/
 /var/archivematica/storage_service/
 /usr/lib/systemd/system/archivematica-storage-service.service
@@ -27,7 +27,7 @@ The Storage Service is the mechanism by which Archivematica is able to store pac
 %config /etc/archivematica/storage-service.gunicorn-config.py
 
 %prep
-rm -rf /usr/lib/python2.7/archivematica
+rm -rf /usr/share/python/archivematica
 rm -rf /usr/share/archivematica
 rm -rf %{_sourcedir}/*
 rm -rf %{buildroot}/*
@@ -45,8 +45,8 @@ git clone \
 
 %install
 mkdir -p \
-  %{buildroot}/usr/lib/python2.7/archivematica/storage-service/ \
-  %{buildroot}/usr/share/archivematica/storage-service/ \
+  %{buildroot}/usr/share/python/archivematica-storage-service/ \
+  %{buildroot}/usr/lib/archivematica/storage-service/ \
   %{buildroot}/var/archivematica/storage-service/ \
   %{buildroot}/var/archivematica/storage_service/ \
   %{buildroot}/usr/lib/systemd/system \
@@ -54,13 +54,13 @@ mkdir -p \
   %{buildroot}/etc/sysconfig/ \
   %{buildroot}/etc/nginx/conf.d
 
-virtualenv /usr/lib/python2.7/archivematica/storage-service
-/usr/lib/python2.7/archivematica/storage-service/bin/pip install --upgrade pip
-/usr/lib/python2.7/archivematica/storage-service/bin/pip install -r %{_sourcedir}/%{name}/requirements/production.txt
-virtualenv --relocatable /usr/lib/python2.7/archivematica/storage-service
-cp -rf /usr/lib/python2.7/archivematica/storage-service/* %{buildroot}/usr/lib/python2.7/archivematica/storage-service/
+virtualenv /usr/share/python/archivematica-storage-service
+/usr/share/python/archivematica-storage-service/bin/pip install --upgrade pip
+/usr/share/python/archivematica-storage-service/bin/pip install -r %{_sourcedir}/%{name}/requirements/production.txt
+virtualenv --relocatable /usr/share/python/archivematica-storage-service
+cp -rf /usr/share/python/archivematica-storage-service/* %{buildroot}/usr/share/python/archivematica-storage-service/
 
-cp -rf %{_sourcedir}/%{name}/storage_service/* %{buildroot}/usr/share/archivematica/storage-service/
+cp -rf %{_sourcedir}/%{name}/storage_service/* %{buildroot}/usr/lib/archivematica/storage-service/
 cp %{_sourcedir}/%{name}/install/make_key.py %{buildroot}/var/archivematica/storage-service/
 cp %{_sourcedir}/%{name}/install/storage-service.gunicorn-config.py %{buildroot}/etc/archivematica/storage-service.gunicorn-config.py 
 cp %{_etcdir}/archivematica-storage-service.service %{buildroot}/usr/lib/systemd/system/archivematica-storage-service.service
@@ -83,9 +83,13 @@ fi
 mkdir -p /var/log/archivematica/storage-service /var/archivematica/storage-service /var/archivematica/storage_service
 touch /var/log/archivematica/storage-service/storage_service.log
 touch /var/log/archivematica/storage-service/storage_service_debug.log
-chown -R archivematica:archivematica /var/archivematica/storage_service /var/log/archivematica/storage-service /usr/share/archivematica/storage-service /var/lib/archivematica /var/archivematica/storage-service
+chown -R archivematica:archivematica /var/archivematica/storage_service /var/log/archivematica/storage-service /usr/lib/archivematica/storage-service /var/lib/archivematica /var/archivematica/storage-service
 chmod 770 /var/archivematica/storage-service/
 chmod 750 /var/lib/archivematica/
+
+cd /usr/lib/archivematica/storage-service
+export $(cat /etc/sysconfig/archivematica-storage-service)
+/usr/share/python/archivematica-storage-service/bin/python manage.py collectstatic --noinput
 
 # Update SELinux policies
 if [ x$(semanage port -l | grep http_port_t | grep 7500 | wc -l) == x0 ]; then
