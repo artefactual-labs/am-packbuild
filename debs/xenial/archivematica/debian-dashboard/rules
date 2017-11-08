@@ -4,5 +4,5 @@
 	dh $@ --with python-virtualenv --with systemd
 
 override_dh_virtualenv:
-	dh_virtualenv -v --skip-install -D src/ --extra-pip-arg --no-binary --extra-pip-arg :all:
+	dh_virtualenv -v --skip-install -D src/ 
 

@@ -34,7 +34,7 @@ build:
  		--rm \
                 --volume "$(shell cd ../../ && pwd):$(DEB_TOPDIR)/$(NAME)" \
 		--volume "$(shell pwd):$(DOCKER_VOLUME)" \
-		$(DOCKER_IMAGE) \
+		 $(DOCKER_IMAGE) \
                  make -C $(DOCKER_VOLUME) deb-build
 
 deb-build: 
@@ -54,7 +54,7 @@ deb-clean:
 	@echo "==> Cleaning up previous RPMs builds."
 	@rm -rf $(DOCKER_VOLUME)/build/
 	mkdir -p src/$(PACKAGE)
-	rm -rf src/
+	sudo rm -rf src/
 	@git clone \
 	  --quiet \
  	  --branch $(BRANCH) \

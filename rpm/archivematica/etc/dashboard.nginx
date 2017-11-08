@@ -11,11 +11,6 @@ server {
     proxy_read_timeout 120;
     proxy_pass http://localhost:7400;
   }
-  location /media {
-    alias /usr/share/archivematica/dashboard/media;
-  }
-  error_page 500 502 503 504 /500.html;
-  location = /500.html {
-    root /usr/share/archivematica/dashboard/templates;
-  }
+
+
 }

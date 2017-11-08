@@ -8,7 +8,7 @@ export DEBEMAIL="sysadmin@artefactual.com"
 cd $SOURCE
 BRANCH="$(git branch | cut -d\  -f2-)"
 COMMIT=$(git rev-parse HEAD)
-cp ${BASE}/debian-storage-service/* debian/
+cp -rf ${BASE}/debian-storage-service/* debian/
 pip download -d lib --no-binary :all: -r requirements.txt
 dch -v 1:${VERSION}${RELEASE} commit: $(echo $COMMIT)
 dch -v 1:${VERSION}${RELEASE} checkout: $(echo $BRANCH) 

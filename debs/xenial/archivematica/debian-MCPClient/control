@@ -30,6 +30,7 @@ Depends:
 	md5deep,
 	mediainfo,
 	nailgun,
+	nailgun-client,
 	nfs-common,
 	openjdk-8-jre-headless,
 	p7zip-full,

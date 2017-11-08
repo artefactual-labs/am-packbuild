@@ -6,6 +6,7 @@ After=syslog.target network.target
 PIDFile=/run/archivematica-dashboard_gunicorn.pid
 User=archivematica
 Group=archivematica
+EnvironmentFile=/etc/default/archivematica-dashboard
 WorkingDirectory=/usr/share/archivematica/dashboard/
 ExecStart=/usr/share/python/archivematica-dashboard/bin/gunicorn  --config /etc/archivematica/dashboard.gunicorn-config.py wsgi:application
 ExecReload=/bin/kill -s HUP $MAINPID

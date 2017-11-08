@@ -1,0 +1,13 @@
+Index: archivematica-storage-service/install/archivematica-storage-service.conf
+===================================================================
+--- archivematica-storage-service.orig/install/archivematica-storage-service.conf
++++ archivematica-storage-service/install/archivematica-storage-service.conf
+@@ -8,4 +8,7 @@ env LANG="en_US.UTF-8"
+ env LC_ALL="en_US.UTF-8"
+ env LC_LANG="en_US.UTF-8"
+ 
+-exec /usr/share/python/archivematica-storage-service/bin/gunicorn --config /etc/archivematica/storage-service.gunicorn-config.py storage_service.wsgi:application
++script
++  export $(cat /etc/default/archivematica-storage-service)
++  exec /usr/share/python/archivematica-storage-service/bin/gunicorn --config /etc/archivematica/storage-service.gunicorn-config.py storage_service.wsgi:application
++end script

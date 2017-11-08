@@ -6,19 +6,10 @@ DOCKER_IMAGE  = "debbuild-$(NAME)-$(VERSION)"
 GPG_ID ?= 0F4A4D31
 PACKBUILD_EXTRA_ARGS ?= 
 #PACKBUILD_EXTRA_ARGS ?= "-b 1"
-
-
-ifeq ($(PACKAGE),archivematica)
-BRANCH     ?= stable/1.6.x
-VERSION     ?= 1.6.0
-RELEASE       ?= +3
+BRANCH     ?= qa/1.x
+VERSION     ?= 1.7.0
+RELEASE       ?= +rc1~xenial
 BUILD_TYPE         ?= am
-else 
-BRANCH     ?= stable/0.10.x
-VERSION     ?= 0.10.0
-RELEASE       ?= 1
-BUILD_TYPE         ?= ss
-endif
 
 .PHONY: build-docker-image build deb-build deb-clean deb-test update-changelog
 
@@ -65,8 +56,6 @@ deb-build: deb-clean
 	cd src/$(PACKAGE) && git submodule init && \
 		git submodule update && \
 		cd ../../	
-	pwd 
-	find .
 	./build.sh
 	mkdir -p repo/
 	cp -rf src/archivematica/src/archivematica-* repo

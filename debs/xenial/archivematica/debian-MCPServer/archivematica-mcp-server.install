@@ -1,3 +1,1 @@
-etc/* /etc/archivematica/MCPServer/
 lib/* /usr/lib/archivematica/MCPServer/
-share/* /usr/share/archivematica/

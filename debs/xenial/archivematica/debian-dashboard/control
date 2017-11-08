@@ -18,6 +18,8 @@ Depends:
 	python-gearman,
 	python-simplejson,
 	libffi-dev,
+	libldap2-dev,
+	libsasl2-dev,
 	libssl-dev,
 	python-dev,
 	libxml2-dev,
