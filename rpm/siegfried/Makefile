@@ -1,8 +1,9 @@
 NAME          = siegfried
-VERSION       = 1.5.0
+VERSION       = 1.7.3
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
+SIEGFRIED_SRC = "/go/src/github.com/richardlehane/siegfried"
 
 RPMBUILD_ARGS := \
 	--define "_topdir $(RPM_TOPDIR)" \
@@ -23,11 +24,12 @@ build:
 
 rpm-build: rpm-clean
 	@echo "==> Downloading siegfried."
-	go get -v github.com/richardlehane/siegfried
-	cd /go/src/github.com/richardlehane/siegfried && git checkout v$(VERSION)
+	mkdir -p $(SIEGFRIED_SRC)
+	git clone --branch v$(VERSION) --depth 1 https://github.com/richardlehane/siegfried.git $(SIEGFRIED_SRC)
+	cd $(SIEGFRIED_SRC)
 
 	@echo "==> Building sources."
-	go install -tags archivematica -v github.com/richardlehane/siegfried/...
+	go install -tags archivematica -v github.com/richardlehane/siegfried/cmd/...
 
 	@echo "==> Preparing environment for rpmbuild."
 	mkdir -p $(RPM_TOPDIR)/{BUILD,RPMS,SRPMS}

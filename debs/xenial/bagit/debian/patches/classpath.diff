@@ -1,0 +1,16 @@
+Index: bagit-4.9.0/bin/bag
+===================================================================
+--- bagit-4.9.0.orig/src/assembly/bin/bag	2014-02-27 08:23:26.000000000 -0800
++++ bagit-4.9.0/src/assembly/bin/bag	2014-07-31 17:17:36.577101941 -0700
+@@ -28,10 +28,7 @@
+     fi
+ done
+ 
+-APP_HOME=`dirname $PRG`/..
+-
+-# make it fully qualified
+-APP_HOME=`cd $APP_HOME && pwd`
++APP_HOME="/usr/share/bagit"
+ 
+ APP_NAME=`basename $PRG`
+ DATE=`date "+%Y%m%d-%T"`

@@ -1,5 +1,5 @@
-NAME          = fits
-VERSION       = 0.10.1
+NAME          = ghostscript
+VERSION       = 9.20
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
@@ -20,20 +20,18 @@ build-docker-image:
 
 build:
 	@echo "==> Building RPM."
-	@docker run --rm --volume "$(shell pwd):/src" $(DOCKER_IMAGE) make -C /src rpm-build
+	@docker run --rm --volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) make -C $(DOCKER_VOLUME) rpm-build
 
 rpm-build: rpm-clean
 	@echo "==> Preparing environment for rpmbuild."
-	mkdir -p $(RPM_TOPDIR)
-	cp $(DOCKER_VOLUME)/package.spec $(RPM_TOPDIR)/package.spec
-	mkdir -p $(RPM_TOPDIR)/SOURCES/
-	wget -q -O  $(RPM_TOPDIR)/SOURCES/v$(VERSION).zip https://github.com/harvard-lts/fits/archive/$(VERSION).zip
-	cp files/* $(RPM_TOPDIR)/SOURCES/
-	rpmbuild $(RPMBUILD_ARGS) -ba --clean $(RPM_TOPDIR)/package.spec
+	mkdir -p $(RPM_TOPDIR)/SOURCES
+	yum-builddep -y ghostscript
+	yum install -y openjpeg2-devel
+	wget "https://kojipkgs.fedoraproject.org//packages/ghostscript/9.20/12.fc27/src/ghostscript-9.20-12.fc27.src.rpm" -O ghostscript-9.20-12.fc27.src.rpm
+	rpmbuild $(RPMBUILD_ARGS) --rebuild ghostscript-9.20-12.fc27.src.rpm
 
 	@echo "==> Copying RPM files."
-	cp -p $(RPM_TOPDIR)/RPMS/x86_64/$(NAME)-$(VERSION)*.x86_64.rpm $(DOCKER_VOLUME)
-	cp -p $(RPM_TOPDIR)/SRPMS/$(NAME)-$(VERSION)*.src.rpm $(DOCKER_VOLUME)
+	cp -prf $(RPM_TOPDIR)/RPMS/* $(DOCKER_VOLUME)
 
 rpm-clean:
 	@echo "==> Cleaning up previous RPMs builds."
