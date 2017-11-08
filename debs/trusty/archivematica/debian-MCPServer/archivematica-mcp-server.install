@@ -1,2 +1,4 @@
 lib/* /usr/lib/archivematica/MCPServer/
 init/* /etc/init/
+install/serverConfig.conf /etc/archivematica/
+install/serverConfig.logging.json /etc/archivematica/

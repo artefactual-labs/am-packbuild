@@ -2,3 +2,5 @@ lib/* /usr/lib/archivematica/MCPClient/
 requirements.txt /usr/share/archivematica/MCPClient/
 requirements/* /usr/share/archivematica/MCPClient/requirements/
 init/* /etc/init/
+install/clientConfig.logging.json /etc/archivematica/
+install/clientConfig.conf /etc/archivematica/

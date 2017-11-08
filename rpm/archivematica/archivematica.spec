@@ -100,6 +100,8 @@ Archivematica dashboard with Nginx + gunicorn.
 /usr/lib/archivematica/MCPServer/
 /usr/lib/systemd/system/archivematica-mcp-server.service
 %config /etc/sysconfig/archivematica-mcp-server
+%config /etc/archivematica/serverConfig.conf
+%config /etc/archivematica/serverConfig.logging.json
 
 # MCPClient
 %files mcp-client
@@ -107,6 +109,8 @@ Archivematica dashboard with Nginx + gunicorn.
 /usr/lib/archivematica/MCPClient/
 /usr/lib/systemd/system/archivematica-mcp-client.service
 %config /etc/sysconfig/archivematica-mcp-client
+%config /etc/archivematica/clientConfig.conf
+%config /etc/archivematica/clientConfig.logging.json
 
 # Dashboard
 %files dashboard
@@ -116,6 +120,7 @@ Archivematica dashboard with Nginx + gunicorn.
 %config /etc/sysconfig/archivematica-dashboard
 %config /etc/nginx/conf.d/archivematica-dashboard.conf
 %config /etc/archivematica/dashboard.gunicorn-config.py
+%config /etc/archivematica/dashboard.logging.json
 
 #
 # Preparations
@@ -170,6 +175,9 @@ virtualenv /usr/share/python/archivematica-mcp-server
 virtualenv --relocatable /usr/share/python/archivematica-mcp-server
 cp -rf /usr/share/python/archivematica-mcp-server/* %{buildroot}/usr/share/python/archivematica-mcp-server/
 cp -rf %{_sourcedir}/%{name}/src/MCPServer/lib/* %{buildroot}/usr/lib/archivematica/MCPServer/
+cp %{_sourcedir}/%{name}/src/MCPServer/install/serverConfig.logging.json %{buildroot}/etc/archivematica/serverConfig.logging.json
+cp %{_sourcedir}/%{name}/src/MCPServer/install/serverConfig.conf %{buildroot}/etc/archivematica/serverConfig.conf
+
 cp %{_etcdir}/archivematica-mcp-server.service %{buildroot}/usr/lib/systemd/system/archivematica-mcp-server.service
 cp %{_etcdir}/archivematica-mcp-server.env %{buildroot}/etc/sysconfig/archivematica-mcp-server
 
@@ -183,6 +191,8 @@ virtualenv --relocatable /usr/share/python/archivematica-mcp-client
 cp -rf /usr/share/python/archivematica-mcp-client/* %{buildroot}/usr/share/python/archivematica-mcp-client/
 
 cp -rf %{_sourcedir}/%{name}/src/MCPClient/lib/* %{buildroot}/usr/lib/archivematica/MCPClient
+cp %{_sourcedir}/%{name}/src/MCPClient/install/clientConfig.logging.json %{buildroot}/etc/archivematica/clientConfig.logging.json
+cp %{_sourcedir}/%{name}/src/MCPClient/install/clientConfig.conf %{buildroot}/etc/archivematica/clientConfig.conf
 cp %{_etcdir}/archivematica-mcp-client.service %{buildroot}/usr/lib/systemd/system/archivematica-mcp-client.service
 cp %{_etcdir}/archivematica-mcp-client.env %{buildroot}/etc/sysconfig/archivematica-mcp-client
 
@@ -201,6 +211,7 @@ cp -rf /usr/share/python/archivematica-dashboard/* %{buildroot}/usr/share/python
 
 cp -rf %{_sourcedir}/%{name}/src/dashboard/src/* %{buildroot}/usr/share/archivematica/dashboard/
 cp %{_sourcedir}/%{name}/src/dashboard/install/dashboard.gunicorn-config.py %{buildroot}/etc/archivematica/dashboard.gunicorn-config.py
+cp %{_sourcedir}/%{name}/src/dashboard/install/dashboard.logging.json %{buildroot}/etc/archivematica/dashboard.logging.json
 cp %{_etcdir}/archivematica-dashboard.service %{buildroot}/usr/lib/systemd/system/archivematica-dashboard.service
 cp %{_etcdir}/archivematica-dashboard.env %{buildroot}/etc/sysconfig/archivematica-dashboard
 cp %{_etcdir}/dashboard.nginx %{buildroot}/etc/nginx/conf.d/archivematica-dashboard.conf
