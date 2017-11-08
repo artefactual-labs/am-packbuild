@@ -269,14 +269,15 @@ chown -R archivematica:archivematica /var/log/archivematica/MCPClient
 
 # Dashboard
 %post dashboard
-export $(cat /etc/sysconfig/archivematica-dashboard)
-cd /usr/share/archivematica/dashboard
-/usr/share/python/archivematica-dashboard/bin/python manage.py collectstatic --noinput
+
 mkdir -p /var/log/archivematica/dashboard
 touch /var/log/archivematica/dashboard/dashboard.log
 touch /var/log/archivematica/dashboard/dashboard_debug.log
 chown -R archivematica:archivematica /var/log/archivematica/dashboard
 
+export $(cat /etc/sysconfig/archivematica-dashboard)
+cd /usr/share/archivematica/dashboard
+/usr/share/python/archivematica-dashboard/bin/python manage.py collectstatic --noinput
 # Update SELinux policy
 if [ x$(semanage port -l | grep http_port_t | grep 7400 | wc -l) == x0 ]; then
   semanage port -a -t http_port_t -p tcp 7400
