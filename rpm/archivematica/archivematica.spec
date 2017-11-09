@@ -48,7 +48,6 @@ Requires: clamav-scanner-systemd
 Requires: clamav-devel
 Requires: clamav-lib
 Requires: clamav-server-systemd
-Requires: fido
 Requires: libvpx
 Requires: libraw1394
 Requires: python-unidecode
