@@ -33,7 +33,6 @@ Archivematica MCP server.
 %package mcp-client
 Summary: Archivematica MCP client
 Requires: archivematica-common
-Requires: sudo
 Requires: tesseract
 Requires: p7zip
 Requires: ImageMagick
@@ -240,18 +239,6 @@ fi
 
 # Configure permissions of shared directory
 chown -R archivematica:archivematica /var/archivematica/sharedDirectory
-
-# Configure sudoers and check validity
-set -e
-tmp="/tmp/archivematica-sudoers"
-real="/etc/sudoers.d/archivematica"
-echo "archivematica ALL=NOPASSWD:/bin/mv,/bin/chown,/bin/chmod,/usr/bin/find,/usr/bin/gs,/usr/bin/inkscape" > "${tmp}"
-visudo -c -f ${tmp}
-if [ "$?" -eq "0" ]; then
-  chown root:root "${tmp}"
-  chmod 440 "${tmp}"
-  mv ${tmp} ${real}
-fi
 
 # MCP Server
 %post mcp-server
