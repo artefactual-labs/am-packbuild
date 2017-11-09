@@ -169,8 +169,8 @@ cp -rf %{_sourcedir}/%{name}/src/archivematicaCommon/lib/* %{buildroot}/usr/lib/
 virtualenv /usr/share/python/archivematica-mcp-server
 /usr/share/python/archivematica-mcp-server/bin/pip install --upgrade pip
 /usr/share/python/archivematica-mcp-server/bin/pip install -r %{_sourcedir}/%{name}/src/archivematicaCommon/requirements/production.txt
-/usr/share/python/archivematica-mcp-server/bin/pip install -r %{_sourcedir}/%{name}/src/MCPServer/requirements/production.txt
 /usr/share/python/archivematica-mcp-server/bin/pip install -r %{_sourcedir}/%{name}/src/dashboard/src/requirements/production.txt
+/usr/share/python/archivematica-mcp-server/bin/pip install -r %{_sourcedir}/%{name}/src/MCPServer/requirements/production.txt
 virtualenv --relocatable /usr/share/python/archivematica-mcp-server
 cp -rf /usr/share/python/archivematica-mcp-server/* %{buildroot}/usr/share/python/archivematica-mcp-server/
 cp -rf %{_sourcedir}/%{name}/src/MCPServer/lib/* %{buildroot}/usr/lib/archivematica/MCPServer/
@@ -184,8 +184,8 @@ cp %{_etcdir}/archivematica-mcp-server.env %{buildroot}/etc/sysconfig/archivemat
 virtualenv /usr/share/python/archivematica-mcp-client
 /usr/share/python/archivematica-mcp-client/bin/pip install --upgrade pip
 /usr/share/python/archivematica-mcp-client/bin/pip install -r %{_sourcedir}/%{name}/src/archivematicaCommon/requirements/production.txt
-/usr/share/python/archivematica-mcp-client/bin/pip install -r %{_sourcedir}/%{name}/src/MCPClient/requirements/production.txt
 /usr/share/python/archivematica-mcp-client/bin/pip install -r %{_sourcedir}/%{name}/src/dashboard/src/requirements/production.txt
+/usr/share/python/archivematica-mcp-client/bin/pip install -r %{_sourcedir}/%{name}/src/MCPClient/requirements/production.txt
 virtualenv --relocatable /usr/share/python/archivematica-mcp-client
 cp -rf /usr/share/python/archivematica-mcp-client/* %{buildroot}/usr/share/python/archivematica-mcp-client/
 
