@@ -5,11 +5,13 @@ Maintainer: Artefactual Systems Inc. <ops@artefactual.com>
 Build-Depends: 
     python (>= 2.7.3),
     debhelper (>= 9),
+    gnupg,
     libffi-dev,
     libssl-dev,
     libxml2-dev,
     libxslt-dev,
     python-dev,
+    rng-tools,
     dh-virtualenv (>= 0.8),
     zlib1g-dev
 Standards-Version: 3.9.3

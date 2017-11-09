@@ -5,6 +5,7 @@ Maintainer: Artefactual Systems Inc. <ops@artefactual.com>
 Build-Depends: 
     python (>= 2.7.3),
     debhelper (>= 9),
+    gnupg,
     libmysqlclient-dev,
     libffi-dev,
     libssl-dev,
@@ -12,6 +13,7 @@ Build-Depends:
     libxslt-dev,
     python-dev,
     postgresql-server-dev-9.5,
+    rng-tools,
     dh-virtualenv (>= 0.8),
     dh-systemd,
     zlib1g-dev
