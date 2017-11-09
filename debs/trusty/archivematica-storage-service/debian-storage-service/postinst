@@ -57,6 +57,7 @@ echo "updating directory permissions"
 chown -R archivematica:archivematica /var/archivematica/storage-service
 chown -R archivematica:archivematica /var/archivematica/.storage-service
 chown -R archivematica:archivematica /usr/share/python/archivematica-storage-service
+mkdir -p /var/log/archivematica/storage-service
 chown -R archivematica:archivematica /var/log/archivematica/storage-service
 
 rm -f /tmp/storage_service.log

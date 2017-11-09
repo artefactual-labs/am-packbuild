@@ -7,8 +7,13 @@ dbc_go archivematica-mcp-server $@
 
 # Create sharedDirectory and rsync content
 mkdir -p /var/archivematica/sharedDirectory/
-
 chown -R archivematica:archivematica /var/archivematica/
+
+# Create logs dir
+logdir=/var/log/archivematica/MCPServer
+mkdir -p $logdir
+chown -R archivematica:archivematica $logdir
+chmod -R g+s $logdir
 
 # Populate default mysql config
 DBPASS=$(grep "dbc_dbpass=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
