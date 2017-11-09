@@ -1,5 +1,10 @@
 #!/bin/sh
 
+logdir=/var/log/archivematica/MCPClient
+mkdir -p $logdir
+chown -R archivematica:archivematica $logdir
+chmod -R g+s $logdir
+
 # Populate default mysql config
 DBPASS=$(grep "dbc_dbpass=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
 sed -i "s/^\(ARCHIVEMATICA_MCPCLIENT_CLIENT_PASSWORD=\).*/\1$DBPASS/g" /etc/default/archivematica-mcp-client

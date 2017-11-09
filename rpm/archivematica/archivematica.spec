@@ -256,16 +256,12 @@ fi
 # MCP Server
 %post mcp-server
 mkdir -p /var/log/archivematica/MCPServer
-touch /var/log/archivematica/MCPServer/MCPServer.log
-touch /var/log/archivematica/MCPServer/MCPServer_debug.log
 chown -R archivematica:archivematica /var/log/archivematica/MCPServer
 systemctl daemon-reload
 
 # MCP Client
 %post mcp-client
 mkdir -p /var/log/archivematica/MCPClient
-touch /var/log/archivematica/MCPClient/MCPClient.log
-touch /var/log/archivematica/MCPClient/MCPClient_debug.log
 chown -R archivematica:archivematica /var/log/archivematica/MCPClient
 systemctl daemon-reload
 
@@ -273,8 +269,6 @@ systemctl daemon-reload
 %post dashboard
 
 mkdir -p /var/log/archivematica/dashboard
-touch /var/log/archivematica/dashboard/dashboard.log
-touch /var/log/archivematica/dashboard/dashboard_debug.log
 chown -R archivematica:archivematica /var/log/archivematica/dashboard
 
 # Create Django key
