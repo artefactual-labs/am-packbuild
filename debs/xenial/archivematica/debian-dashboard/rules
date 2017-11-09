@@ -4,5 +4,6 @@
 	dh $@ --with python-virtualenv --with systemd
 
 override_dh_virtualenv:
+	dh_virtualenv --requirements ../archivematicaCommon/requirements/production.txt --skip-install
 	dh_virtualenv -v --skip-install -D src/ 
 
