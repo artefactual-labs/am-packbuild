@@ -1,5 +1,5 @@
 NAME          = siegfried
-VERSION       = 1.7.3
+VERSION       = 1.7.6
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
