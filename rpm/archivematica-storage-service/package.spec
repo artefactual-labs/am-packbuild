@@ -89,9 +89,17 @@ chown -R archivematica:archivematica /var/archivematica/storage_service /var/log
 chmod 770 /var/archivematica/storage-service/
 chmod 750 /var/lib/archivematica/
 
+# Create Django secret key
+KEYCMD=$(python /var/archivematica/storage-service/make_key.py 2>&1)
+echo $KEYCMD
+sed -i "s/<replace-with-key>/\"$KEYCMD\"/g" /etc/sysconfig/archivematica-storage-service
+
+# Run django collectstatic task
 cd /usr/lib/archivematica/storage-service
 export $(cat /etc/sysconfig/archivematica-storage-service)
 /usr/share/python/archivematica-storage-service/bin/python manage.py collectstatic --noinput
+
+systemctl daemon-reload
 
 # Update SELinux policies
 if [ x$(semanage port -l | grep http_port_t | grep 7500 | wc -l) == x0 ]; then
@@ -101,7 +109,3 @@ if [ x$(semanage port -l | grep http_port_t | grep 8001 | wc -l) == x0 ]; then
   semanage port -a -t http_port_t -p tcp 8001
 fi
 
-# Create Django secret key
-KEYCMD=$(python /var/archivematica/storage-service/make_key.py 2>&1)
-echo $KEYCMD
-sed -i "s/<replace-with-key>/\"$KEYCMD\"/g" /etc/sysconfig/archivematica-storage-service
