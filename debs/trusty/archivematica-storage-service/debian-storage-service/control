@@ -5,13 +5,11 @@ Maintainer: Artefactual Systems Inc. <ops@artefactual.com>
 Build-Depends: 
     python (>= 2.7.3),
     debhelper (>= 9),
-    gnupg,
     libffi-dev,
     libssl-dev,
     libxml2-dev,
     libxslt-dev,
     python-dev,
-    rng-tools,
     dh-virtualenv (>= 0.8),
     zlib1g-dev
 Standards-Version: 3.9.3
@@ -19,7 +17,14 @@ X-Python-Version: 2.7
 
 Package: archivematica-storage-service
 Architecture: i386 amd64
-Depends: ${python:Depends}, ${misc:Depends}, nginx, unar (>= 1.8.1-4~), python (>= 2.7.3)
+Depends:
+    ${python:Depends},
+    ${misc:Depends}, 
+    gnupg,
+    nginx, 
+    unar (>= 1.8.1-4~),
+    python (>= 2.7.3),
+    rng-tools
 Description: Django webapp for managing storage in an Archivematica
     installation.
 Homepage: http://archivematica.org

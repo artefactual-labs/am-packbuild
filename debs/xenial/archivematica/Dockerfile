@@ -2,12 +2,21 @@ FROM ubuntu:xenial
 
 RUN apt-get update && \
     apt-get install -y dpkg-dev git build-essential wget debhelper \
-    devscripts equivs quilt 
+    devscripts equivs
 
 RUN wget -O /tmp/pip.py https://bootstrap.pypa.io/get-pip.py && python /tmp/pip.py
 
-RUN apt-get update && apt-get install -y libffi-dev libssl-dev libxslt-dev dh-virtualenv python-dev dh-systemd libmysqlclient-dev libldap2-dev libsasl2-dev curl
+RUN wget -O - https://deb.nodesource.com/setup_8.x |  bash -
 
-RUN curl -sL https://deb.nodesource.com/setup_8.x |  bash - && apt-get install -y nodejs
+ADD debian-dashboard/control /tmp/dashboard
+ADD debian-MCPClient/control /tmp/mcpclient
+ADD debian-MCPServer/control /tmp/mcpserver
 
-
+RUN  apt-get update && \
+     mkdir debian && \
+     cp /tmp/dashboard debian/control && \
+     yes  | mk-build-deps -i debian/control && \
+     cp /tmp/mcpclient debian/control && \
+     yes  | mk-build-deps -i debian/control && \
+     cp /tmp/mcpserver debian/control && \
+     yes  | mk-build-deps -i debian/control 

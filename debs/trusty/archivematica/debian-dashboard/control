@@ -2,10 +2,22 @@ Source: archivematica-dashboard
 Section: utils
 Priority: extra
 Maintainer: Santiago Collazo <sysadmin@artefactual.com>
-Build-Depends: debhelper (>= 9), libffi-dev, libssl-dev
+Build-Depends: 
+	debhelper (>= 9),
+	libffi-dev,
+	libldap2-dev,
+	libsasl2-dev,
+	libssl-dev,
+	python-virtualenv,
+	python-dev,
+	libxml2-dev,
+	libxslt1-dev,
+	libmysqlcilent-dev,
+	dh-virtualenv (>= 0.11),
+	quilt,
+	nodejs (>= 8)
 Standards-Version: 3.9.8
 Homepage: http://archivematica.org
-
 Package: archivematica-dashboard
 Architecture: any
 Depends: 

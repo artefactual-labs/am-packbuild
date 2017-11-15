@@ -35,6 +35,23 @@ build:
 		$(DOCKER_IMAGE) \
                  make -C $(DOCKER_VOLUME) deb-build
 
+dev:
+	@echo "==> Building deb."
+	@docker run -i -t \
+                -e BRANCH=$(BRANCH) \
+		-e VERSION=$(VERSION) \
+		-e RELEASE=$(RELEASE) \
+                -e BUILD_TYPE=$(BUILD_TYPE) \
+                -e GPG_ID=$(GPG_ID) \
+		-e GPG_KEY \
+		-e PACKBUILD_EXTRA_ARGS="$(PACKBUILD_EXTRA_ARGS)" \
+ 		--rm \
+                --volume "$(shell cd ../../ && pwd):$(DEB_TOPDIR)/$(NAME)" \
+		--volume "$(shell pwd):$(DOCKER_VOLUME)" \
+		$(DOCKER_IMAGE) \
+                 /bin/bash
+
+
 deb-build: deb-clean
 	@echo "==> Install dependencies."
 	# Add GPG if available

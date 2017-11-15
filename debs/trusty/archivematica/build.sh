@@ -27,7 +27,7 @@ for i in dashboard MCPClient MCPServer archivematicaCommon
 	cp -rf $BASE/debian-$i/* debian/
 	dch -v 1:${VERSION}${RELEASE} commit: $(echo $COMMIT)
 	dch -v 1:${VERSION}${RELEASE} checkout: $(echo $BRANCH) 
-	dch -r --distribution trusty --urgency high ignored		
+	dch -r --distribution trusty --urgency high ignored
 	QUILT_PATCHES="debian/patches" quilt push -a || true
 	dpkg-buildpackage -us -uc
 	cd $SOURCE

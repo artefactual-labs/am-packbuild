@@ -17,7 +17,7 @@ all: build-docker-image build
 
 build-docker-image: update-changelog
 	@echo "==> Building Docker image with build environment."
-	@docker build --rm --tag "$(DOCKER_IMAGE)" .
+	@docker build --no-cache --rm --tag "$(DOCKER_IMAGE)" .
 
 build:
 	@echo "==> Building deb."

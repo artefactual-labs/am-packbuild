@@ -9,6 +9,7 @@ cd $SOURCE
 BRANCH="$(git branch | cut -d\  -f2-)"
 COMMIT=$(git rev-parse HEAD)
 cp -rf ${BASE}/debian-storage-service/* debian/
+yes | mk-build-deps -i debian/control
 pip download -d lib --no-binary :all: -r requirements.txt
 dch -v 1:${VERSION}${RELEASE} commit: $(echo $COMMIT)
 dch -v 1:${VERSION}${RELEASE} checkout: $(echo $BRANCH) 
