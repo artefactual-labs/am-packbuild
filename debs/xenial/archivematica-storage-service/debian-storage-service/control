@@ -12,7 +12,6 @@ Build-Depends:
     libxml2-dev,
     libxslt-dev,
     python-dev,
-    postgresql-server-dev-9.5,
     rng-tools,
     dh-virtualenv (>= 0.8),
     dh-systemd,

@@ -2,7 +2,7 @@ FROM ubuntu:xenial
 
 RUN apt-get update && \
     apt-get install -y dpkg-dev git build-essential wget debhelper \
-    devscripts equivs
+    devscripts equivs quilt
 
 RUN wget -O /tmp/pip.py https://bootstrap.pypa.io/get-pip.py && python /tmp/pip.py
 
