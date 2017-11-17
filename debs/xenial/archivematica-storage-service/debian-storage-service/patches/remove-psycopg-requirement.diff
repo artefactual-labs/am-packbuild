@@ -1,0 +1,10 @@
+Index: archivematica-storage-service/requirements/production.txt
+===================================================================
+--- archivematica-storage-service.orig/requirements/production.txt
++++ archivematica-storage-service/requirements/production.txt
+@@ -6,4 +6,3 @@
+ # in all cases (i.e. test.txt doesn't need them, but local and production do)
+ dj-database-url==0.4.2
+ mysqlclient==1.3.8
+-psycopg2==2.7.1
+\ No newline at end of file
