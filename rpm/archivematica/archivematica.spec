@@ -54,6 +54,7 @@ Requires: python-unidecode
 Requires: libpst
 Requires: openjpeg
 Requires: mediainfo
+Requires: mediaconch
 # Packages from Archivematica repo
 Requires: siegfried
 Requires: fits

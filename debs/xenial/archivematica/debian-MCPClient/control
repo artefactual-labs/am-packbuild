@@ -28,6 +28,7 @@ Depends:
 	libxml2-utils,
 	logapp,
 	md5deep,
+	mediaconch (>= 16.12),
 	mediainfo,
 	nailgun,
 	nailgun-client,
