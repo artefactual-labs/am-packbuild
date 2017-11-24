@@ -35,6 +35,8 @@ libflac8 | 1.3.2-1\~16.04.york0 |  |
 libfontconfig1 | 2.11.94-0ubuntu2\~16.04.york0 |  | 
 libfontconfig1-dbg | 2.11.94-0ubuntu2\~16.04.york0 |  | 
 libfontconfig1-dev | 2.11.94-0ubuntu2\~16.04.york0 |  | 
+libmediainfo0v5 | | 0.7.91-1 | |
+libmediainfo0 | 0.7.91-1 |  | |
 libopenjp2-7 | 2.1.2-1.1\~16.04.york0 | 2.1.1-1\~ubuntu14.04.1york0 | 
 libopenjp2-7-dbg | 2.1.2-1.1\~16.04.york0 | 2.1.1-1\~ubuntu14.04.1york0 | 
 libopenjp2-7-dev | 2.1.2-1.1\~16.04.york0 | 2.1.1-1\~ubuntu14.04.1york0 | 
@@ -76,7 +78,10 @@ libx265-130 | 2.5-1\~16.04.york0 | 2.5-1\~14.04.york0 |
 libx265-79 |  | 1.9-3\~ubuntu14.04.1york1 | 
 libx265-87 | 2.0-4\~ubuntu16.04.1york0 | 2.0-4\~ubuntu14.04.1york0 | 
 libx265-95 | 2.2-0\~16.04.york0 | 2.2-0\~14.04.york0 | 
-libx265-dev | 2.5-1\~16.04.york0 | 2.5-1\~14.04.york0 | 
+libx265-dev | 2.5-1\~16.04.york0 | 2.5-1\~14.04.york0 |
+libzen0 | 0.4.34-1 | |
+libzen0v5 | 0.4.35-1 | |
+mediaconch | 16.12 | 16.12\~14.04 |
 nailgun | 0.9.1-10\~14.04 | 0.9.1-10\~14.04 | 
 nailgun-client | 0.9.1-4\~14.04 | 0.9.1-4\~14.04 | 
 openmpt123 | 0.2.7386\~beta20.3-3\~16.04.york0 |  | 
