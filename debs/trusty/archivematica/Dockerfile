@@ -1,6 +1,6 @@
 FROM ubuntu:trusty
 
-
+# Intall required repos and dependencies
 RUN apt-get update && \
     apt-get install -y dpkg-dev git build-essential wget debhelper \
     devscripts equivs quilt 
@@ -15,3 +15,8 @@ RUN apt-get update && apt-get install -y libffi-dev libssl-dev libxslt-dev pytho
 
 RUN curl -sL https://deb.nodesource.com/setup_8.x |  bash - && apt-get install -y nodejs
 
+# Set Path
+ENV PATH=/usr/local/bin:$PATH
+
+# Update setuptools and virtualenv
+RUN /usr/local/bin/pip install -U setuptools virtualenv
