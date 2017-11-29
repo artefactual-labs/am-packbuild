@@ -256,7 +256,6 @@ systemctl daemon-reload
 %post dashboard
 
 mkdir -p /var/log/archivematica/dashboard
-chown -R archivematica:archivematica /var/log/archivematica/dashboard
 
 # Create Django key
 KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
@@ -267,6 +266,7 @@ export $(cat /etc/sysconfig/archivematica-dashboard)
 cd /usr/share/archivematica/dashboard
 /usr/share/python/archivematica-dashboard/bin/python manage.py collectstatic --noinput
 
+chown -R archivematica:archivematica /var/log/archivematica/dashboard
 systemctl daemon-reload
 # Update SELinux policy
 if [ x$(semanage port -l | grep http_port_t | grep 7400 | wc -l) == x0 ]; then
