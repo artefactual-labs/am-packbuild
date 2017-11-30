@@ -1,3 +1,17 @@
+archivematica-mcp-server (1:1.6.1-2~16.04) trusty; urgency=high
+
+  * commit: 11e89646f2708d525ba5f19ccce9b4879b02a619
+  * checkout: stable/1.6.x
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Mon, 31 Jul 2017 19:20:04 +0000
+
+archivematica-mcp-server (1:1.5.1-1~14.04) trusty; urgency=high
+
+  * commit: 78f1dcb77de2eb24bbf3430e662d3999f9c86192
+  * checkout: v1.5.1
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Wed, 24 Aug 2016 09:30:51 +0000
+
 archivematica-mcp-server (1:1.4.1+2SNAPSHOT20160605122700~14.04) trusty; urgency=high
 
   * commit: 

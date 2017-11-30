@@ -1,3 +1,17 @@
+archivematica-storage-service (1:0.10.1-1~14.04) trusty; urgency=high
+
+  * commit: 1afb22aa7c05d1ba43dc531536b8e49dfe4c2da8
+  * checkout: stable/0.10.x
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Mon, 31 Jul 2017 09:24:16 +0000
+
+archivematica-storage-service (1:0.9.1-1~14.04) trusty; urgency=high
+
+  * commit: 35e24cb7a69f1c7cfd79a8ffafdc9ccd4f8e7e35
+  * checkout: v0.9.1
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Wed, 24 Aug 2016 09:25:25 +0000
+
 archivematica-storage-service (0.5.0.rc.4-1~precise1) precise; urgency=high
 
   * Archivematica Storage Service 0.5.0 release adding DuraCloud integration
