@@ -19,7 +19,7 @@ COMMIT=$(git rev-parse HEAD)
 for i in dashboard MCPClient MCPServer archivematicaCommon
 	do
 	cd "${SOURCE}/$i/"
-	cp -rf $BASE/debian-$i/* debian/
+	cp -rf $BASE/debian-$i debian
 	yes | mk-build-deps -i debian/control
 	dch -v 1:${VERSION}${RELEASE} commit: $(echo $COMMIT)
 	dch -v 1:${VERSION}${RELEASE} checkout: $(echo $BRANCH) 
