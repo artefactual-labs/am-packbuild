@@ -16,13 +16,19 @@ build-docker-image:
 
 build:
 	@echo "==> Building deb."
-	docker run --rm --volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) make -C $(DOCKER_VOLUME) deb-build
+	docker run \
+                   -e RELEASE=$(RELEASE) \
+                   --rm \
+                   --volume "$(shell pwd):$(DOCKER_VOLUME)" \
+                  $(DOCKER_IMAGE) \
+                   make -C $(DOCKER_VOLUME) deb-build
 
 deb-build: deb-clean
 	@echo "==> Build package from source."
 	cd /debbuild/$(NAME) && mvn package
 	@echo "==> Copy package skel."
 	cp -rf $(DOCKER_VOLUME)/package /debbuild/$(NAME)_$(VERSION)-$(RELEASE)
+	sed -i 's/RELEASE/$(RELEASE)/g' /debbuild/$(NAME)_$(VERSION)-$(RELEASE)/DEBIAN/control
 	@echo "==> Build package."
 	cp /debbuild/$(NAME)/jhove-apps/target/jhove-apps-*.jar  /debbuild/$(NAME)_$(VERSION)-$(RELEASE)/usr/share/java/jhove.jar
 	dpkg-deb --build /debbuild/$(NAME)_$(VERSION)-$(RELEASE)
