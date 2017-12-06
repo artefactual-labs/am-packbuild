@@ -35,6 +35,7 @@ libflac8 | 1.3.2-1\~16.04.york0 |  |
 libfontconfig1 | 2.11.94-0ubuntu2\~16.04.york0 |  | 
 libfontconfig1-dbg | 2.11.94-0ubuntu2\~16.04.york0 |  | 
 libfontconfig1-dev | 2.11.94-0ubuntu2\~16.04.york0 |  | 
+jhove | 1.16.7-1+16.04 |1.16.7-1+14.04|
 libmediainfo0v5 | | 0.7.91-1 | |
 libmediainfo0 | 0.7.91-1 |  | |
 libopenjp2-7 | 2.1.2-1.1\~16.04.york0 | 2.1.1-1\~ubuntu14.04.1york0 | 
