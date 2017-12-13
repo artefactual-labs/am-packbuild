@@ -52,6 +52,7 @@ sudo service archivematica-mcp-client start
 sudo service archivematica-storage-service start
 sudo service archivematica-dashboard start
 sudo service nginx restart
+sudo systemctl enable fits
 sudo service fits start
 sudo service clamav-daemon start
 
