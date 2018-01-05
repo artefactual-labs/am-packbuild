@@ -58,7 +58,7 @@ rpm-build: rpm-clean
 	cp -p $(RPM_TOPDIR)/SRPMS/$(PACKAGE)-*.src.rpm $(DOCKER_VOLUME)
 
 rpm-clean:
-	@echo "==> Cleaning up previous RPMs builds."
+	@echo "==> Cleaning up previous builds."
 	@rm -rf $(RPM_TOPDIR)
 
 rpm-test:
