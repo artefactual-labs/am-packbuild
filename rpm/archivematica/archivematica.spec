@@ -50,7 +50,6 @@ Requires: clamav-lib
 Requires: clamav-server-systemd
 Requires: libvpx
 Requires: libraw1394
-Requires: python-unidecode
 Requires: libpst
 Requires: openjpeg
 Requires: mediainfo
