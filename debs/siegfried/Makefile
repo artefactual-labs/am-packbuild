@@ -1,8 +1,8 @@
 NAME          = siegfried
 PACKAGE       = siegfried
-VERSION       ?= 1.7.6
+VERSION       ?= 1.7.8
 RELEASE       ?= 1
-BRANCH        ?= v1.7.6
+BRANCH        ?= v1.7.8
 GIT_URL       = https://github.com/richardlehane/siegfried/
 DEB_TOPDIR    = "/debbuild"
 DOCKER_VOLUME = "/src"
