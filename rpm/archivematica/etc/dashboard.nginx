@@ -9,7 +9,7 @@ server {
     proxy_redirect off;
     proxy_buffering off;
     proxy_read_timeout 120;
-    proxy_pass http://localhost:7400;
+    proxy_pass http://localhost4:7400;
   }
 
 

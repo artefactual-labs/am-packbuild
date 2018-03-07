@@ -9,7 +9,7 @@ server {
     proxy_redirect off;
     proxy_buffering off;
     proxy_read_timeout 120;
-    proxy_pass http://localhost:7500;
+    proxy_pass http://localhost4:7500;
   }
   error_page 500 502 503 504 /500.html;
   location = /500.html {
