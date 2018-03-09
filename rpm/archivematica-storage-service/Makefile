@@ -1,5 +1,5 @@
 NAME          = archivematica-storage-service
-BRANCH        ?= qa/0.x
+BRANCH        ?= stable/0.11.x
 VERSION       ?= 0.11.0
 RELEASE       ?= rc1
 RPM_TOPDIR    = "/rpmbuild"

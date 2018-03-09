@@ -134,7 +134,7 @@ mkdir -p %{buildroot}/%{install_dir}
 
 git clone \
   --quiet \
-  --branch qa/1.x \
+  --branch stable/1.7.x \
   --depth 1 \
   --single-branch \
   --recurse-submodules \

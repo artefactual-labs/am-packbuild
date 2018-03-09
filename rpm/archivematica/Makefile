@@ -3,7 +3,7 @@ RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  ?= "rpmbuild-$(PACKAGE)-$(VERSION)"
 
-BRANCH     ?= qa/1.x
+BRANCH     ?= stable/1.7.x
 VERSION     ?= 1.7.0
 RELEASE       ?= rc1
 

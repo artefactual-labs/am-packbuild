@@ -7,8 +7,8 @@ GPG_ID ?= 0F4A4D31
 PACKBUILD_EXTRA_ARGS ?= 
 #PACKBUILD_EXTRA_ARGS ?= "-b 1"
 PACKAGE = archivematica-storage-service
-BRANCH     ?= stable/0.10.x
-VERSION     ?= 0.10.1
+BRANCH     ?= stable/0.11.x
+VERSION     ?= 0.11.0
 RELEASE       ?= +rc2~xenial
 BUILD_TYPE         ?= ss
 
