@@ -9,7 +9,7 @@ Group: Application/System
 License: AGPLv3
 Source0: https://github.com/artefactual/archivematica-storage-service/
 BuildRequires: git, gcc, libffi-devel, openssl-devel, libxslt-devel, python-virtualenv, python-pip, mariadb-devel, postgresql-devel, gcc-c++
-Requires: gnupg, policycoreutils-python, rng-tools, rsync, nginx, unar, p7zip
+Requires: gnupg, policycoreutils-python, rng-tools, rsync, nginx, unar, p7zip, shadow-utils
 AutoReq: No
 AutoProv: No
 %description
@@ -76,11 +76,16 @@ rm -rf %{buildroot}
 
 %post
 
-# Create archivematica user
-userID=`id -u archivematica`
-if [ "${userID}" != 333 ]; then
-  useradd --uid 333 --user-group --home /var/lib/archivematica/ archivematica
+# Create archivematica user and group
+getent group archivematica >/dev/null || groupadd -f -g 333 -r archivematica
+if ! getent passwd archivematica >/dev/null ; then
+  if ! getent passwd 333 >/dev/null ; then
+    useradd -r -u 333 -g archivematica -d /var/lib/archivematica/ -s /sbin/nologin -c "Archivematica system account" archivematica
+    else
+    useradd -r -g archivematica -d /var/lib/archivematica/ -s /sbin/nologin -c "Archivematica system account" archivematica
+    fi
 fi
+
 
 mkdir -p /var/log/archivematica/storage-service /var/archivematica/storage-service /var/archivematica/storage_service
 touch /var/log/archivematica/storage-service/storage_service.log

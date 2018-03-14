@@ -21,6 +21,7 @@ Archivematica is a web- and standards-based, open-source application which allow
 
 %package common
 Summary: Archivematica common libraries
+Requires: shadow-utils
 %description common
 Common files and libraries for Archivematica.
 
@@ -230,10 +231,14 @@ rm -rf %{buildroot}
 # Common
 %post common
 
-# Create archivematica user
-userID=`id -u archivematica`
-if [ "${userID}" != 333 ]; then
-  useradd --uid 333 --user-group --home /var/lib/archivematica/ archivematica
+# Create archivematica user and group
+getent group archivematica >/dev/null || groupadd -f -g 333 -r archivematica
+if ! getent passwd archivematica >/dev/null ; then
+  if ! getent passwd 333 >/dev/null ; then
+    useradd -r -u 333 -g archivematica -d /var/lib/archivematica/ -s /sbin/nologin -c "Archivematica system account" archivematica
+    else
+    useradd -r -g archivematica -d /var/lib/archivematica/ -s /sbin/nologin -c "Archivematica system account" archivematica
+  fi
 fi
 
 # Configure permissions of shared directory
