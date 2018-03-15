@@ -1,127 +1,21 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-#
-# Environment variables
-#
-
-repofile = ENV.fetch('REPOSITORY_CONFIG_FILE', 'archivematica-official.repo')
-
-
-#
-# Vagrant configuration
-#
-
 Vagrant.configure(2) do |config|
-
   config.vm.box = "centos/7"
-
-  # VirtualBox Guest Additions not installed in "centos/7" box, using bridge device for now!
-  # config.vm.network "forwarded_port", guest: 80, host: 8080
-  # config.vm.network "private_network", ip: "192.168.33.66"
-  config.vm.network "public_network"
-
-  # VirtualBox Guest Additions not installed in "centos/7" box, using rsync for now!
-#  config.vm.synced_folder "../rpm/_yum_repository", "/am-packbuild/_yum_repository", type: "rsync", rsync__enclude: ".git/"
- config.vm.synced_folder "./", "/am-packbuild/rpm-testing", type: "rsync", rsync__enclude: ".git/"
-  config.vm.synced_folder ".", "/home/vagrant/sync", disabled: true
-
+  unless Vagrant.has_plugin?("vagrant-vbguest")
+    raise 'vagrant-vbguest plugin not installed!'
+  end
+  config.vm.network "private_network", ip: "192.168.33.2"
+  config.vm.synced_folder ".", "/vagrant", type: "virtualbox"
+  config.vm.synced_folder "../", "/am-packbuild", type: "virtualbox"
   config.vm.provider "virtualbox" do |vb|
     vb.memory = "4096"
   end
-
-  config.vm.provision "shell", inline: <<-SHELL
-
-    #
-    # Configure local yum repository
-    #
-
-    sudo -u root rm -f /etc/yum.repos.d/archivematica-*.repo
-    sudo -u root cp /am-packbuild/rpm-testing/#{repofile} /etc/yum.repos.d
-    sudo -u root yum update -y
-    sudo -u root yum install -y epel-release
-
-    #
-    # Install additional repos
-    #
-
-    sudo -u root rpm -Uvh https://forensics.cert.org/cert-forensics-tools-release-el7.rpm
-    sudo -u root rpm -Uvh https://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm
-    sudo -u root rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
-    sudo -u root bash -c 'cat << EOF > /etc/yum.repos.d/elasticsearch.repo
-[elasticsearch-1.7]
-name=Elasticsearch repository for 1.7 packages
-baseurl=https://packages.elastic.co/elasticsearch/1.7/centos
-gpgcheck=1
-gpgkey=https://packages.elastic.co/GPG-KEY-elasticsearch
-enabled=1
-EOF'
-
-
-    #
-    # Install OpenJDK 8, Elasticsearch 1.7, MariaDB and Gearman
-    #
-
-    sudo -u root yum install -y java-1.8.0-openjdk-headless elasticsearch mariadb-server gearmand
-    sudo -u root systemctl enable elasticsearch
-    sudo -u root systemctl start elasticsearch
-    sudo -u root systemctl enable mariadb
-    sudo -u root systemctl start mariadb
-    sudo -u root systemctl enable gearmand
-    sudo -u root systemctl start gearmand
-
-    #
-    # Archivematica Storage Service
-    #
-
-    sudo -u root yum install -y python-pip archivematica-storage-service
-    sudo -u archivematica bash -c " \
-      set -a -e -x
-      source /etc/sysconfig/archivematica-storage-service
-      cd /usr/share/archivematica/storage-service
-      /usr/lib/python2.7/archivematica/storage-service/bin/python manage.py migrate
-      /usr/lib/python2.7/archivematica/storage-service/bin/python manage.py collectstatic --noinput
-    ";
-
-    sudo -u root systemctl enable archivematica-storage-service
-    sudo -u root systemctl start archivematica-storage-service
-    sudo -u root systemctl enable nginx
-    sudo -u root systemctl start nginx
-
-    #
-    # Archivematica
-    #
-
-    sudo -u root yum install -y archivematica-common archivematica-mcp-server archivematica-mcp-client archivematica-dashboard
-
-    sudo -H -u root mysql -hlocalhost -uroot -e "DROP DATABASE IF EXISTS MCP; CREATE DATABASE MCP CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
-    sudo -H -u root mysql -hlocalhost -uroot -e "CREATE USER 'archivematica'@'localhost' IDENTIFIED BY 'demo';"
-    sudo -H -u root mysql -hlocalhost -uroot -e "GRANT ALL ON MCP.* TO 'archivematica'@'localhost';"
-
-    sudo -u archivematica bash -c " \
-      set -a -e -x
-      source /etc/sysconfig/archivematica-dashboard
-      cd /usr/share/archivematica/dashboard
-      /usr/lib/python2.7/archivematica/dashboard/bin/python manage.py syncdb --noinput
-    ";
-
-    sudo -u root systemctl enable archivematica-mcp-server
-    sudo -u root systemctl start archivematica-mcp-server
-    sudo -u root systemctl enable archivematica-mcp-client
-    sudo -u root systemctl start archivematica-mcp-client
-    sudo -u root systemctl enable archivematica-dashboard
-    sudo -u root systemctl start archivematica-dashboard
-    sudo -u root systemctl enable fits-nailgun
-    sudo -u root systemctl start fits-nailgun
-    sudo -u root systemctl reload nginx
-
-    # TODO: configure clamav-daemon and freshclam
-    sudo cp /usr/bin/clamscan /usr/bin/clamdscan
-    sudo ln -sf /usr/bin/7za /usr/bin/7z
-
-    # Print IP address after provisioning
-    ip addr | grep "dynamic eth1"
-
-  SHELL
-
+  config.vm.provision "shell",
+    inline: "/am-packbuild/rpm-testing/install.sh",
+    env: {
+      "LOCAL_REPOSITORY" => ENV.fetch('LOCAL_REPOSITORY', 'no'),
+      "SEARCH_ENABLED" => ENV.fetch('SEARCH_ENABLED', 'no'),
+    }
 end
