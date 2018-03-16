@@ -9,5 +9,7 @@
 # Uncomment this to turn on verbose mode.
 #export DH_VERBOSE=1
 
+export DH_VIRTUALENV_INSTALL_ROOT=/usr/share/archivematica/virtualenvs
+
 %:
 	dh  $@

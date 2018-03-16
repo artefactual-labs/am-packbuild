@@ -6,7 +6,7 @@ After=syslog.target network.target mysql.service
 Type=simple
 User=archivematica
 EnvironmentFile=/etc/default//archivematica-mcp-server
-ExecStart=/usr/share/python/archivematica-mcp-server/bin/python /usr/lib/archivematica/MCPServer/archivematicaMCP.py
+ExecStart=/usr/share/archivematica/virtualenvs/archivematica-mcp-server/bin/python /usr/lib/archivematica/MCPServer/archivematicaMCP.py
 
 [Install]
 WantedBy=multi-user.target
