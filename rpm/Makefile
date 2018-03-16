@@ -4,7 +4,7 @@ all: build createrepo
 
 build:
 	make -C ./siegfried
-	make -C ./storage-service
+	make -C ./archivematica-storage-service
 	make -C ./archivematica
 	make -C ./nailgun
 	make -C ./fits
