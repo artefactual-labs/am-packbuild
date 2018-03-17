@@ -1,22 +1,21 @@
-# am-packbuild
+### Build packages
 
-Archivematica package building scripts.
+You need Docker installed and running.
 
-Usage example:
+CentOS 7 packages:
 
-For snapshot package:
+    make -C rpm
 
-    ./packbuild.py -r am -v 1.3.1 -c dev/issue-7239-contentdm-metadata-dip -p archivematica/daily -k 7F0699A0
+This also builds a local repository that you can use later from `rpm-testing`.
 
-For release package (include -b flag):
+We don't have a single target yet for Xenial/Trusty packages but you can build
+the packages individually, for example:
 
-    ./packbuild.py -r ss -v 0.6.1 -c stable/0.6.x -p archivematica/packbuild-test -k 7F0699A0 -b 1
+    make -C debs/xenial/archivematica
+    make -C debs/xenial/archivematica-storage-service
 
-### RPM
+### Test packages
 
-The `rpm/` directory contains the files that we use to build our RPM packages.
-Use the Makefiles to build the packages. You need Docker installed and running
-but it works if the Docker daemon is running a remote machine.
+CentOS 7 packages: see the [./rpm-testing](rpm-testing) directory for more details.
 
-The `rpm-testing` directory contains our Vagrant environment to test the RPM
-packages.
+Ubuntu packages: this is work in progress (see #127).
