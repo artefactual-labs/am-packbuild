@@ -52,3 +52,11 @@ docs/_build/
 
 # PyBuilder
 target/
+
+
+/deb-testing/.repo
+/deb-testing/.vagrant
+/debs/xenial/archivematica/src
+/debs/xenial/archivematica/repo
+/debs/xenial/archivematica-storage-service/src
+/debs/xenial/archivematica-storage-service/repo
