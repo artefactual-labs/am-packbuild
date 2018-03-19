@@ -1,0 +1,14 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure(2) do |config|
+  config.vm.box = "ubuntu/xenial64"
+  config.vm.synced_folder "../", "/am-packbuild"
+  config.vm.network "private_network", type: "dhcp"
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "3000"
+  end
+  config.vm.provision "shell",
+    inline: "/am-packbuild/debs/xenial/install.sh",
+    env: {"LOCAL_REPOSITORY": ENV.fetch('LOCAL_REPOSITORY', 'no')}
+end
