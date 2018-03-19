@@ -95,7 +95,7 @@ Archivematica dashboard with Nginx + gunicorn.
 
 # MCPServer
 %files mcp-server
-/usr/share/python/archivematica-mcp-server/
+/usr/share/archivematica/virtualenvs/archivematica-mcp-server/
 /usr/lib/archivematica/MCPServer/
 /usr/lib/systemd/system/archivematica-mcp-server.service
 %config /etc/sysconfig/archivematica-mcp-server
@@ -104,7 +104,7 @@ Archivematica dashboard with Nginx + gunicorn.
 
 # MCPClient
 %files mcp-client
-/usr/share/python/archivematica-mcp-client/
+/usr/share/archivematica/virtualenvs/archivematica-mcp-client/
 /usr/lib/archivematica/MCPClient/
 /usr/lib/systemd/system/archivematica-mcp-client.service
 %config /etc/sysconfig/archivematica-mcp-client
@@ -113,7 +113,7 @@ Archivematica dashboard with Nginx + gunicorn.
 
 # Dashboard
 %files dashboard
-/usr/share/python/archivematica-dashboard/
+/usr/share/archivematica/virtualenvs/archivematica-dashboard/
 /usr/share/archivematica/dashboard/
 /usr/lib/systemd/system/archivematica-dashboard.service
 %config /etc/sysconfig/archivematica-dashboard
@@ -126,9 +126,8 @@ Archivematica dashboard with Nginx + gunicorn.
 #
 
 %prep
-rm -rf /usr/share/archivematica
+rm -rf /usr/share/python/archivematica*
 rm -rf /usr/lib/archivematica
-rm -rf /usr/share/python/archivematica
 rm -rf %{_sourcedir}/*
 rm -rf %{buildroot}/*
 mkdir -p %{buildroot}/%{install_dir}
@@ -153,9 +152,9 @@ mkdir -p \
   %{buildroot}/usr/lib/archivematica/MCPServer \
   %{buildroot}/usr/lib/archivematica/MCPClient \
   %{buildroot}/usr/lib/archivematica/archivematicaCommon \
-  %{buildroot}/usr/share/python/archivematica-mcp-server \
-  %{buildroot}/usr/share/python/archivematica-mcp-client \
-  %{buildroot}/usr/share/python/archivematica-dashboard \
+  %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-mcp-server \
+  %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-mcp-client \
+  %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-dashboard \
   %{buildroot}/usr/share/archivematica/dashboard \
   %{buildroot}/var/archivematica/sharedDirectory \
   %{buildroot}/etc/sysconfig \
@@ -166,13 +165,13 @@ mkdir -p \
 cp -rf %{_sourcedir}/%{name}/src/archivematicaCommon/lib/* %{buildroot}/usr/lib/archivematica/archivematicaCommon/
 
 # MCPServer
-virtualenv /usr/share/python/archivematica-mcp-server
-/usr/share/python/archivematica-mcp-server/bin/pip install --upgrade pip
-/usr/share/python/archivematica-mcp-server/bin/pip install -r %{_sourcedir}/%{name}/src/archivematicaCommon/requirements/production.txt
-/usr/share/python/archivematica-mcp-server/bin/pip install -r %{_sourcedir}/%{name}/src/dashboard/src/requirements/production.txt
-/usr/share/python/archivematica-mcp-server/bin/pip install -r %{_sourcedir}/%{name}/src/MCPServer/requirements/production.txt
-virtualenv --relocatable /usr/share/python/archivematica-mcp-server
-cp -rf /usr/share/python/archivematica-mcp-server/* %{buildroot}/usr/share/python/archivematica-mcp-server/
+virtualenv /usr/share/archivematica/virtualenvs/archivematica-mcp-server
+/usr/share/archivematica/virtualenvs/archivematica-mcp-server/bin/pip install --upgrade pip
+/usr/share/archivematica/virtualenvs/archivematica-mcp-server/bin/pip install -r %{_sourcedir}/%{name}/src/archivematicaCommon/requirements/production.txt
+/usr/share/archivematica/virtualenvs/archivematica-mcp-server/bin/pip install -r %{_sourcedir}/%{name}/src/dashboard/src/requirements/production.txt
+/usr/share/archivematica/virtualenvs/archivematica-mcp-server/bin/pip install -r %{_sourcedir}/%{name}/src/MCPServer/requirements/production.txt
+virtualenv --relocatable /usr/share/archivematica/virtualenvs/archivematica-mcp-server
+cp -rf /usr/share/archivematica/virtualenvs/archivematica-mcp-server/* %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-mcp-server/
 cp -rf %{_sourcedir}/%{name}/src/MCPServer/lib/* %{buildroot}/usr/lib/archivematica/MCPServer/
 cp %{_sourcedir}/%{name}/src/MCPServer/install/serverConfig.logging.json %{buildroot}/etc/archivematica/serverConfig.logging.json
 cp %{_sourcedir}/%{name}/src/MCPServer/install/serverConfig.conf %{buildroot}/etc/archivematica/serverConfig.conf
@@ -181,13 +180,13 @@ cp %{_etcdir}/archivematica-mcp-server.service %{buildroot}/usr/lib/systemd/syst
 cp %{_etcdir}/archivematica-mcp-server.env %{buildroot}/etc/sysconfig/archivematica-mcp-server
 
 # MCPClient
-virtualenv /usr/share/python/archivematica-mcp-client
-/usr/share/python/archivematica-mcp-client/bin/pip install --upgrade pip
-/usr/share/python/archivematica-mcp-client/bin/pip install -r %{_sourcedir}/%{name}/src/archivematicaCommon/requirements/production.txt
-/usr/share/python/archivematica-mcp-client/bin/pip install -r %{_sourcedir}/%{name}/src/dashboard/src/requirements/production.txt
-/usr/share/python/archivematica-mcp-client/bin/pip install -r %{_sourcedir}/%{name}/src/MCPClient/requirements/production.txt
-virtualenv --relocatable /usr/share/python/archivematica-mcp-client
-cp -rf /usr/share/python/archivematica-mcp-client/* %{buildroot}/usr/share/python/archivematica-mcp-client/
+virtualenv /usr/share/archivematica/virtualenvs/archivematica-mcp-client
+/usr/share/archivematica/virtualenvs/archivematica-mcp-client/bin/pip install --upgrade pip
+/usr/share/archivematica/virtualenvs/archivematica-mcp-client/bin/pip install -r %{_sourcedir}/%{name}/src/archivematicaCommon/requirements/production.txt
+/usr/share/archivematica/virtualenvs/archivematica-mcp-client/bin/pip install -r %{_sourcedir}/%{name}/src/dashboard/src/requirements/production.txt
+/usr/share/archivematica/virtualenvs/archivematica-mcp-client/bin/pip install -r %{_sourcedir}/%{name}/src/MCPClient/requirements/production.txt
+virtualenv --relocatable /usr/share/archivematica/virtualenvs/archivematica-mcp-client
+cp -rf /usr/share/archivematica/virtualenvs/archivematica-mcp-client/* %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-mcp-client/
 
 cp -rf %{_sourcedir}/%{name}/src/MCPClient/lib/* %{buildroot}/usr/lib/archivematica/MCPClient
 cp %{_sourcedir}/%{name}/src/MCPClient/install/clientConfig.logging.json %{buildroot}/etc/archivematica/clientConfig.logging.json
@@ -196,17 +195,17 @@ cp %{_etcdir}/archivematica-mcp-client.service %{buildroot}/usr/lib/systemd/syst
 cp %{_etcdir}/archivematica-mcp-client.env %{buildroot}/etc/sysconfig/archivematica-mcp-client
 
 # Dashboard
-virtualenv /usr/share/python/archivematica-dashboard
-/usr/share/python/archivematica-dashboard/bin/pip install --upgrade pip
-/usr/share/python/archivematica-dashboard/bin/pip install -r %{_sourcedir}/%{name}/src/archivematicaCommon/requirements/production.txt
-/usr/share/python/archivematica-dashboard/bin/pip install -r %{_sourcedir}/%{name}/src/dashboard/src/requirements/production.txt
-virtualenv --relocatable /usr/share/python/archivematica-dashboard
+virtualenv /usr/share/archivematica/virtualenvs/archivematica-dashboard
+/usr/share/archivematica/virtualenvs/archivematica-dashboard/bin/pip install --upgrade pip
+/usr/share/archivematica/virtualenvs/archivematica-dashboard/bin/pip install -r %{_sourcedir}/%{name}/src/archivematicaCommon/requirements/production.txt
+/usr/share/archivematica/virtualenvs/archivematica-dashboard/bin/pip install -r %{_sourcedir}/%{name}/src/dashboard/src/requirements/production.txt
+virtualenv --relocatable /usr/share/archivematica/virtualenvs/archivematica-dashboard
 cd %{_sourcedir}/%{name}/src/dashboard/frontend/transfer-browser/ && npm install --unsafe-perm 
 
 cd %{_sourcedir}/%{name}/src/dashboard/frontend/appraisal-tab/ && npm install --unsafe-perm
 
 find %{_sourcedir}/%{name}/src/dashboard/ | grep static
-cp -rf /usr/share/python/archivematica-dashboard/* %{buildroot}/usr/share/python/archivematica-dashboard/
+cp -rf /usr/share/archivematica/virtualenvs/archivematica-dashboard/* %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-dashboard/
 
 cp -rf %{_sourcedir}/%{name}/src/dashboard/src/* %{buildroot}/usr/share/archivematica/dashboard/
 cp %{_sourcedir}/%{name}/src/dashboard/install/dashboard.gunicorn-config.py %{buildroot}/etc/archivematica/dashboard.gunicorn-config.py
@@ -268,7 +267,7 @@ sed -i "s/CHANGE_ME_WITH_A_SECRET_KEY/\"$KEY\"/g" /etc/sysconfig/archivematica-d
 # Run django collectstatic
 export $(cat /etc/sysconfig/archivematica-dashboard)
 cd /usr/share/archivematica/dashboard
-/usr/share/python/archivematica-dashboard/bin/python manage.py collectstatic --noinput
+/usr/share/archivematica/virtualenvs/archivematica-dashboard/bin/python manage.py collectstatic --noinput
 
 chown -R archivematica:archivematica /var/log/archivematica/dashboard
 systemctl daemon-reload

@@ -17,7 +17,7 @@ The Storage Service is the mechanism by which Archivematica is able to store pac
 
 
 %files
-/usr/share/python/archivematica-storage-service/
+/usr/share/archivematica/virtualenvs/archivematica-storage-service/
 /usr/lib/archivematica/storage-service/
 /var/archivematica/storage-service/
 /var/archivematica/storage_service/
@@ -28,7 +28,7 @@ The Storage Service is the mechanism by which Archivematica is able to store pac
 %config /etc/archivematica/storageService.logging.json
 
 %prep
-rm -rf /usr/share/python/archivematica
+rm -rf /usr/share/python/archivematica-storage-service
 rm -rf /usr/share/archivematica
 rm -rf %{_sourcedir}/*
 rm -rf %{buildroot}/*
@@ -46,7 +46,7 @@ git clone \
 
 %install
 mkdir -p \
-  %{buildroot}/usr/share/python/archivematica-storage-service/ \
+  %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-storage-service/ \
   %{buildroot}/usr/lib/archivematica/storage-service/ \
   %{buildroot}/var/archivematica/storage-service/ \
   %{buildroot}/var/archivematica/storage_service/ \
@@ -55,11 +55,11 @@ mkdir -p \
   %{buildroot}/etc/sysconfig/ \
   %{buildroot}/etc/nginx/conf.d
 
-virtualenv /usr/share/python/archivematica-storage-service
-/usr/share/python/archivematica-storage-service/bin/pip install --upgrade pip
-/usr/share/python/archivematica-storage-service/bin/pip install -r %{_sourcedir}/%{name}/requirements/production.txt
-virtualenv --relocatable /usr/share/python/archivematica-storage-service
-cp -rf /usr/share/python/archivematica-storage-service/* %{buildroot}/usr/share/python/archivematica-storage-service/
+virtualenv /usr/share/archivematica/virtualenvs/archivematica-storage-service
+/usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/pip install --upgrade pip
+/usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/pip install -r %{_sourcedir}/%{name}/requirements/production.txt
+virtualenv --relocatable /usr/share/archivematica/virtualenvs/archivematica-storage-service
+cp -rf /usr/share/archivematica/virtualenvs/archivematica-storage-service/* %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-storage-service/
 
 cp -rf %{_sourcedir}/%{name}/storage_service/* %{buildroot}/usr/lib/archivematica/storage-service/
 cp %{_sourcedir}/%{name}/install/make_key.py %{buildroot}/var/archivematica/storage-service/
@@ -102,7 +102,7 @@ sed -i "s/<replace-with-key>/\"$KEYCMD\"/g" /etc/sysconfig/archivematica-storage
 # Run django collectstatic task
 cd /usr/lib/archivematica/storage-service
 export $(cat /etc/sysconfig/archivematica-storage-service)
-/usr/share/python/archivematica-storage-service/bin/python manage.py collectstatic --noinput
+/usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py collectstatic --noinput
 
 systemctl daemon-reload
 
