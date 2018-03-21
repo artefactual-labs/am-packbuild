@@ -9,5 +9,5 @@ Index: dashboard/install/archivematica-dashboard.conf
 -exec /usr/local/bin/gunicorn --config /etc/archivematica/dashboard.gunicorn-config.py wsgi:application
 +script 
 +  export $(cat /etc/default/archivematica-dashboard)
-+  exec /usr/share/python/archivematica-dashboard/bin/gunicorn --config /etc/archivematica/dashboard.gunicorn-config.py wsgi:application
++  exec /usr/share/archivematica/virtualenvs/archivematica-dashboard/bin/gunicorn --config /etc/archivematica/dashboard.gunicorn-config.py wsgi:application
 +end script

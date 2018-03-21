@@ -7,7 +7,7 @@ Index: MCPServer/init/archivematica-mcp-server.conf
  
  env CONF=/etc/archivematica/MCPServer
 -env LOCATION=/usr/lib/archivematica/MCPServer/archivematicaMCP.py
-+env LOCATION="/usr/share/python/archivematica-mcp-server/bin/python /usr/lib/archivematica/MCPServer/archivematicaMCP.py"
++env LOCATION="/usr/share/archivematica/virtualenvs/archivematica-mcp-server/bin/python /usr/lib/archivematica/MCPServer/archivematicaMCP.py"
 +env PYTHONPATH=/usr/lib/archivematica/archivematicaCommon/:/usr/share/archivematica/dashboard/
 +
  
