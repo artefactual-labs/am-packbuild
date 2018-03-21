@@ -7,6 +7,7 @@ echo "postrm" $1
 if [ $1 = "remove" ]; then
     #clean up storage service directories
     rm -rf /usr/share/python/archivematica-storage-service
+    rm -rf /usr/share/archivematica/virtualenvs/archivematica-storage-service
     rm -rf /var/archivematica/storage*
     rm -r /var/archivematica/.storage-service
     rm -f /tmp/storage_service.log
