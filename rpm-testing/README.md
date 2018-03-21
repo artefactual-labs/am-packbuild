@@ -1,9 +1,7 @@
 This Vagrant environment is based on the official CentOS 7 Vagrant box
 `centos/7` which does not include the VirtualBox Guest Additions yet. We will
-be using `rsync` file sharing and `public_network` connectivity for now.
-
-You can provision the Vagrant box using the local yum repository in `../rpm`
-that needs to be previously built or our official repository.
+be using the `vagrant-vbguest` plugin to make sure that they're installed
+before we reach the provisioning stage.
 
 ### Instructions
 
@@ -18,6 +16,8 @@ Provision the Vagrant box using our official repository:
 Alternatively, provision the box using the local repository (`../rpm`), which
 needs to be previously built:
 
+    # Build the packages and the local repo. Then create the box.
+    $ make -C ../rpm 
     $ LOCAL_REPOSITORY="yes" vagrant up
 
 Once is up you should be able to access to the web interfaces:
