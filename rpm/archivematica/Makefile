@@ -10,6 +10,7 @@ RELEASE       ?= rc1
 RPMBUILD_ARGS := \
 	--define "_topdir $(RPM_TOPDIR)" \
 	--define "_etcdir $(DOCKER_VOLUME)/etc" \
+	--define "_branch $(BRANCH)" \
 	--define "name $(PACKAGE)" \
 	--define "rpmversion $(VERSION)" \
 	--define "rpmrelease $(RELEASE)" \

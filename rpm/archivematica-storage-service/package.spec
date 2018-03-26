@@ -36,7 +36,7 @@ mkdir -p %{buildroot}/%{install_dir}
 
 git clone \
   --quiet \
-  --branch stable/0.11.x \
+  --branch %{_branch} \
   --depth 1 \
   --single-branch \
   --recurse-submodules \
