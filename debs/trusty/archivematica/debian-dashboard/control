@@ -12,6 +12,7 @@ Depends:
 	${shlibs:Depends},
 	${misc:Depends},
 	nginx,
+	git,
 	python (>= 2.7.3),
 	libffi-dev,
 	libldap2-dev,
