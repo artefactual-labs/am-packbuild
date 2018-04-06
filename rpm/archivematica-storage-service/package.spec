@@ -26,6 +26,7 @@ The Storage Service is the mechanism by which Archivematica is able to store pac
 %config /etc/nginx/conf.d/archivematica-storage-service.conf
 %config /etc/archivematica/storage-service.gunicorn-config.py
 %config /etc/archivematica/storageService.logging.json
+/usr/bin/archivematica-storage-service-manage
 
 %prep
 rm -rf /usr/share/python/archivematica-storage-service
@@ -53,7 +54,8 @@ mkdir -p \
   %{buildroot}/usr/lib/systemd/system \
   %{buildroot}/etc/archivematica/ \
   %{buildroot}/etc/sysconfig/ \
-  %{buildroot}/etc/nginx/conf.d
+  %{buildroot}/etc/nginx/conf.d \
+  %{buildroot}/usr/bin/
 
 virtualenv /usr/share/archivematica/virtualenvs/archivematica-storage-service
 /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/pip install --upgrade pip
@@ -68,7 +70,7 @@ cp %{_sourcedir}/%{name}/install/storageService.logging.json %{buildroot}/etc/ar
 cp %{_etcdir}/archivematica-storage-service.service %{buildroot}/usr/lib/systemd/system/archivematica-storage-service.service
 cp %{_etcdir}/archivematica-storage-service.env %{buildroot}/etc/sysconfig/archivematica-storage-service
 cp %{_etcdir}/archivematica-storage-service.nginx %{buildroot}/etc/nginx/conf.d/archivematica-storage-service.conf
-
+cp %{_etcdir}/archivematica-storage-service-manage %{buildroot}/usr/bin/
 
 %clean
 rm -rf %{buildroot}

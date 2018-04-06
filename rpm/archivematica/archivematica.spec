@@ -116,6 +116,7 @@ Archivematica dashboard with Nginx + gunicorn.
 /usr/share/archivematica/virtualenvs/archivematica-dashboard/
 /usr/share/archivematica/dashboard/
 /usr/lib/systemd/system/archivematica-dashboard.service
+/usr/bin/archivematica-dashboard-manage
 %config /etc/sysconfig/archivematica-dashboard
 %config /etc/nginx/conf.d/archivematica-dashboard.conf
 %config /etc/archivematica/dashboard.gunicorn-config.py
@@ -159,7 +160,8 @@ mkdir -p \
   %{buildroot}/var/archivematica/sharedDirectory \
   %{buildroot}/etc/sysconfig \
   %{buildroot}/usr/lib/systemd/system \
-  %{buildroot}/etc/nginx/conf.d
+  %{buildroot}/etc/nginx/conf.d \
+  %{buildroot}/usr/bin/
 
 # Common
 cp -rf %{_sourcedir}/%{name}/src/archivematicaCommon/lib/* %{buildroot}/usr/lib/archivematica/archivematicaCommon/
@@ -213,6 +215,7 @@ cp %{_sourcedir}/%{name}/src/dashboard/install/dashboard.logging.json %{buildroo
 cp %{_etcdir}/archivematica-dashboard.service %{buildroot}/usr/lib/systemd/system/archivematica-dashboard.service
 cp %{_etcdir}/archivematica-dashboard.env %{buildroot}/etc/sysconfig/archivematica-dashboard
 cp %{_etcdir}/dashboard.nginx %{buildroot}/etc/nginx/conf.d/archivematica-dashboard.conf
+cp %{_etcdir}/archivematica-dashboard-manage %{buildroot}/usr/bin/
 
 
 #
