@@ -9,7 +9,7 @@ if [ $1 = "remove" ]; then
     rm -rf /usr/share/python/archivematica-storage-service
     rm -rf /usr/share/archivematica/virtualenvs/archivematica-storage-service
     rm -rf /var/archivematica/storage*
-    rm -r /etc/default/archiematica-storage-service
+    rm -r /etc/default/archivematica-storage-service
     rm -f /tmp/storage_service.log
     rm -f /etc/nginx/sites-enabled/storage
     rm -f /etc/nginx/sites-available/storage
