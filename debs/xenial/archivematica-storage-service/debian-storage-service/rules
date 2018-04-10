@@ -6,4 +6,8 @@ export DH_VIRTUALENV_INSTALL_ROOT=/usr/share/archivematica/virtualenvs
 	dh $@ --with python-virtualenv --with systemd
 
 override_dh_virtualenv:
-	dh_virtualenv --extra-pip-arg --find-links=lib 
+	# Preinstalling pip 9.0.3 solves a problem with the shebangs inside the
+	# virtual environment. See:
+	# - https://github.com/artefactual/archivematica/issues/1042
+	# - https://github.com/artefactual-labs/am-packbuild/pull/159
+	dh_virtualenv --preinstall "pip==9.0.3" --extra-pip-arg --find-links=lib
