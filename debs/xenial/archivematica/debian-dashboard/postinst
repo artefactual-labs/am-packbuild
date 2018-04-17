@@ -28,7 +28,9 @@ sed -i "s/^\(ARCHIVEMATICA_DASHBOARD_CLIENT_USER=\).*/\1$DBUSER/g" /etc/default/
 DBNAME=$(grep "dbc_dbname=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
 sed -i "s/^\(ARCHIVEMATICA_DASHBOARD_CLIENT_DATABASE=\).*/\1$DBNAME/g" /etc/default/archivematica-dashboard
 
-
+# Use ucf to preserve user changes in the default file
+ucfr archivematica-dashboard /etc/default/archivematica-dashboard
+ucf --debconf-ok /etc/default/archivematica-dashboard /etc/default/archivematica-dashboard
 
 #this is required to allow syncdb to work properly
 export $(cat /etc/default/archivematica-dashboard)
