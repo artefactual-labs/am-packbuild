@@ -19,6 +19,10 @@ echo $KEYCMD
 sed -i "s/<replace-with-key>/\"$KEYCMD\"/g" /var/archivematica/.storage-service
 sed -i "s/<replace-with-key>/$KEYCMD/g" /etc/archivematica/storage-service.gunicorn-config.py
 
+# Use ucf to preserve user changes in the default file
+ucfr archivematica-storage-service /etc/default/archivematica-storage-service
+ucf --debconf-ok /etc/default/archivematica-storage-service /etc/default/archivematica-storage-service
+
 . /var/archivematica/.storage-service
 export $(cat /etc/default/archivematica-storage-service)
 echo "creating symlink in /usr/lib/archivematica"

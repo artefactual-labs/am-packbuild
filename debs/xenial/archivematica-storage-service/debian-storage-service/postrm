@@ -18,6 +18,14 @@ if [ $1 = "remove" ]; then
     rm -rf /usr/lib/archivematica/storage*
 fi
 
+if [ "$1" = "purge" ]; then
+    rm -f /etc/default/archivematica-storage-service
+    if which ucf >/dev/null 2>&1; then
+        ucf --purge /etc/default/archivematica-storage-service
+        ucfr --purge archivematica-storage-service /etc/default/archivematica-storage-service
+    fi
+fi
+
 exit 0
 
 #DEBHELPER#
