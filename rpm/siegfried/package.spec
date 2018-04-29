@@ -27,8 +27,4 @@ rm -rf $RPM_BUILD_ROOT
 %files
 /usr/bin/roy
 /usr/bin/sf
-
-# Needed so sf can update the signature file.
-# Ideally, should the signature be saved somewhere else?
-%defattr(0644, 1000, 1000, 0755)
 /usr/share/siegfried
