@@ -1,0 +1,45 @@
+#!/usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python
+
+import os
+import re
+import shlex
+import sys
+
+
+ENV_FILE = '/etc/sysconfig/archivematica-storage-service'
+
+
+def read_envfile(path):
+    try:
+        with open(path, 'r') as f:
+            content = f.read()
+    except getattr(__builtins__, 'FileNotFoundError', IOError):
+        return
+    for line in content.splitlines():
+        tokens = list(shlex.shlex(line, posix=True))
+        if len(tokens) < 3:
+            continue
+        name, op = tokens[:2]
+        value = ''.join(tokens[2:])
+        if op != '=':
+            continue
+        if not re.match(r'[A-Za-z_][A-Za-z_0-9]*', name):
+            continue
+        value = value.replace(r'\n', '\n').replace(r'\t', '\t')
+        os.environ.setdefault(name, value)
+
+
+def update_sys_path():
+    try:
+        python_path = os.environ['PYTHONPATH']
+    except KeyError:
+        return
+    for path in python_path.split(':'):
+        sys.path.append(path)
+
+
+if __name__ == "__main__":
+    read_envfile(ENV_FILE)
+    update_sys_path()
+    from django.core.management import execute_from_command_line
+    execute_from_command_line(sys.argv)
