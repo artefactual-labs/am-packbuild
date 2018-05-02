@@ -1,3 +1,10 @@
+archivematica-common (1:1.7.0-1~14.04) trusty; urgency=high
+
+  * commit: 353fb054bfed3cce09cc10e08068712aba2219fb
+  * checkout: v1.7.0
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Tue, 01 May 2018 20:25:25 +0000
+
 archivematica-common (1:1.6.1-2~16.04) trusty; urgency=high
 
   * commit: 11e89646f2708d525ba5f19ccce9b4879b02a619

@@ -1,3 +1,10 @@
+archivematica-storage-service (1:0.11.0-1~16.04) xenial; urgency=high
+
+  * commit: 5a6ce126fec6afea9947714da30ad8533bfc5620
+  * checkout: v0.11.0
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Tue, 01 May 2018 21:18:57 +0000
+
 archivematica-storage-service (1:0.10.1-2~16.04) trusty; urgency=high
 
   * commit: 1afb22aa7c05d1ba43dc531536b8e49dfe4c2da8
