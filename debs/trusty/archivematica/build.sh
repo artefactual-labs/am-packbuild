@@ -12,7 +12,6 @@ for j in transfer-browser appraisal-tab
   done
 
 cd $SOURCE
-BRANCH="$(git branch | cut -d\  -f2-)"
 COMMIT=$(git rev-parse HEAD)
 
 # Just to be sure we use the correct pip
