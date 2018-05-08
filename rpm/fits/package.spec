@@ -1,6 +1,6 @@
 Name: %{name}
 Version: %{version}
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: File Information Tool Set (FITS)
 Buildrequires: ant, gcc
 Source: https://github.com/harvard-lts/fits/archive/v%{version}.zip
