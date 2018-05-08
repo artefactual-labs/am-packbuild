@@ -8,6 +8,7 @@ Patch: fits-home.patch
 Patch1: fits-log4j.patch
 Patch2: fits-enable-toolOutput.patch
 Patch3: fits-use-system-exitftool.patch
+Patch4: fits-disable-mediainfo.patch
 Requires: mediainfo, libzen, perl-Image-ExifTool, nailgun
 License: GPLv3
 
@@ -31,6 +32,7 @@ rm -rf %{buildroot}/*
 %patch1
 %patch2
 %patch3
+%patch4
 
 %install
 ANT_OPTS=-Dfile.encoding=UTF8 ant clean-compile-jar
