@@ -1,4 +1,4 @@
-rchivematica-dashboard (1:1.7.0-1~14.04) trusty; urgency=high
+archivematica-dashboard (1:1.7.0-1~14.04) trusty; urgency=high
 
   * commit: 353fb054bfed3cce09cc10e08068712aba2219fb
   * checkout: v1.7.0
