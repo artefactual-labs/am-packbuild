@@ -35,6 +35,7 @@ Archivematica MCP server.
 Summary: Archivematica MCP client
 Requires: archivematica-common
 Requires: tesseract
+Requires: tree
 Requires: p7zip
 Requires: ImageMagick
 Requires: ghostscript
