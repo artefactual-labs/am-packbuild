@@ -28,7 +28,7 @@ echo REPOSITORY=${REPOSITORY}
 }
 
 stage('Build rpm packages') {
-build job: 'WIP/rpm-jenkinsci', parameters: [
+build job: 'am-packbuild/rpm-jenkinsci', parameters: [
   string(name: 'PACKAGE', value: "${PACKAGE}"),
   string(name: 'BRANCH', value: 'stable/1.7.x'),
   string(name: 'GPG_ID', value: '0F4A4D31'),
@@ -38,7 +38,7 @@ build job: 'WIP/rpm-jenkinsci', parameters: [
 }
 
 stage('Build trusty packages') {
-build job: 'WIP/trusty-jenkinsci', parameters: [
+build job: 'am-packbuild/trusty-jenkinsci', parameters: [
   string(name: 'PACKAGE', value: "${PACKAGE}"),
   string(name: 'BRANCH', value: 'stable/1.7.x'),
   string(name: 'GPG_ID', value: '0F4A4D31'),
@@ -48,7 +48,7 @@ build job: 'WIP/trusty-jenkinsci', parameters: [
 }
 
 stage('Build xenial packages') {
-build job: 'WIP/xenial-jenkinsci', parameters: [
+build job: 'am-packbuild/xenial-jenkinsci', parameters: [
   string(name: 'PACKAGE', value: "${PACKAGE}"),
   string(name: 'BRANCH', value: 'stable/1.7.x'),
   string(name: 'GPG_ID', value: '0F4A4D31'),
