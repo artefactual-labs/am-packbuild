@@ -1,8 +1,13 @@
 
-
 node {
 stage('Get code') {
    git branch: 'stable/1.7.x', url: 'https://github.com/artefactual/archivematica'
+   properties([disableConcurrentBuilds(),
+            gitLabConnection(''),
+            [$class: 'RebuildSettings',
+             autoRebuild: false,
+             rebuildDisabled: false], 
+            pipelineTriggers([pollSCM('*/5 * * * *')])])
 }
 stage ('Set properties') {
     
