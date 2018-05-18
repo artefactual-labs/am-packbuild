@@ -1,0 +1,37 @@
+
+properties([gitLabConnection(''), [$class: 'RebuildSettings', autoRebuild: false, rebuildDisabled: false],
+parameters([
+    string(defaultValue: 'archivematica', description: '', name: 'PACKAGE'), 
+    string(defaultValue: 'stable/1.7.x', description: '', name: 'BRANCH'),
+    string(defaultValue: '0F4A4D31', description: 'For production packages, use production key', name: 'GPG_ID'),
+    string(defaultValue: '1.7.1', description: '', name: 'VERSION'),
+    string(defaultValue: '1', description: '', name: 'RELEASE'),
+    string(defaultValue: 'stable/1.7.x', description: '', name: 'PACKBUILD_BRANCH'),
+    string(defaultValue: 'jenkinsci', description: '', name: 'REPOSITORY')]),
+    pipelineTriggers([])])
+
+node {
+stage('Get code') {
+   git branch: '${PACKBUILD_BRANCH}', url: 'https://github.com/artefactual-labs/am-packbuild'
+   sh '''
+     cd rpm/$PACKAGE/
+     rm -rf *.rpm || true
+     '''
+    }
+stage('Build package'){
+    sh '''
+    cd rpm/${PACKAGE}/
+    RPMRELEASE=$(echo ${RELEASE} | sed -e 's/-/_/g')
+    make PACKAGE=$PACKAGE BRANCH=${BRANCH} VERSION=${VERSION} RELEASE=${RPMRELEASE}
+    '''
+    }
+stage('Update repository'){
+    sh '''
+    mkdir -p /srv/repos/am-packbuild/${REPOSITORY}/centos7
+    cp rpm/${PACKAGE}/*.rpm /srv/repos/am-packbuild/${REPOSITORY}/centos7/
+    cd /srv/repos/am-packbuild/${REPOSITORY}/centos7/
+    createrepo .
+    '''
+}
+
+}
