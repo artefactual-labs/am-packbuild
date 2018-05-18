@@ -32,7 +32,7 @@ stage('Update repository'){
        -o -iname '*.deb' \
        -o -iname '*.build' \
        -o -iname '*.changes' \
-       -o -iname '*.xz' | grep -v "build-deps"  xargs -I{} cp --remove-destination {}  /srv/repos/apt/${REPOSITORY}-trusty/
+       -o -iname '*.xz' | grep -v "build-deps" | xargs -I{} cp --remove-destination {}  /srv/repos/apt/${REPOSITORY}-trusty/
 
     cd /srv/repos/apt/${REPOSITORY}-trusty/
     dpkg-scanpackages . /dev/null > Packages
