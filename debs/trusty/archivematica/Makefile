@@ -51,6 +51,15 @@ dev:
 		$(DOCKER_IMAGE) \
                  /bin/bash
 
+cleanup:
+	@echo "==> Remove artifacts."
+	@docker run -i \
+ 		--rm \
+                --volume "$(shell cd ../../ && pwd):$(DEB_TOPDIR)/$(NAME)" \
+		--volume "$(shell pwd):$(DOCKER_VOLUME)" \
+		$(DOCKER_IMAGE) \
+                 rm -rf /src/repo/ /src/src/
+
 
 deb-build: deb-clean
 	@echo "==> Install dependencies."
@@ -80,7 +89,9 @@ deb-build: deb-clean
 
 deb-clean:
 	@echo "==> Cleaning up previous RPMs builds."
-	@rm -rf $(DOCKER_VOLUME)/build/
+	@@rm -rf $(DOCKER_VOLUME)/repo/
+	@@rm -rf $(DOCKER_VOLUME)/src/
+
 
 deb-test:
 	@docker run --rm --volume="$(shell pwd):$(DOCKER_VOLUME)" ubuntu:trusty echo "Create repo and install package"

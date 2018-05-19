@@ -6,7 +6,7 @@ parameters([
     string(defaultValue: '0F4A4D31', description: 'For production packages, use production key', name: 'GPG_ID'),
     string(defaultValue: '1.7.1', description: '', name: 'VERSION'),
     string(defaultValue: '1', description: '', name: 'RELEASE'),
-    string(defaultValue: 'stable/1.7.x', description: '', name: 'PACKBUILD_BRANCH'),
+    string(defaultValue: 'wip/jenkins-ci', description: '', name: 'PACKBUILD_BRANCH'),
     string(defaultValue: 'jenkinsci', description: '', name: 'REPOSITORY')]),
     pipelineTriggers([])])
 
@@ -29,6 +29,8 @@ stage('Update repository'){
     sh '''
     mkdir -p /srv/repos/am-packbuild/${REPOSITORY}/centos7
     cp rpm/${PACKAGE}/*.rpm /srv/repos/am-packbuild/${REPOSITORY}/centos7/
+    cd rpm/${PACKAGE}/
+    make cleanup
     cd /srv/repos/am-packbuild/${REPOSITORY}/centos7/
     createrepo .
     '''
