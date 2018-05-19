@@ -53,7 +53,7 @@ dev:
 
 cleanup:
 	@echo "==> Remove artifacts."
-	@docker run -i -t \
+	@docker run -i \
  		--rm \
                 --volume "$(shell cd ../../ && pwd):$(DEB_TOPDIR)/$(NAME)" \
 		--volume "$(shell pwd):$(DOCKER_VOLUME)" \

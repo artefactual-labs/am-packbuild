@@ -46,6 +46,14 @@ dev:
 		-e BRANCH="$(BRANCH)" \
 		--rm --volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) /bin/bash
 
+cleanup:
+	@echo "==> Remove artifacts created as root."
+	@docker run -i  \
+		--rm \
+		--volume "$(shell pwd):$(DOCKER_VOLUME)" \
+		 $(DOCKER_IMAGE) \
+		bash -c "rm -rf /src/*.rpm"
+
 
 rpm-build: rpm-clean
 	@echo "==> Preparing environment for rpmbuild."

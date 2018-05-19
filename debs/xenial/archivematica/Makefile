@@ -67,13 +67,13 @@ deb-clean:
 	@rm -rf $(DOCKER_VOLUME)/src/
 
 cleanup:
-	@echo "==> Remove artifacts."
-	@docker run -i -t \
-	--rm \
-	--volume "$(shell cd ../../ && pwd):$(DEB_TOPDIR)/$(NAME)" \
-	--volume "$(shell pwd):$(DOCKER_VOLUME)" \
-	$(DOCKER_IMAGE) \
-	rm -rf /src/repo/ /src/src/
+	@echo "==> Remove artifacts created as root. "
+	@docker run -i \
+		--rm \
+		--volume "$(shell cd ../../ && pwd):$(DEB_TOPDIR)/$(NAME)" \
+		--volume "$(shell pwd):$(DOCKER_VOLUME)" \
+		$(DOCKER_IMAGE) \
+		rm -rf /src/repo/ /src/src/
 
 deb-test:
 	@docker run --rm --volume="$(shell pwd):$(DOCKER_VOLUME)" ubuntu:trusty echo "Create repo and install package"
