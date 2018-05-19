@@ -13,15 +13,11 @@ parameters([
 node {
 stage('Get code') {
    git branch: '${PACKBUILD_BRANCH}', url: 'https://github.com/artefactual-labs/am-packbuild'
-   sh '''
-     cd rpm/$PACKAGE/
-     rm -rf *.rpm || true
-     '''
     }
 stage('Build package'){
     sh '''
     cd debs/trusty/${PACKAGE}/
-    make PACKAGE=$PACKAGE BRANCH=${BRANCH} VERSION=${VERSION} RELEASE=${RELEASE} GPG_ID=${GPG_ID} PACKBUILD_EXTRA_ARGS="-b ${RELEASE}"
+    make PACKAGE=$PACKAGE BRANCH=${BRANCH} VERSION=${VERSION} RELEASE=${RELEASE} GPG_ID=${GPG_ID}
     '''
     }
 stage('Update repository'){
