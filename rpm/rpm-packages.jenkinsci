@@ -27,9 +27,9 @@ stage('Build package'){
     }
 stage('Update repository'){
     sh '''
-    mkdir -p /srv/repos/rpm/${REPOSITORY}
-    cp rpm/${PACKAGE}/*.rpm /srv/repos/rpm/${REPOSITORY}
-    cd /srv/repos/rpm/${REPOSITORY}
+    mkdir -p /srv/repos/am-packbuild/${REPOSITORY}/centos7
+    cp rpm/${PACKAGE}/*.rpm /srv/repos/am-packbuild/${REPOSITORY}/centos7/
+    cd /srv/repos/am-packbuild/${REPOSITORY}/centos7/
     createrepo .
     '''
 }

@@ -27,14 +27,14 @@ stage('Build package'){
 stage('Update repository'){
     sh '''
     cd debs/xenial/${PACKAGE}/
-    mkdir -p /srv/repos/apt/${REPOSITORY}-xenial/
+    mkdir -p /srv/repos/am-packbuild/${REPOSITORY}/xenial/
     find  -iname '*.dsc' \
        -o -iname '*.deb' \
        -o -iname '*.build' \
        -o -iname '*.changes' \
-       -o -iname '*.xz' | grep -v "build-deps" |  xargs -I{} cp --remove-destination {}  /srv/repos/apt/${REPOSITORY}-xenial/
+       -o -iname '*.xz' | grep -v "build-deps" |  xargs -I{} cp --remove-destination {}  /srv/repos/am-packbuild/${REPOSITORY}/xenial/
 
-    cd /srv/repos/apt/${REPOSITORY}-xenial/
+    cd /srv/repos/am-packbuild/${REPOSITORY}/xenial/
     dpkg-scanpackages . /dev/null > Packages
     gzip -9c Packages > Packages.gz
 
