@@ -21,8 +21,10 @@ stage('Get code') {
 stage('Build package'){
     sh '''
     cd rpm/${PACKAGE}/
-    RPMRELEASE=$(echo ${RELEASE} | sed -e 's/-/_/g')
-    make PACKAGE=$PACKAGE BRANCH=${BRANCH} VERSION=${VERSION} RELEASE=${RPMRELEASE}
+    # For rc versions, the version string uses ~
+    CURRENT_VERSION=$(echo ${VERSION} | sed -e 's/-/~/g')
+    CURRENT_RELEASE=$(echo ${VERSION} | sed -e 's/-//g')
+    make PACKAGE=$PACKAGE BRANCH=${BRANCH} VERSION=${CURRENT_VERSION} RELEASE=${CURRENT_RELEASE}
     '''
     }
 stage('Update repository'){
