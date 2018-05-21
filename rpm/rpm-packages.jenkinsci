@@ -22,7 +22,7 @@ stage('Build package'){
     sh '''
     cd rpm/${PACKAGE}/
     RPMRELEASE=$(echo ${RELEASE} | sed -e 's/-/_/g')
-    make PACKAGE=$PACKAGE BRANCH=${BRANCH} VERSION=${VERSION} RELEASE=${RELEASE}
+    make PACKAGE=$PACKAGE BRANCH=${BRANCH} VERSION=${VERSION} RELEASE=${RPMRELEASE}
     '''
     }
 stage('Update repository'){
