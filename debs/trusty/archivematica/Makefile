@@ -66,7 +66,6 @@ deb-build: deb-clean
 	# Add GPG if available
 	@if [ -f "$(DOCKER_VOLUME)/GPG-KEY" ]; then gpg --import $(DOCKER_VOLUME)/GPG-KEY; fi
 	@if [ x"$$GPG_KEY" != x ]; then echo "$$GPG_KEY" | gpg --import - ; fi
-	#@cd /debbuild/$(NAME) && ./packbuild.py -r $(BUILD_TYPE) -v $(VERSION) -c $(BRANCH) -k$(GPG_ID) $(PACKBUILD_EXTRA_ARGS) 
 	@cd /debbuild/$(NAME)  
 	@echo "==> Clone code."
 	mkdir -p src/$(PACKAGE)
