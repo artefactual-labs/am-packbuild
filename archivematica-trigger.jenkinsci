@@ -21,8 +21,8 @@ sh '''
        echo "This is an official tag"
        # Avoid creating packages with -0
        RELEASE=$(echo "-"$(($GRELEASE + 1)))
-       RPMRELEASE=$RELEASE
        RPMVERSION=$VERSION
+       RPMRELEASE=$RELEASE
        else
        RELEASE=$(echo "~"${GRELEASE}"+"${GCOMMITS}"."${GHEAD})
        # RPM prereleases have the release tag in the version field:
