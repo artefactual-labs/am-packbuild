@@ -23,7 +23,7 @@ stage('Build package'){
     cd rpm/${PACKAGE}/
     # For rc versions, the version string uses ~
     CURRENT_VERSION=$(echo ${VERSION} | sed -e 's/-/~/g')
-    CURRENT_RELEASE=$(echo ${VERSION} | sed -e 's/-//g')
+    CURRENT_RELEASE=$(echo ${RELEASE} | sed -e 's/-//g')
     make PACKAGE=$PACKAGE BRANCH=${BRANCH} VERSION=${CURRENT_VERSION} RELEASE=${CURRENT_RELEASE}
     '''
     }
