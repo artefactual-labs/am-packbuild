@@ -80,9 +80,9 @@ rm -rf %{buildroot}
 getent group archivematica >/dev/null || groupadd -f -g 333 -r archivematica
 if ! getent passwd archivematica >/dev/null ; then
   if ! getent passwd 333 >/dev/null ; then
-    useradd -r -u 333 -g archivematica -d /var/lib/archivematica/ -s /sbin/nologin -c "Archivematica system account" archivematica
+    useradd -r -u 333 -g archivematica -d /var/lib/archivematica/ -s /sbin/nologin -c "Archivematica system account" -m archivematica
     else
-    useradd -r -g archivematica -d /var/lib/archivematica/ -s /sbin/nologin -c "Archivematica system account" archivematica
+    useradd -r -g archivematica -d /var/lib/archivematica/ -s /sbin/nologin -c "Archivematica system account" -m archivematica
     fi
 fi
 
