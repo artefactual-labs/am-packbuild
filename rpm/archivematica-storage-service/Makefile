@@ -4,7 +4,7 @@ VERSION       ?= 0.11.0
 RELEASE       ?= rc1
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
-DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
+DOCKER_IMAGE  = $(subst ~,-,"rpmbuild-$(NAME)-$(VERSION)")
 
 RPMBUILD_ARGS := \
 	--define "_topdir $(RPM_TOPDIR)" \
@@ -47,6 +47,14 @@ rpm-build: rpm-clean
 rpm-clean:
 	@echo "==> Cleaning up previous RPMs builds."
 	@rm -rf $(RPM_TOPDIR)
+
+cleanup:
+	@echo "==> Remove artifacts created as root."
+	@docker run -i  \
+		--rm \
+		--volume "$(shell pwd):$(DOCKER_VOLUME)" \
+		$(DOCKER_IMAGE) \
+		bash -c "rm -rf /src/*.rpm"
 
 rpm-test:
 	@docker run --rm --volume="$(shell pwd):$(DOCKER_VOLUME)" centos:7 bash -c "yum install -y epel-release && yum localinstall -y --nogpgcheck $(DOCKER_VOLUME)/$(NAME)-$(VERSION)*.rpm"

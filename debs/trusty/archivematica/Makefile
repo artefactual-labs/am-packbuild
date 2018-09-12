@@ -51,13 +51,21 @@ dev:
 		$(DOCKER_IMAGE) \
                  /bin/bash
 
+cleanup:
+	@echo "==> Remove artifacts."
+	@docker run -i \
+ 		--rm \
+                --volume "$(shell cd ../../ && pwd):$(DEB_TOPDIR)/$(NAME)" \
+		--volume "$(shell pwd):$(DOCKER_VOLUME)" \
+		$(DOCKER_IMAGE) \
+                 rm -rf /src/repo/ /src/src/
+
 
 deb-build: deb-clean
 	@echo "==> Install dependencies."
 	# Add GPG if available
 	@if [ -f "$(DOCKER_VOLUME)/GPG-KEY" ]; then gpg --import $(DOCKER_VOLUME)/GPG-KEY; fi
 	@if [ x"$$GPG_KEY" != x ]; then echo "$$GPG_KEY" | gpg --import - ; fi
-	#@cd /debbuild/$(NAME) && ./packbuild.py -r $(BUILD_TYPE) -v $(VERSION) -c $(BRANCH) -k$(GPG_ID) $(PACKBUILD_EXTRA_ARGS) 
 	@cd /debbuild/$(NAME)  
 	@echo "==> Clone code."
 	mkdir -p src/$(PACKAGE)
@@ -80,7 +88,9 @@ deb-build: deb-clean
 
 deb-clean:
 	@echo "==> Cleaning up previous RPMs builds."
-	@rm -rf $(DOCKER_VOLUME)/build/
+	@@rm -rf $(DOCKER_VOLUME)/repo/
+	@@rm -rf $(DOCKER_VOLUME)/src/
+
 
 deb-test:
 	@docker run --rm --volume="$(shell pwd):$(DOCKER_VOLUME)" ubuntu:trusty echo "Create repo and install package"

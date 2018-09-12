@@ -62,8 +62,18 @@ deb-build: deb-clean
 	cd  repo && dpkg-scanpackages . | gzip > Packages.gz
 
 deb-clean:
-	@echo "==> Cleaning up previous RPMs builds."
-	@rm -rf $(DOCKER_VOLUME)/build/
+	@echo "==> Cleaning up previous builds."
+	@rm -rf $(DOCKER_VOLUME)/repo/
+	@rm -rf $(DOCKER_VOLUME)/src/
+
+cleanup:
+	@echo "==> Remove artifacts created as root. "
+	@docker run -i \
+		--rm \
+		--volume "$(shell cd ../../ && pwd):$(DEB_TOPDIR)/$(NAME)" \
+		--volume "$(shell pwd):$(DOCKER_VOLUME)" \
+		$(DOCKER_IMAGE) \
+		rm -rf /src/repo/ /src/src/
 
 deb-test:
 	@docker run --rm --volume="$(shell pwd):$(DOCKER_VOLUME)" ubuntu:trusty echo "Create repo and install package"

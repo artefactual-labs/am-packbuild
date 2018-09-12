@@ -37,24 +37,6 @@ build:
 		 $(DOCKER_IMAGE) \
                  make -C $(DOCKER_VOLUME) deb-build
 
-dev:
-	@echo "==> Development shell."
-	@docker run -i -t \
-                -e BRANCH=$(BRANCH) \
-		-e VERSION=$(VERSION) \
-		-e RELEASE=$(RELEASE) \
-		-e PACKAGE=$(PACKAGE) \
-                -e BUILD_TYPE=$(BUILD_TYPE) \
-                -e GPG_ID=$(GPG_ID) \
-		-e GPG_KEY \
-		-e PACKBUILD_EXTRA_ARGS="$(PACKBUILD_EXTRA_ARGS)" \
- 		--rm \
-                --volume "$(shell cd ../../ && pwd):$(DEB_TOPDIR)/$(NAME)" \
-		--volume "$(shell pwd):$(DOCKER_VOLUME)" \
-		 $(DOCKER_IMAGE) \
-                 /bin/bash
-
-
 deb-build: 
 	@echo "==> Install dependencies."
 	# Add GPG if available
@@ -69,10 +51,9 @@ deb-build:
 	cd  repo && dpkg-scanpackages . | gzip > Packages.gz
 
 deb-clean:
-	@echo "==> Cleaning up previous RPMs builds."
-	@rm -rf $(DOCKER_VOLUME)/build/
-	mkdir -p src/$(PACKAGE)
-	sudo rm -rf src/
+	@echo "==> Cleaning up previous builds."
+	@rm -rf $(DOCKER_VOLUME)/repo/
+	@rm -rf $(DOCKER_VOLUME)/src/
 	@git clone \
 	  --quiet \
  	  --branch $(BRANCH) \
@@ -84,6 +65,16 @@ deb-clean:
 	cd src/$(PACKAGE) && git submodule init && \
 		git submodule update 
 
+
+
+cleanup:
+	@echo "==> Remove artifacts."
+	@docker run -i -t \
+ 		--rm \
+                --volume "$(shell cd ../../ && pwd):$(DEB_TOPDIR)/$(NAME)" \
+		--volume "$(shell pwd):$(DOCKER_VOLUME)" \
+		 $(DOCKER_IMAGE) \
+                 rm -rf /src/repo/ /src/src/
 
 
 dev:

@@ -1,7 +1,7 @@
 PACKAGE     ?= archivematica
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
-DOCKER_IMAGE  ?= "rpmbuild-$(PACKAGE)-$(VERSION)"
+DOCKER_IMAGE  ?= $(subst ~,-,"rpmbuild-$(NAME)-$(VERSION)")
 
 BRANCH     ?= stable/1.7.x
 VERSION     ?= 1.7.0
@@ -45,6 +45,14 @@ dev:
 		-e RELEASE="$(RELEASE)" \
 		-e BRANCH="$(BRANCH)" \
 		--rm --volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) /bin/bash
+
+cleanup:
+	@echo "==> Remove artifacts created as root."
+	@docker run -i  \
+		--rm \
+		--volume "$(shell pwd):$(DOCKER_VOLUME)" \
+		 $(DOCKER_IMAGE) \
+		bash -c "rm -rf /src/*.rpm"
 
 
 rpm-build: rpm-clean
