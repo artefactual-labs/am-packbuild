@@ -1,3 +1,10 @@
+archivematica-mcp-client (1:1.7.2-1~14.04) trusty; urgency=high
+
+  * commit: 26a261c4e4c43cdf091ddf1a027657b9ac8fffaa
+  * checkout: v1.7.2
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Tue, 11 Sep 2018 17:17:21 +0000
+
 archivematica-mcp-client (1:1.7.0-1~14.04) trusty; urgency=high
 
   * commit: 353fb054bfed3cce09cc10e08068712aba2219fb
