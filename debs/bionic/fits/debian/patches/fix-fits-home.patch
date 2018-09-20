@@ -1,0 +1,14 @@
+Description: Adjust default FITS_HOME value in fits-env.sh
+Forwarded: not-needed
+Author: Misty De Meo <mdemeo@artefactual.com>
+Last-Update: 2013-12-10--- a/fits-env.sh
++++ b/fits-env.sh
+@@ -3,8 +3,8 @@
+ # Sets up the environment for launching a FITS instance via
+ # either the fits.sh launcher, or the fits-ngserver.sh Nailgun server
+
+-FITS_HOME=`dirname $FITS_ENV_SCRIPT`
++FITS_HOME=/usr/share/fits
+ export FITS_HOME
+ 
+ # Uncomment the following line if you want "file utility" to dereference and follow symlinks.
