@@ -1,8 +1,8 @@
 NAME          = siegfried
 PACKAGE       = siegfried
-VERSION       ?= 1.7.6
+VERSION       ?= 1.7.10
 RELEASE       ?= 1
-BRANCH        ?= v1.7.6
+BRANCH        ?= v1.7.10
 GIT_URL       = https://github.com/richardlehane/siegfried/
 DEB_TOPDIR    = "/debbuild"
 DOCKER_VOLUME = "/src"
@@ -40,7 +40,7 @@ deb-build:
 	dch -r --distribution trusty --urgency medium ignored && \
 	yes | mk-build-deps --install debian/control
 	@echo "==> Build package."
-	cd src/$(PACKAGE) && PATH=/usr/lib/go-1.9/bin:${PATH} GOPATH=/usr/share/go-1.9/ dpkg-buildpackage  -k${GPG_ID}
+	cd src/$(PACKAGE) && PATH=${PATH} GOPATH=${GOPATH} dpkg-buildpackage -k${GPG_ID}
 	@echo "==> Copying DEB files."
 	mkdir -p build
 	cp src/$(PACKAGE)_* build/
