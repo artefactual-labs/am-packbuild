@@ -2,7 +2,7 @@ Package: jhove
 Section: main
 Architecture: all
 Maintainer: Artefactual <sysadmin@artefactual.com>
-Depends: default-jre-headless
+Depends: openjdk-8-jre-headless
 Priority: optional
 Version: 1.16.7-RELEASE
 Description: JSTOR/Harvard Object Validation Environment
