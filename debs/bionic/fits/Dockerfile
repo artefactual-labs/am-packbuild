@@ -1,4 +1,4 @@
-FROM ubuntu:xenial
+FROM ubuntu:bionic
 
 ARG GIT_URL
 ARG GIT_BRANCH
