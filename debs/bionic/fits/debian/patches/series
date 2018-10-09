@@ -1,3 +1,4 @@
 archivematica-config.diff
 changehome.diff
+fits-log4j.diff
 fits-use-system-exitftool.diff

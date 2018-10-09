@@ -1,0 +1,7 @@
+#!/bin/sh
+
+mkdir -p /var/log/archivematica/
+touch /var/log/archivematica/fits.log
+chown archivematica:archivematica /var/log/archivematica/fits.log
+
+#DEBHELPER#
