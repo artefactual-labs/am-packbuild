@@ -1,6 +1,6 @@
 NAME          = fits
 VERSION       ?= 1.1.0
-RELEASE	      ?= 2~18.04
+RELEASE	      ?= 3~18.04
 GIT_URL	      = https://github.com/harvard-lts/fits
 GPG_ID        ?= 5236CA08
 DEB_TOPDIR    = "/debbuild"
