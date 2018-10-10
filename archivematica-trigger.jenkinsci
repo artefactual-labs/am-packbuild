@@ -1,7 +1,7 @@
 
 node {
 stage('Get code') {
-   git branch: 'stable/1.7.x', url: 'https://github.com/artefactual/archivematica'
+   git branch: 'qa/1.x', url: 'https://github.com/artefactual/archivematica'
    properties([disableConcurrentBuilds(),
             gitLabConnection(''),
             [$class: 'RebuildSettings',
@@ -50,17 +50,18 @@ env.REPOSITORY = sh(script: "cat .version", returnStdout: true).trim()
 stage('Build rpm packages') {
 build job: 'am-packbuild/rpm-jenkinsci', parameters: [
   string(name: 'PACKAGE', value: "${PACKAGE}"),
-  string(name: 'BRANCH', value: 'stable/1.7.x'),
+  string(name: 'BRANCH', value: 'qa/1.x'),
   string(name: 'GPG_ID', value: '0F4A4D31'),
   string(name: 'VERSION', value: "${RPMVERSION}"),
   string(name: 'RELEASE', value: "${RPMRELEASE}"),
   string(name: 'REPOSITORY', value: "${REPOSITORY}")]
 }
 
-stage('Build trusty packages') {
-build job: 'am-packbuild/trusty-jenkinsci', parameters: [
+
+stage('Build bionic packages') {
+build job: 'am-packbuild/bionic-jenkinsci', parameters: [
   string(name: 'PACKAGE', value: "${PACKAGE}"),
-  string(name: 'BRANCH', value: 'stable/1.7.x'),
+  string(name: 'BRANCH', value: 'qa/1.x'),
   string(name: 'GPG_ID', value: '0F4A4D31'),
   string(name: 'VERSION', value: "${VERSION}"),
   string(name: 'RELEASE', value: "${RELEASE}"),
@@ -70,7 +71,7 @@ build job: 'am-packbuild/trusty-jenkinsci', parameters: [
 stage('Build xenial packages') {
 build job: 'am-packbuild/xenial-jenkinsci', parameters: [
   string(name: 'PACKAGE', value: "${PACKAGE}"),
-  string(name: 'BRANCH', value: 'stable/1.7.x'),
+  string(name: 'BRANCH', value: 'qa/1.x'),
   string(name: 'GPG_ID', value: '0F4A4D31'),
   string(name: 'VERSION', value: "${VERSION}"),
   string(name: 'RELEASE', value: "${RELEASE}"),

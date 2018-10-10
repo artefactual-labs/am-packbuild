@@ -2,11 +2,11 @@
 properties([gitLabConnection(''), [$class: 'RebuildSettings', autoRebuild: false, rebuildDisabled: false],
 parameters([
     string(defaultValue: 'archivematica', description: '', name: 'PACKAGE'), 
-    string(defaultValue: 'stable/1.7.x', description: '', name: 'BRANCH'),
+    string(defaultValue: 'qa/1.x', description: '', name: 'BRANCH'),
     string(defaultValue: '0F4A4D31', description: 'For production packages, use production key', name: 'GPG_ID'),
-    string(defaultValue: '1.7.1', description: '', name: 'VERSION'),
-    string(defaultValue: '-1', description: '', name: 'RELEASE'),
-    string(defaultValue: 'wip/jenkins-ci', description: '', name: 'PACKBUILD_BRANCH'),
+    string(defaultValue: '1.8.0', description: '', name: 'VERSION'),
+    string(defaultValue: '-beta1', description: '', name: 'RELEASE'),
+    string(defaultValue: 'dev/packages-ci', description: '', name: 'PACKBUILD_BRANCH'),
     string(defaultValue: 'jenkinsci', description: '', name: 'REPOSITORY')]),
     pipelineTriggers([])])
 
@@ -16,26 +16,26 @@ stage('Get code') {
     }
 stage('Build package'){
     sh '''
-    cd debs/trusty/${PACKAGE}/
+    cd debs/bionic/${PACKAGE}/
     make PACKAGE=$PACKAGE BRANCH=${BRANCH} VERSION=${VERSION} RELEASE=${RELEASE} GPG_ID=${GPG_ID}
     '''
     }
 stage('Update repository'){
     sh '''
-    cd debs/trusty/${PACKAGE}/
-    mkdir -p /srv/repos/am-packbuild/${REPOSITORY}/trusty/
+    cd debs/bionic/${PACKAGE}/
+    mkdir -p /srv/repos/am-packbuild/${REPOSITORY}/bionic/
     find . -iname '*.dsc' \
        -o -iname '*.deb' \
        -o -iname '*.build' \
        -o -iname '*.changes' \
-       -o -iname '*.xz' | grep -v "build-deps" | xargs -I{} cp --remove-destination {}  /srv/repos/am-packbuild/${REPOSITORY}/trusty/
+       -o -iname '*.xz' | grep -v "build-deps" | xargs -I{} cp --remove-destination {}  /srv/repos/am-packbuild/${REPOSITORY}/bionic/
     make cleanup
-    cd /srv/repos/am-packbuild/${REPOSITORY}/trusty/
+    cd /srv/repos/am-packbuild/${REPOSITORY}/bionic/
     dpkg-scanpackages . /dev/null > Packages
     gzip -9c Packages > Packages.gz
 
     cat > Release <<EOF
-    Archive: trusty
+    Archive: bionic
     Origin: jenkins-ci.archivematica.org
     Version: 14.04
     Date: `date`

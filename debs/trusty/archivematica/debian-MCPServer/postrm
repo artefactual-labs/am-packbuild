@@ -1,9 +1,0 @@
-#!/bin/sh
-
-if [ "$1" = "purge" ]; then
-    rm -f /etc/default/archivematica-mcp-server
-    if which ucf >/dev/null 2>&1; then
-        ucf --purge /etc/default/archivematica-mcp-server
-        ucfr --purge archivematica-mcp-server /etc/default/archivematica-mcp-server
-    fi
-fi
