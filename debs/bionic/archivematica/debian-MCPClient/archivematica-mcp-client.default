@@ -1,0 +1,15 @@
+PATH=/usr/share/archivematica/virtualenvs/archivematica-mcp-client/bin:/usr/local/sbin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin
+PYTHONPATH=/usr/lib/archivematica/MCPClient:/usr/lib/archivematica/archivematicaCommon/:/usr/share/archivematica/dashboard/
+
+DJANGO_SETTINGS_MODULE=settings.common
+
+ARCHIVEMATICA_MCPCLIENT_CLIENT_HOST=localhost
+ARCHIVEMATICA_MCPCLIENT_CLIENT_DATABASE=
+ARCHIVEMATICA_MCPCLIENT_CLIENT_USER=
+ARCHIVEMATICA_MCPCLIENT_CLIENT_PASSWORD=
+
+ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_ELASTICSEARCHSERVER=localhost:9200
+ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_MCPARCHIVEMATICASERVER=localhost:4730
+ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_CLAMAV_SERVER=/var/run/clamav/clamd.ctl
+
+REQUEST_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt

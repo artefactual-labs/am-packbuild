@@ -1,0 +1,33 @@
+#!/bin/sh
+# source debconf stuff
+. /usr/share/debconf/confmodule
+. /usr/share/dbconfig-common/dpkg/postinst
+
+dbc_go archivematica-mcp-server $@
+
+# Create sharedDirectory and rsync content
+mkdir -p /var/archivematica/sharedDirectory/
+chown -R archivematica:archivematica /var/archivematica/
+
+# Create logs dir
+logdir=/var/log/archivematica/MCPServer
+mkdir -p $logdir
+chown -R archivematica:archivematica $logdir
+chmod -R g+s $logdir
+
+# Populate default mysql config
+DBPASS=$(grep "dbc_dbpass=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(ARCHIVEMATICA_MCPSERVER_CLIENT_PASSWORD=\).*/\1$DBPASS/g" /etc/default/archivematica-mcp-server
+
+DBUSER=$(grep "dbc_dbuser=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(ARCHIVEMATICA_MCPSERVER_CLIENT_USER=\).*/\1$DBUSER/g" /etc/default/archivematica-mcp-server
+
+DBNAME=$(grep "dbc_dbname=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(ARCHIVEMATICA_MCPSERVER_CLIENT_DATABASE=\).*/\1$DBNAME/g" /etc/default/archivematica-mcp-server
+
+# Use ucf to preserve user changes in the default file
+ucfr archivematica-mcp-server /etc/default/archivematica-mcp-server
+ucf --debconf-ok /etc/default/archivematica-mcp-server /etc/default/archivematica-mcp-server
+
+#DEBHELPER#
+

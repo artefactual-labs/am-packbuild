@@ -1,0 +1,10 @@
+#!/usr/bin/make -f
+
+export DH_VIRTUALENV_INSTALL_ROOT=/usr/share/archivematica/virtualenvs
+
+%:
+	dh $@ --with python-virtualenv --with systemd
+
+override_dh_virtualenv:
+	dh_virtualenv --requirements ../archivematicaCommon/requirements/production.txt --skip-install
+	dh_virtualenv -v --preinstall "pip==9.0.3" --skip-install -D src/
