@@ -1,6 +1,7 @@
+%global _default_patch_fuzz 2
 Name: %{name}
 Version: %{version}
-Release: 4%{?dist}
+Release: 1%{?dist}
 Summary: File Information Tool Set (FITS)
 Buildrequires: ant, gcc
 Source: https://github.com/harvard-lts/fits/archive/v%{version}.zip
@@ -44,7 +45,7 @@ mkdir -p \
 
 cp fits.sh fits-ngserver.sh fits-env.sh  %{buildroot}/usr/bin/
 cp -rf lib/* %{buildroot}/usr/share/fits/lib/
-cp lib-fits/fits.jar %{buildroot}/usr/share/fits/lib/
+cp lib-fits/fits-%{version}.jar %{buildroot}/usr/share/fits/lib/
 cp -rf xml %{buildroot}/usr/share/fits/
 cp log4j.properties version.properties %{buildroot}/usr/share/fits/
 cp %{_sourcedir}/fits-nailgun.service %{buildroot}/usr/lib/systemd/system/fits-nailgun.service

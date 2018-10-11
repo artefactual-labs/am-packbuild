@@ -1,11 +1,12 @@
---- xml/fits.xml.orig	2018-05-08 17:12:07.000000000 +0200
-+++ xml/fits.xml	2018-05-08 17:12:26.000000000 +0200
-@@ -3,7 +3,7 @@
- 	<!-- Order of the tools determines preference -->
- 	<tools>
- 		<!-- exclude-exts attribute is a comma delimited list of file extensions that the tool should not try to process -->
+--- xml/fits.xml.orig           2018-10-11 16:56:42.497940129 +0000
++++ xml/fits.xml     2018-10-11 17:22:25.905011303 +0000
+@@ -5,7 +5,8 @@
+                <!-- exclude-exts attribute is a comma delimited list of file extensions that the tool should not try to process -->
+         <!-- include-exts attribute is a comma delimited list of file extensions that are the only ones the tool will process -->
+         <!-- classpath-dirs attribute is a list of directories where any tool-specific Java JAR files and configuration files used solely by these JAR files -->
 -        <tool class="edu.harvard.hul.ois.fits.tools.mediainfo.MediaInfo" include-exts="avi,mov,mpg,mpeg,mkv,mp4,mxf,ogv,mj2,divx,dv,m4v,m2v,ismv,m2ts,mpeg4" classpath-dirs="lib/mediainfo" />
-+	<!-- <tool class="edu.harvard.hul.ois.fits.tools.mediainfo.MediaInfo" include-exts="avi,mov,mpg,mpeg,mkv,mp4,mxf,ogv,mj2,divx,dv,m4v,m2v,ismv,m2ts,mpeg4" classpath-dirs="lib/mediainfo" /> -->
++<!--        <tool class="edu.harvard.hul.ois.fits.tools.mediainfo.MediaInfo" include-exts="avi,mov,mpg,mpeg,mkv,mp4,mxf,ogv,mj2,divx,dv,m4v,m2v,ismv,m2ts,mpeg4" classpath-dirs="lib/mediainfo" />
++-->
          <tool class="edu.harvard.hul.ois.fits.tools.oisfileinfo.AudioInfo" include-exts="wav" classpath-dirs="lib/audioinfo" />
          <tool class="edu.harvard.hul.ois.fits.tools.oisfileinfo.ADLTool" include-exts="adl" classpath-dirs="lib/adltool" />
-         <tool class="edu.harvard.hul.ois.fits.tools.oisfileinfo.VTTTool" include-exts="vtt" />    
+         <tool class="edu.harvard.hul.ois.fits.tools.oisfileinfo.VTTTool" include-exts="vtt" />

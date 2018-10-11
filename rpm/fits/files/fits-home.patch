@@ -1,11 +1,11 @@
---- fits-env.sh.orig    2016-03-25 19:23:23.360820040 +0000
-+++ fits-env.sh 2016-03-25 19:23:40.115810010 +0000
-@@ -4,7 +4,7 @@
- # either the fits.sh launcher, or the fits-ngserver.sh Nailgun server
+--- fits-env.sh.orig 2018-10-11 16:56:42.585940463 +0000
++++ fits-env.sh      2018-10-11 16:57:15.690063077 +0000
+@@ -17,7 +17,7 @@
+   fi
+ done
  
- #FITS_HOME=`dirname "$0"`
--FITS_HOME=`echo "$0" | sed 's,/[^/]*$,,'`
-+FITS_HOME="/usr/share/fits"
+-FITS_HOME=`dirname $FITS_ENV_SCRIPT`
++FITS_HOME=/usr/share/fits/
+ 
  export FITS_HOME
  
- # Uncomment the following line if you want "file utility" to dereference and follow symlinks.
