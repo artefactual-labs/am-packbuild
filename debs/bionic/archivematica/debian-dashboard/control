@@ -16,7 +16,6 @@ Depends:
 	python (>= 2.7.3),
 	python-pip,
 	python-dateutil,
-	python-gearman,
 	python-simplejson,
 	libffi-dev,
 	libldap2-dev,
