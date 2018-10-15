@@ -56,3 +56,5 @@ cp -rf tools/droid  %{buildroot}/usr/share/fits/tools/
 %post
 touch /var/log/archivematica/fits.log
 chown archivematica.archivematica /var/log/archivematica/fits.log
+# TODO: reload only when the script changes. Check https://fedoraproject.org/wiki/Packaging:Scriptlets?rd=Packaging:ScriptletSnippets#Systemd
+systemctl daemon-reload

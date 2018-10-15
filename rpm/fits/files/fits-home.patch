@@ -1,11 +1,15 @@
---- fits-env.sh.orig 2018-10-11 16:56:42.585940463 +0000
-+++ fits-env.sh      2018-10-11 16:57:15.690063077 +0000
-@@ -17,7 +17,7 @@
+--- fits-env.sh.orig    2018-10-15 12:56:32.314319133 +0200
++++ fits-env.sh 2018-10-15 12:56:52.626363167 +0200
+@@ -17,9 +17,10 @@
    fi
  done
  
 -FITS_HOME=`dirname $FITS_ENV_SCRIPT`
-+FITS_HOME=/usr/share/fits/
++FITS_HOME="/usr/share/fits"
  
  export FITS_HOME
++cd $FITS_HOME
  
+ # Uncomment the following line if you want "file utility" to dereference and follow symlinks.
+ # export POSIXLY_CORRECT=1
+
