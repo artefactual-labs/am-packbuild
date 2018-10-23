@@ -5,6 +5,8 @@ After=syslog.target network.target
 [Service]
 User=archivematica
 ExecStart=/usr/bin/fits-ngserver.sh /usr/share/nailgun/nailgun-server-0.9.2-SNAPSHOT.jar
+Restart=always
+RestartSec=3
 
 [Install]
 WantedBy=multi-user.target
