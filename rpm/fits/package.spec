@@ -1,7 +1,7 @@
 %global _default_patch_fuzz 2
 Name: %{name}
 Version: %{version}
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: File Information Tool Set (FITS)
 Buildrequires: ant, gcc
 Source: https://github.com/harvard-lts/fits/archive/v%{version}.zip
@@ -10,6 +10,8 @@ Patch1: fits-log4j.patch
 Patch2: fits-enable-toolOutput.patch
 Patch3: fits-use-system-exitftool.patch
 Patch4: fits-disable-mediainfo.patch
+Patch5: fits-ngserver-logging.patch
+Patch6: fits-logging.patch
 Requires: mediainfo, libzen, perl-Image-ExifTool, nailgun
 License: GPLv3
 
@@ -34,6 +36,8 @@ rm -rf %{buildroot}/*
 %patch2
 %patch3
 %patch4
+%patch5
+%patch6
 
 %install
 ANT_OPTS=-Dfile.encoding=UTF8 ant clean-compile-jar
