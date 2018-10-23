@@ -1,82 +1,78 @@
 
 node {
-stage('Get code') {
-   git branch: 'qa/1.x', url: 'https://github.com/artefactual/archivematica'
-   properties([disableConcurrentBuilds(),
-            gitLabConnection(''),
-            [$class: 'RebuildSettings',
-             autoRebuild: false,
-             rebuildDisabled: false], 
-            pipelineTriggers([pollSCM('*/5 * * * *')])])
-}
-stage ('Set properties') {
-sh '''
-   # Not pretty
-   CURRENT=$(git describe --tags --always --long)
-   read -r GVERSION GRELEASE GCOMMITS GHEAD < <(echo $CURRENT | awk -F- '{print $1" "$2" "$3" "$4}')
-   VERSION=$(echo $GVERSION | sed -e "s/v//g")
-   # Official releases are tagged  vX.Y.Z instead of vX.Y.Z-RELEASE, so they values are shifted·
-   if [ "x$GHEAD" = "x" ]
+  stage('Get code') {
+    git branch: 'qa/1.x', url: 'https://github.com/artefactual/archivematica'
+    properties([disableConcurrentBuilds(),gitLabConnection(''),
+      [$class: 'RebuildSettings',autoRebuild: false, rebuildDisabled: false],
+       pipelineTriggers([pollSCM('*/5 * * * *')])])
+  }
+  stage ('Set properties') {
+    sh '''
+     # Not pretty
+     CURRENT=$(git describe --tags --always --long)
+     read -r GVERSION GRELEASE GCOMMITS GHEAD < <(echo $CURRENT | awk -F- '{print $1" "$2" "$3" "$4}')
+     VERSION=$(echo $GVERSION | sed -e "s/v//g")
+     # Official releases are tagged  vX.Y.Z instead of vX.Y.Z-RELEASE, so they values are shifted·
+     if [ "x$GHEAD" = "x" ]
        then
-       echo "This is an official tag"
-       # Avoid creating packages with -0
-       RELEASE=$(echo "-"$(($GRELEASE + 1)))
-       RPMVERSION=$VERSION
-       RPMRELEASE=$RELEASE
+         echo "This is an official tag"
+         # Avoid creating packages with -0
+         RELEASE=$(echo "-"$(($GRELEASE + 1)))
+         RPMVERSION=$VERSION
+         RPMRELEASE=$RELEASE
        else
-       RELEASE=$(echo "~"${GRELEASE}"+"${GCOMMITS}"."${GHEAD})
-       # RPM prereleases have the release tag in the version field:
-       RPMVERSION=$(echo $VERSION"-"${GRELEASE})
-       RPMRELEASE=$(echo "+"${GCOMMITS}"."${GHEAD})
-       fi
+         RELEASE=$(echo "~"${GRELEASE}"+"${GCOMMITS}"."${GHEAD})
+         # RPM prereleases have the release tag in the version field:
+         RPMVERSION=$(echo $VERSION"-"${GRELEASE})
+         RPMRELEASE=$(echo "+"${GCOMMITS}"."${GHEAD})
+      fi
 
-   echo $VERSION | tee .version
-   echo $RPMVERSION | tee .rpmversion
-   echo $RELEASE | tee .release
-   echo $RPMRELEASE | tee .rpmrelease
+      echo $VERSION | tee .version
+      echo $RPMVERSION | tee .rpmversion
+      echo $RELEASE | tee .release
+      echo $RPMRELEASE | tee .rpmrelease
 
-  # Debian versions can be compared with
-  # if $(dpkg --compare-versions "1.7.0~rc.5" "lt" "1.7.1-1"); then echo true; fi
-  # For centos, rpmdev-vercmp from package rpmdevtools can be used
-'''
-env.PACKAGE = sh(script: "echo archivematica", returnStdout: true).trim()
-env.VERSION = sh(script: "cat .version", returnStdout: true).trim()
-env.RPMVERSION = sh(script: "cat .rpmversion", returnStdout: true).trim()
-env.RELEASE = sh(script: "cat .release", returnStdout: true).trim()
-env.RPMRELEASE = sh(script: "cat .rpmrelease", returnStdout: true).trim()
-env.REPOSITORY = sh(script: "cat .version", returnStdout: true).trim()
-}
+      # Debian versions can be compared with
+      # if $(dpkg --compare-versions "1.7.0~rc.5" "lt" "1.7.1-1"); then echo true; fi
+      # For centos, rpmdev-vercmp from package rpmdevtools can be used
+    '''
+    env.PACKAGE = sh(script: "echo archivematica", returnStdout: true).trim()
+    env.VERSION = sh(script: "cat .version", returnStdout: true).trim()
+    env.RPMVERSION = sh(script: "cat .rpmversion", returnStdout: true).trim()
+    env.RELEASE = sh(script: "cat .release", returnStdout: true).trim()
+    env.RPMRELEASE = sh(script: "cat .rpmrelease", returnStdout: true).trim()
+    env.REPOSITORY = sh(script: "cat .version", returnStdout: true).trim()
+  }
 
-stage('Build rpm packages') {
-build job: 'am-packbuild/rpm-jenkinsci', parameters: [
-  string(name: 'PACKAGE', value: "${PACKAGE}"),
-  string(name: 'BRANCH', value: 'qa/1.x'),
-  string(name: 'GPG_ID', value: '0F4A4D31'),
-  string(name: 'VERSION', value: "${RPMVERSION}"),
-  string(name: 'RELEASE', value: "${RPMRELEASE}"),
-  string(name: 'REPOSITORY', value: "${REPOSITORY}")]
-}
+  stage('Build rpm packages') {
+    build job: 'am-packbuild/rpm-jenkinsci', parameters: [
+      string(name: 'PACKAGE', value: "${PACKAGE}"),
+      string(name: 'BRANCH', value: 'qa/1.x'),
+      string(name: 'GPG_ID', value: '0F4A4D31'),
+      string(name: 'VERSION', value: "${RPMVERSION}"),
+      string(name: 'RELEASE', value: "${RPMRELEASE}"),
+      string(name: 'REPOSITORY', value: "${REPOSITORY}")]
+  }
 
+  stage('Build bionic packages') {
+    build job: 'am-packbuild/bionic-jenkinsci', parameters: [
+      string(name: 'PACKAGE', value: "${PACKAGE}"),
+      string(name: 'BRANCH', value: 'qa/1.x'),
+      string(name: 'GPG_ID', value: '0F4A4D31'),
+      string(name: 'VERSION', value: "${VERSION}"),
+      string(name: 'RELEASE', value: "${RELEASE}"),
+      string(name: 'REPOSITORY', value: "${REPOSITORY}")]
+  }
 
-stage('Build bionic packages') {
-build job: 'am-packbuild/bionic-jenkinsci', parameters: [
-  string(name: 'PACKAGE', value: "${PACKAGE}"),
-  string(name: 'BRANCH', value: 'qa/1.x'),
-  string(name: 'GPG_ID', value: '0F4A4D31'),
-  string(name: 'VERSION', value: "${VERSION}"),
-  string(name: 'RELEASE', value: "${RELEASE}"),
-  string(name: 'REPOSITORY', value: "${REPOSITORY}")]
-}
-
-stage('Build xenial packages') {
-build job: 'am-packbuild/xenial-jenkinsci', parameters: [
-  string(name: 'PACKAGE', value: "${PACKAGE}"),
-  string(name: 'BRANCH', value: 'qa/1.x'),
-  string(name: 'GPG_ID', value: '0F4A4D31'),
-  string(name: 'VERSION', value: "${VERSION}"),
-  string(name: 'RELEASE', value: "${RELEASE}"),
-  string(name: 'REPOSITORY', value: "${REPOSITORY}")]
-}
+  stage('Build xenial packages') {
+    build job: 'am-packbuild/xenial-jenkinsci', parameters: [
+      string(name: 'PACKAGE', value: "${PACKAGE}"),
+      string(name: 'BRANCH', value: 'qa/1.x'),
+      string(name: 'GPG_ID', value: '0F4A4D31'),
+      string(name: 'VERSION', value: "${VERSION}"),
+      string(name: 'RELEASE', value: "${RELEASE}"),
+      string(name: 'REPOSITORY', value: "${REPOSITORY}")]
+  }
 
 }
 

@@ -1,41 +1,41 @@
 
 properties([gitLabConnection(''), [$class: 'RebuildSettings', autoRebuild: false, rebuildDisabled: false],
 parameters([
-    string(defaultValue: 'archivematica', description: '', name: 'PACKAGE'), 
-    string(defaultValue: 'stable/1.7.x', description: '', name: 'BRANCH'),
-    string(defaultValue: '0F4A4D31', description: 'For production packages, use production key', name: 'GPG_ID'),
-    string(defaultValue: '1.7.1', description: '', name: 'VERSION'),
-    string(defaultValue: '1', description: '', name: 'RELEASE'),
-    string(defaultValue: 'wip/jenkins-ci', description: '', name: 'PACKBUILD_BRANCH'),
-    string(defaultValue: 'jenkinsci', description: '', name: 'REPOSITORY')]),
-    pipelineTriggers([])])
+  string(defaultValue: 'archivematica', description: '', name: 'PACKAGE'), 
+  string(defaultValue: 'qa/1.x', description: '', name: 'BRANCH'),
+  string(defaultValue: '0F4A4D31', description: 'For production packages, use production key', name: 'GPG_ID'),
+  string(defaultValue: '1.8.0', description: '', name: 'VERSION'),
+  string(defaultValue: 'beta1', description: '', name: 'RELEASE'),
+  string(defaultValue: 'dev/packages-ci', description: '', name: 'PACKBUILD_BRANCH'),
+  string(defaultValue: 'jenkinsci', description: '', name: 'REPOSITORY')]),
+  pipelineTriggers([])])
 
 node {
-stage('Get code') {
-   git branch: '${PACKBUILD_BRANCH}', url: 'https://github.com/artefactual-labs/am-packbuild'
-   sh '''
-     cd rpm/$PACKAGE/
-     rm -rf *.rpm || true
-     '''
-    }
-stage('Build package'){
+  stage('Get code') {
+    git branch: '${PACKBUILD_BRANCH}', url: 'https://github.com/artefactual-labs/am-packbuild'
+      sh '''
+        cd rpm/$PACKAGE/
+        rm -rf *.rpm || true
+      '''
+  }
+  stage('Build package'){
     sh '''
-    cd rpm/${PACKAGE}/
-    # For rc versions, the version string uses ~
-    CURRENT_VERSION=$(echo ${VERSION} | sed -e 's/-/~/g')
-    CURRENT_RELEASE=$(echo ${RELEASE} | sed -e 's/-//g')
-    make PACKAGE=$PACKAGE BRANCH=${BRANCH} VERSION=${CURRENT_VERSION} RELEASE=${CURRENT_RELEASE}
+      cd rpm/${PACKAGE}/
+      # For rc versions, the version string uses ~
+      CURRENT_VERSION=$(echo ${VERSION} | sed -e 's/-/~/g')
+      CURRENT_RELEASE=$(echo ${RELEASE} | sed -e 's/-//g')
+      make PACKAGE=$PACKAGE BRANCH=${BRANCH} VERSION=${CURRENT_VERSION} RELEASE=${CURRENT_RELEASE}
     '''
-    }
-stage('Update repository'){
+  }
+  stage('Update repository'){
     sh '''
-    mkdir -p /srv/repos/am-packbuild/${REPOSITORY}/centos7
-    cp rpm/${PACKAGE}/*.rpm /srv/repos/am-packbuild/${REPOSITORY}/centos7/
-    cd rpm/${PACKAGE}/
-    make cleanup
-    cd /srv/repos/am-packbuild/${REPOSITORY}/centos7/
-    createrepo .
+      mkdir -p /srv/repos/am-packbuild/${REPOSITORY}/centos7
+      cp rpm/${PACKAGE}/*.rpm /srv/repos/am-packbuild/${REPOSITORY}/centos7/
+      cd rpm/${PACKAGE}/
+      make cleanup
+      cd /srv/repos/am-packbuild/${REPOSITORY}/centos7/
+      createrepo .
     '''
-}
+  }
 
 }

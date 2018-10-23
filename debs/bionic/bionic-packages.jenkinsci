@@ -1,55 +1,56 @@
 
 properties([gitLabConnection(''), [$class: 'RebuildSettings', autoRebuild: false, rebuildDisabled: false],
 parameters([
-    string(defaultValue: 'archivematica', description: '', name: 'PACKAGE'), 
-    string(defaultValue: 'qa/1.x', description: '', name: 'BRANCH'),
-    string(defaultValue: '0F4A4D31', description: 'For production packages, use production key', name: 'GPG_ID'),
-    string(defaultValue: '1.8.0', description: '', name: 'VERSION'),
-    string(defaultValue: '-beta1', description: '', name: 'RELEASE'),
-    string(defaultValue: 'dev/packages-ci', description: '', name: 'PACKBUILD_BRANCH'),
-    string(defaultValue: 'jenkinsci', description: '', name: 'REPOSITORY')]),
-    pipelineTriggers([])])
+  string(defaultValue: 'archivematica', description: '', name: 'PACKAGE'), 
+  string(defaultValue: 'qa/1.x', description: '', name: 'BRANCH'),
+  string(defaultValue: '0F4A4D31', description: 'For production packages, use production key', name: 'GPG_ID'),
+  string(defaultValue: '1.8.0', description: '', name: 'VERSION'),
+  string(defaultValue: '-beta1', description: '', name: 'RELEASE'),
+  string(defaultValue: 'dev/packages-ci', description: '', name: 'PACKBUILD_BRANCH'),
+  string(defaultValue: 'jenkinsci', description: '', name: 'REPOSITORY')]),
+  pipelineTriggers([])])
 
 node {
-stage('Get code') {
-   git branch: '${PACKBUILD_BRANCH}', url: 'https://github.com/artefactual-labs/am-packbuild'
-    }
-stage('Build package'){
+  stage('Get code') {
+    git branch: '${PACKBUILD_BRANCH}', url: 'https://github.com/artefactual-labs/am-packbuild'
+  }
+  stage('Build package'){
     sh '''
-    cd debs/bionic/${PACKAGE}/
-    make PACKAGE=$PACKAGE BRANCH=${BRANCH} VERSION=${VERSION} RELEASE=${RELEASE} GPG_ID=${GPG_ID}
+      cd debs/bionic/${PACKAGE}/
+      make PACKAGE=$PACKAGE BRANCH=${BRANCH} VERSION=${VERSION} RELEASE=${RELEASE} GPG_ID=${GPG_ID}
     '''
-    }
-stage('Update repository'){
+  }
+  stage('Update repository'){
     sh '''
-    cd debs/bionic/${PACKAGE}/
-    mkdir -p /srv/repos/am-packbuild/${REPOSITORY}/bionic/
-    find . -iname '*.dsc' \
-       -o -iname '*.deb' \
-       -o -iname '*.build' \
-       -o -iname '*.changes' \
-       -o -iname '*.xz' | grep -v "build-deps" | xargs -I{} cp --remove-destination {}  /srv/repos/am-packbuild/${REPOSITORY}/bionic/
-    make cleanup
-    cd /srv/repos/am-packbuild/${REPOSITORY}/bionic/
-    dpkg-scanpackages . /dev/null > Packages
-    gzip -9c Packages > Packages.gz
+      cd debs/bionic/${PACKAGE}/
+      mkdir -p /srv/repos/am-packbuild/${REPOSITORY}/bionic/
+      find . -iname '*.dsc' \
+        -o -iname '*.deb' \
+        -o -iname '*.build' \
+        -o -iname '*.changes' \
+        -o -iname '*.xz' | grep -v "build-deps" | xargs -I{} cp --remove-destination {}  /srv/repos/am-packbuild/${REPOSITORY}/bionic/
+      make cleanup
+      cd /srv/repos/am-packbuild/${REPOSITORY}/bionic/
+      dpkg-scanpackages . /dev/null > Packages
+      gzip -9c Packages > Packages.gz
 
-    cat > Release <<EOF
-    Archive: bionic
-    Origin: jenkins-ci.archivematica.org
-    Version: 14.04
-    Date: `date`
-    Label: Archivematica development repo
-    Architecture: amd64
-    SHA256:
-EOF
-printf ' '$(sha256sum Packages | cut --delimiter=' ' --fields=1)' %16d Packages\n' \
-   $(wc --bytes Packages | cut --delimiter=' ' --fields=1) >> Release
-printf ' '$(sha256sum Packages.gz | cut --delimiter=' ' --fields=1)' %16d Packages.gz' \
-   $(wc --bytes Packages.gz | cut --delimiter=' ' --fields=1) >> Release
+      cat > Release <<EOF
+      Archive: bionic
+      Origin: jenkins-ci.archivematica.org
+      Version: 14.04
+      Date: `date`
+      Label: Archivematica development repo
+      Architecture: amd64
+      SHA256:
+      EOF
 
-rm Release.gpg || true
-gpg -u 0x$GPG_ID --armor --detach-sign --output Release.gpg Release
+      printf ' '$(sha256sum Packages | cut --delimiter=' ' --fields=1)' %16d Packages\n' \
+       $(wc --bytes Packages | cut --delimiter=' ' --fields=1) >> Release
+      printf ' '$(sha256sum Packages.gz | cut --delimiter=' ' --fields=1)' %16d Packages.gz' \
+       $(wc --bytes Packages.gz | cut --delimiter=' ' --fields=1) >> Release
+
+      rm Release.gpg || true
+      gpg -u 0x$GPG_ID --armor --detach-sign --output Release.gpg Release
     '''
 }
 
