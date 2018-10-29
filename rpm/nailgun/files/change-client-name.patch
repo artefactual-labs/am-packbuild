@@ -1,0 +1,23 @@
+--- nailgun-client/ng.c-orig	2018-10-29 22:01:38.311627470 +0100
++++ nailgun-client/ng.c	2018-10-29 22:01:09.827125688 +0100
+@@ -81,7 +81,7 @@
+ #define NAILGUN_CLIENT_NAME_EXE "ng.exe"
+ 
+ #define NAILGUN_PORT_DEFAULT "2113"
+-#define NAILGUN_CLIENT_NAME "ng"
++#define NAILGUN_CLIENT_NAME "ng-nailgun"
+ #define CHUNK_HEADER_LEN (5)
+ 
+ #define NAILGUN_SOCKET_FAILED (231)
+@@ -622,9 +622,9 @@
+  */
+ void usage(int exitcode) {
+   fprintf(stderr, "NailGun v%s\n\n", NAILGUN_VERSION);
+-  fprintf(stderr, "Usage: ng class [--nailgun-options] [args]\n");
++  fprintf(stderr, "Usage: ng-nailgun class [--nailgun-options] [args]\n");
+   fprintf(stderr, "          (to execute a class)\n");
+-  fprintf(stderr, "   or: ng alias [--nailgun-options] [args]\n");
++  fprintf(stderr, "   or: ng-nailgun alias [--nailgun-options] [args]\n");
+   fprintf(stderr, "          (to execute an aliased class)\n");
+   fprintf(stderr, "   or: alias [--nailgun-options] [args]\n");
+   fprintf(stderr, "          (to execute an aliased class, where \"alias\"\n");
