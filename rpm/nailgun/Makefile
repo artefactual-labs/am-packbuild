@@ -1,5 +1,5 @@
 NAME          = nailgun
-VERSION       = 0.9.1
+VERSION       = 0.9.3
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
@@ -28,7 +28,8 @@ rpm-build: rpm-clean
 	cp $(DOCKER_VOLUME)/package.spec $(RPM_TOPDIR)/package.spec
 	yum-builddep -y maven gcc
 	mkdir -p $(RPM_TOPDIR)/SOURCES/
-	wget -O  $(RPM_TOPDIR)/SOURCES/master.zip https://github.com/martylamb/nailgun/archive/master.zip
+	wget -O  $(RPM_TOPDIR)/SOURCES/nailgun-all-0.9.3.zip https://github.com/facebook/nailgun/archive/nailgun-all-0.9.3.zip
+	cp files/* $(RPM_TOPDIR)/SOURCES/
 	rpmbuild $(RPMBUILD_ARGS) -ba --clean $(RPM_TOPDIR)/package.spec
 
 	@echo "==> Copying RPM files."
