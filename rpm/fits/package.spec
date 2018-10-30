@@ -65,4 +65,6 @@ systemctl daemon-reload
 
 %changelog
 * Tue Oct 30 2018 - sysadmin@artefactual.com
-- Update systemd init script for nailgun 0.9.3
+- Update systemd init script to use nailgun-server-latest-SNAPSHOT.jar
+  symlink
+
