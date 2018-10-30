@@ -40,7 +40,14 @@ cp ng-nailgun  %{buildroot}/usr/bin/
 cp LICENSE.txt README.md %{buildroot}/usr/share/doc/nailgun/
 cp nailgun-server/target/*.jar %{buildroot}/usr/share/nailgun/
 
+%post
+ln -s -f /usr/share/nailgun/nailgun-server-0.9.3-SNAPSHOT.jar /usr/share/nailgun/nailgun-server-latest-SNAPSHOT.jar
+
+%postun
+rm -f /usr/share/nailgun/nailgun-server-latest-SNAPSHOT.jar
+
 %changelog
 * Mon Oct 29 2018 - sysadmin@artefactual.com
 - bump version to 0.9.3
 - use ng-nailgun client name instead of ng
+- add nailgun-server-latest-SNAPSHOT.jar symlink
