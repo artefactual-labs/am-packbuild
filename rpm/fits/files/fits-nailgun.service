@@ -4,7 +4,7 @@ After=syslog.target network.target
 
 [Service]
 User=archivematica
-ExecStart=/usr/bin/fits-ngserver.sh /usr/share/nailgun/nailgun-server-0.9.3-SNAPSHOT.jar
+ExecStart=/usr/bin/fits-ngserver.sh /usr/share/nailgun/nailgun-server-latest-SNAPSHOT.jar
 Restart=always
 RestartSec=3
 
