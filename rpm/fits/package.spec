@@ -1,7 +1,7 @@
 %global _default_patch_fuzz 2
 Name: %{name}
 Version: %{version}
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: File Information Tool Set (FITS)
 Buildrequires: ant, gcc
 Source: https://github.com/harvard-lts/fits/archive/v%{version}.zip
@@ -62,3 +62,7 @@ touch /var/log/archivematica/fits.log
 chown archivematica.archivematica /var/log/archivematica/fits.log
 # TODO: reload only when the script changes. Check https://fedoraproject.org/wiki/Packaging:Scriptlets?rd=Packaging:ScriptletSnippets#Systemd
 systemctl daemon-reload
+
+%changelog
+* Tue Oct 30 2018 - sysadmin@artefactual.com
+- Update systemd init script for nailgun 0.9.3
