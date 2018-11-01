@@ -7,7 +7,7 @@ export DEBEMAIL="sysadmin@artefactual.com"
 
 cd $SOURCE
 COMMIT=$(git rev-parse HEAD)
-cp -rf ${BASE}/debian-storage-service/* debian/
+cp -rf ${BASE}/debian-storage-service debian
 QUILT_PATCHES="debian/patches" quilt push -a || true
 pip download -d lib --no-binary :all: -r requirements.txt
 yes | mk-build-deps -i debian/control
