@@ -56,6 +56,8 @@ Requires: libpst
 Requires: openjpeg
 Requires: mediainfo
 Requires: mediaconch
+Requires: md5deep
+Requires: uuid
 # Packages from Archivematica repo
 Requires: siegfried
 Requires: fits
