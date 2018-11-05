@@ -35,13 +35,14 @@ node {
       # Debian versions can be compared with
       # if $(dpkg --compare-versions "0.13.0~rc.5" "lt" "0.13.1-1"); then echo true; fi
       # For centos, rpmdev-vercmp from package rpmdevtools can be used
+      # Use same repository than archivematica, so 1.8.0 is set instead of "cat .version"     
     '''
     env.PACKAGE = sh(script: "echo archivematica-storage-service", returnStdout: true).trim()
     env.VERSION = sh(script: "cat .version", returnStdout: true).trim()
     env.RPMVERSION = sh(script: "cat .rpmversion", returnStdout: true).trim()
     env.RELEASE = sh(script: "cat .release", returnStdout: true).trim()
     env.RPMRELEASE = sh(script: "cat .rpmrelease", returnStdout: true).trim()
-    env.REPOSITORY = sh(script: "cat .version", returnStdout: true).trim()
+    env.REPOSITORY = sh(script: "echo 1.8.0", returnStdout: true).trim()
   }
 
   stage('Build rpm packages') {
