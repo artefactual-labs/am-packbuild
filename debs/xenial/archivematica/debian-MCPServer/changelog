@@ -1,3 +1,10 @@
+archivematica-mcp-server (1:1.8.0-1~16.04) xenial; urgency=high
+
+  * commit: 707e9332f0bebf4c32def012e30752314a207d48
+  * checkout: v1.8.0
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Tue, 20 Nov 2018 10:45:31 +0000
+
 archivematica-mcp-server (1:1.7.2-1~16.04) xenial; urgency=high
 
   * commit: 26a261c4e4c43cdf091ddf1a027657b9ac8fffaa
