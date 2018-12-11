@@ -6,9 +6,9 @@ DOCKER_IMAGE  = "debbuild-$(NAME)-$(VERSION)"
 GPG_ID ?= 0F4A4D31
 PACKBUILD_EXTRA_ARGS ?= 
 #PACKBUILD_EXTRA_ARGS ?= "-b 1"
-BRANCH     ?= stable/1.7.x
-VERSION     ?= 1.7.0
-RELEASE       ?= +rc1~xenial
+BRANCH     ?= qa/1.x
+VERSION     ?= 1.8.0
+RELEASE       ?= -2
 BUILD_TYPE         ?= am
 
 .PHONY: build-docker-image build deb-build deb-clean deb-test update-changelog

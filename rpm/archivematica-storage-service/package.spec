@@ -102,7 +102,7 @@ sed -i "s/<replace-with-key>/\"$KEYCMD\"/g" /etc/sysconfig/archivematica-storage
 # Run django collectstatic task
 cd /usr/lib/archivematica/storage-service
 export $(cat /etc/sysconfig/archivematica-storage-service)
-/usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py collectstatic --noinput
+/usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py collectstatic --noinput --clear
 
 systemctl daemon-reload
 
@@ -113,4 +113,8 @@ fi
 if [ x$(semanage port -l | grep http_port_t | grep 8001 | wc -l) == x0 ]; then
   semanage port -a -t http_port_t -p tcp 8001
 fi
+
+%changelog
+* Tue Dec 11 2018 - sysadmin@artefactual.com
+- Update collectstatic command: added --clear option
 

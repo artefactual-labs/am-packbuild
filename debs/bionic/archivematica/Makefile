@@ -8,7 +8,7 @@ PACKBUILD_EXTRA_ARGS ?=
 #PACKBUILD_EXTRA_ARGS ?= "-b 1"
 BRANCH     ?= qa/1.x
 VERSION     ?= 1.8.0
-RELEASE       ?= +beta1
+RELEASE       ?= -2
 BUILD_TYPE         ?= am
 
 .PHONY: build-docker-image build deb-build deb-clean deb-test update-changelog
