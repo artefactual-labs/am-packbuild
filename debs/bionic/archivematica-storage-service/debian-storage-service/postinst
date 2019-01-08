@@ -55,6 +55,7 @@ if [[ $2 == '1:0.7.'* ]]; then
 fi
 
 ${SS_ENV_DIR}/bin/python manage.py migrate
+mkdir -p /usr/lib/archivematica/storage-service/assets
 ${SS_ENV_DIR}/bin/python manage.py collectstatic --noinput --clear
 ${SS_ENV_DIR}/bin/python manage.py backfill_api_keys
 

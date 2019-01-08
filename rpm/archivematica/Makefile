@@ -4,8 +4,8 @@ DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  ?= $(subst ~,-,"rpmbuild-$(NAME)-$(VERSION)")
 
 BRANCH     ?= qa/1.x
-VERSION     ?= 1.8.0
-RELEASE       ?= 2
+VERSION     ?= 1.8.1
+RELEASE       ?= 1
 
 RPMBUILD_ARGS := \
 	--define "_topdir $(RPM_TOPDIR)" \

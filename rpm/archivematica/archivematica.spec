@@ -268,6 +268,7 @@ KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 sed -i "s/CHANGE_ME_WITH_A_SECRET_KEY/\"$KEY\"/g" /etc/sysconfig/archivematica-dashboard
 
 # Run django collectstatic
+mkdir -p /usr/share/archivematica/dashboard/static
 export $(cat /etc/sysconfig/archivematica-dashboard)
 cd /usr/share/archivematica/dashboard
 /usr/share/archivematica/virtualenvs/archivematica-dashboard/bin/python manage.py collectstatic --noinput --clear
@@ -280,6 +281,8 @@ if [ x$(semanage port -l | grep http_port_t | grep 7400 | wc -l) == x0 ]; then
 fi
 
 %changelog
+* Wed Jan 09 2019 - sysadmin@artefactual.com
+- Create collectstatic directory in post script
 * Tue Dec 11 2018 - sysadmin@artefactual.com
 - Update collectstatic command: added --clear option
 
