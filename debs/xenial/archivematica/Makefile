@@ -7,8 +7,8 @@ GPG_ID ?= 0F4A4D31
 PACKBUILD_EXTRA_ARGS ?= 
 #PACKBUILD_EXTRA_ARGS ?= "-b 1"
 BRANCH     ?= qa/1.x
-VERSION     ?= 1.8.0
-RELEASE       ?= -2
+VERSION     ?= 1.8.1
+RELEASE       ?= -1
 BUILD_TYPE         ?= am
 
 .PHONY: build-docker-image build deb-build deb-clean deb-test update-changelog
