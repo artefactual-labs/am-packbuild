@@ -102,6 +102,7 @@ sed -i "s/<replace-with-key>/\"$KEYCMD\"/g" /etc/sysconfig/archivematica-storage
 # Run django collectstatic task
 cd /usr/lib/archivematica/storage-service
 export $(cat /etc/sysconfig/archivematica-storage-service)
+mkdir -p /usr/lib/archivematica/storage-service/assets
 /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py collectstatic --noinput --clear
 
 systemctl daemon-reload
@@ -115,6 +116,7 @@ if [ x$(semanage port -l | grep http_port_t | grep 8001 | wc -l) == x0 ]; then
 fi
 
 %changelog
+* Wed Jan 09 2019 - sysadmin@artefactual.com
+- Create collectstatic directory in post script
 * Tue Dec 11 2018 - sysadmin@artefactual.com
 - Update collectstatic command: added --clear option
-
