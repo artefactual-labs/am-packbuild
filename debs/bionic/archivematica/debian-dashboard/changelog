@@ -1,3 +1,10 @@
+archivematica-dashboard (1:1.8.1-1~18.04) bionic; urgency=high
+
+  * commit: e240825332b76f3cc50b66646921fd9b1ab84d4b
+  * checkout: v1.8.1
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Wed, 09 Jan 2019 17:47:39 +0000
+
 archivematica-dashboard (1:1.8.0-1~18.04) bionic; urgency=high
 
   * commit: 707e9332f0bebf4c32def012e30752314a207d48
