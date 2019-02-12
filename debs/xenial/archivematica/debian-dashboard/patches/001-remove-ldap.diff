@@ -1,0 +1,14 @@
+Index: dashboard/src/requirements/base.txt
+===================================================================
+--- dashboard.orig/src/requirements/base.txt
++++ dashboard/src/requirements/base.txt
+@@ -31,6 +31,6 @@ git+https://github.com/Brown-University-
+ # Using a fork of the main package because this one provides Django (rather than South) migrations
+ git+https://github.com/seatme/django-longer-username.git@seatme#egg=longerusername
+ 
+-# Required by LDAP authentication
+-django-auth-ldap==1.2.0
+-python-ldap==2.4.15
++# Required by LDAP authentication (disabled for debian packages)
++# django-auth-ldap==1.2.0
++# python-ldap==2.4.15
