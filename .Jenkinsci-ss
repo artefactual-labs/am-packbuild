@@ -42,7 +42,7 @@ node {
     env.RPMVERSION = sh(script: "cat .rpmversion", returnStdout: true).trim()
     env.RELEASE = sh(script: "cat .release", returnStdout: true).trim()
     env.RPMRELEASE = sh(script: "cat .rpmrelease", returnStdout: true).trim()
-    env.REPOSITORY = sh(script: "echo 1.8.0", returnStdout: true).trim()
+    env.REPOSITORY = sh(script: "cat .version", returnStdout: true).trim()
   }
 
   stage('Build rpm packages') {
