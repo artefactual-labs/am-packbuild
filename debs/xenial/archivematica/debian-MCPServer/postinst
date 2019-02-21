@@ -1,7 +1,10 @@
 #!/bin/sh
 # source debconf stuff
 . /usr/share/debconf/confmodule
-. /usr/share/dbconfig-common/dpkg/postinst
+. /usr/share/dbconfig-common/dpkg/postinst.mysql
+
+# Set the default database encoding to UTF8
+dbc_mysql_createdb_encoding="UTF8"
 
 dbc_go archivematica-mcp-server $@
 
