@@ -14,6 +14,7 @@ Depends:
 	archivematica-common(>=1.6.0),
 	libmysqlclient20|libmysqlclient18,
 	dbconfig-common,
+	dbconfig-mysql,
 	mysql-server,
 	gearman
 Description: MCP Server for Archivematica

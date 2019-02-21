@@ -1,5 +1,22 @@
 #!/bin/sh
 
+if [ -f /usr/share/debconf/confmodule ]; then
+    . /usr/share/debconf/confmodule
+fi
+
+if [ -f /usr/share/dbconfig-common/dpkg/postrm.mysql ]; then
+    . /usr/share/dbconfig-common/dpkg/postrm.mysql
+    dbc_go archivematica-mcp-server $@
+fi
+
+if [ "$1" = "purge" ]; then
+	rm -f /etc/dbconfig-common/archivematica-mcp-server.conf
+	if which ucf >/dev/null 2>&1; then
+		ucf --purge /etc/dbconfig-common/archivematica-mcp-server.conf
+		ucfr --purge archivematica-mcp-server /etc/dbconfig-common/archivematica-mcp-server.conf
+	fi
+fi
+
 if [ "$1" = "purge" ]; then
     rm -f /etc/default/archivematica-mcp-server
     if which ucf >/dev/null 2>&1; then
