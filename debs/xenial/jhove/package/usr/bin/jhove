@@ -1,3 +1,2 @@
 #!/bin/bash
-java -jar /usr/share/java/jhove.jar -c /etc/jhove/jhove.conf "$@"
-
+java -cp "/usr/share/java/jhove-ext-modules.jar:/usr/share/java/jhove.jar" Jhove -c /etc/jhove/jhove.conf "$@"

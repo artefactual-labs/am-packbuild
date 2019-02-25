@@ -4,7 +4,7 @@ Release: 1%{?dist}
 Summary: JSTOR/Harvard Object Validation Environment
 Buildrequires: maven, gcc
 Source: https://github.com/openpreserve/jhove/archive/%{version}.zip
-Patch: paths.patch
+Patch: include_jar.patch
 License: LGPL
 
 
@@ -42,3 +42,7 @@ cp -rf jhove-installer/target/staging/bin %{buildroot}/usr/share/jhove/
 cp -rf lib %{buildroot}/usr/share/jhove/
 
 cp LICENSE README.md COPYING %{buildroot}/usr/share/doc/jhove/
+
+%changelog
+* Fri May 31 2019 - sysadmin@artefactual.com
+- Bump version to 1.20.1
