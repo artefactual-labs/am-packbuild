@@ -42,3 +42,7 @@ cp -rf jhove-installer/target/staging/bin %{buildroot}/usr/share/jhove/
 cp -rf lib %{buildroot}/usr/share/jhove/
 
 cp LICENSE README.md COPYING %{buildroot}/usr/share/doc/jhove/
+
+%changelog
+* Mon Feb 25 2019 - sysadmin@artefactual.com
+- Bump version to 1.16.7

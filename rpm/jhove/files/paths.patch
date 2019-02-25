@@ -7,8 +7,8 @@ diff -u jhove-installer/src/main/scripts.orig/jhove jhove-installer/src/main/scr
  
 -JHOVE_HOME=%INSTALL_PATH
 -JHOVE_VERSION=%APP_VER
-+JHOVE_HOME=/usr/share/jhove/
-+JHOVE_VERSION=1.12.0-SNAPSHOT
++JHOVE_HOME=/usr/share/jhove
++JHOVE_VERSION=1.16.0
  
  #XTRA_JARS=/users/stephen/xercesImpl.jar
  EXTRA_JARS=              # Extra .jar files to add to CLASSPATH
@@ -28,8 +28,8 @@ diff -u jhove-installer/src/main/scripts.orig/jhove-gui jhove-installer/src/main
  
 -JHOVE_HOME=%INSTALL_PATH
 -JHOVE_VERSION=%APP_VER
-+JHOVE_HOME=/usr/share/jhove/
-+JHOVE_VERSION=1.12.0-SNAPSHOT
++JHOVE_HOME=/usr/share/jhove
++JHOVE_VERSION=1.16.0
  
  #XTRA_JARS=/users/stephen/xercesImpl.jar
  EXTRA_JARS=              # Extra .jar files to add to CLASSPATH
