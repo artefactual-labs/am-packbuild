@@ -1,6 +1,6 @@
 NAME          = jhove
-VERSION       ?= 1.16.7
-RELEASE	      ?= 2+18.04
+VERSION       ?= 1.20.1
+RELEASE	      ?= 1~18.04
 GIT_URL	      = https://github.com/openpreserve/jhove
 DEB_TOPDIR    = "/debbuild"
 DOCKER_VOLUME = "/src"
@@ -31,6 +31,7 @@ deb-build: deb-clean
 	sed -i 's/RELEASE/$(RELEASE)/g' /debbuild/$(NAME)_$(VERSION)-$(RELEASE)/DEBIAN/control
 	@echo "==> Build package."
 	cp /debbuild/$(NAME)/jhove-apps/target/jhove-apps-*.jar  /debbuild/$(NAME)_$(VERSION)-$(RELEASE)/usr/share/java/jhove.jar
+	cp /debbuild/$(NAME)/jhove-ext-modules/target/jhove-ext-modules-*.jar /debbuild/$(NAME)_$(VERSION)-$(RELEASE)/usr/share/java/jhove-ext-modules.jar
 	dpkg-deb --build /debbuild/$(NAME)_$(VERSION)-$(RELEASE)
 	@echo "==> Copying built  files."
 	mkdir -p $(DOCKER_VOLUME)/build/
