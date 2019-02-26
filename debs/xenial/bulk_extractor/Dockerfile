@@ -5,8 +5,9 @@ ARG GIT_BRANCH
 ARG PACKAGE
 
 
-RUN apt-get update && \
-    apt-get install -y dpkg-dev git build-essential wget debhelper \
+RUN apt-get update
+
+RUN apt-get install -y dpkg-dev git build-essential wget debhelper \
     devscripts equivs
 
 

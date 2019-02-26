@@ -5,11 +5,17 @@ Maintainer: Artefactual Systems Inc. <sysadmin@artefactual.com>
 Standards-Version: 3.9.3
 Build-Depends: 
     debhelper (>= 9),
+    dh-autoreconf,
     build-essential,
     flex,
     libcrypto++-dev,
     bison,
-    libssl-dev
+    libssl1.0-dev,
+    expat,
+    libewf-dev,
+    libafflib-dev,
+    libboost-all-dev,
+    openjdk-8-jdk
 
 Package: bulk-extractor
 Architecture: any

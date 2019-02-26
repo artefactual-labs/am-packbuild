@@ -1,6 +1,6 @@
 NAME          = bulk_extractor
 VERSION       ?= 1.5.3
-RELEASE	      ?= 1~16.04
+RELEASE	      ?= 2~16.04
 GIT_URL	      = https://github.com/simsong/bulk_extractor
 DEB_TOPDIR    = "/debbuild"
 DOCKER_VOLUME = "/src"
@@ -28,6 +28,8 @@ deb-build: deb-clean
 	@echo "==> Update changelog."
 	cd /debbuild/$(NAME) && dch -v $(VERSION)-$(RELEASE) -D xenial "New upstream release"
 
+	@echo "==> Run bootstrap.sh."
+	cd /debbuild/$(NAME) && sh bootstrap.sh
 	@echo "==> Build package."
 	cd /debbuild/$(NAME) && dpkg-buildpackage 
 	@echo "==> Copying built  files."
