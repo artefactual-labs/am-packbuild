@@ -1,7 +1,8 @@
 NAME          = bulk_extractor
-VERSION       ?= 1.5.3
-RELEASE	      ?= 2~16.04
-GIT_URL	      = https://github.com/simsong/bulk_extractor
+VERSION       ?= 1.5.5
+RELEASE	      ?= 1~16.04
+SRC_URL       = http://downloads.digitalcorpora.org/downloads/bulk_extractor/bulk_extractor-1.5.5.tar.gz
+SRC_SHA256    = 297a57808c12b81b8e0d82222cf57245ad988804ab467eb0a70cf8669594e8ed
 DEB_TOPDIR    = "/debbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "debbuild-$(NAME)-$(VERSION)"
@@ -12,7 +13,7 @@ all: build-docker-image build
 
 build-docker-image:
 	@echo "==> Building Docker image with build environment."
-	@docker build --tag "$(DOCKER_IMAGE)" --build-arg GIT_URL="$(GIT_URL)" --build-arg GIT_BRANCH=v"$(VERSION)" --build-arg PACKAGE="$(NAME)" .
+	@docker build --tag "$(DOCKER_IMAGE)" --build-arg SRC_URL="$(SRC_URL)" --build-arg SRC_VERSION="$(VERSION)" --build-arg SRC_SHA256="$(SRC_SHA256)" --build-arg PACKAGE="$(NAME)" .
 
 update-changelog:
 	@echo "==> Update changelog."
