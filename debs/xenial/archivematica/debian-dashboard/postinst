@@ -45,7 +45,7 @@ if [[ $2 == '1:1.4.1'* ]]; then
 fi
 
 # Run migrations
-/usr/share/archivematica/dashboard/manage.py migrate --settings='settings.production'
+/usr/share/archivematica/dashboard/manage.py migrate --settings='settings.production' --noinput
 
 # Collect static content
 mkdir -p /usr/share/archivematica/dashboard/static
