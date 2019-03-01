@@ -33,6 +33,7 @@
     {
       "execute_command": "echo 'vagrant'|{{.Vars}} sudo -S -E bash '{{.Path}}'",
       "scripts": [
+        "../../scripts/ubuntu/dashboard-init.sh",
         "../../scripts/ubuntu/cleanup.sh",
         "../../scripts/common/minimize.sh"
       ],
