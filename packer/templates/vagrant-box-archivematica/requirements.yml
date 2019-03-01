@@ -3,29 +3,23 @@
 - src: "https://github.com/artefactual-labs/ansible-elasticsearch"
   version: "master"
   name: "artefactual.elasticsearch"
-  path: "provisioning/roles/"
 
 - src: "https://github.com/artefactual-labs/ansible-percona"
   version: "master"
   name: "artefactual.percona"
-  path: "provisioning/roles/"
-
-- src: "https://github.com/artefactual-labs/ansible-gearman"
-  version: "master"
-  name: "artefactual.gearman"
-  path: "provisioning/roles/"
 
 - src: "https://github.com/artefactual-labs/ansible-nginx"
   version: "master"
   name: "artefactual.nginx"
-  path: "provisioning/roles/"
-
-- src: "https://github.com/artefactual-labs/ansible-archivematica-src"
-  version: "stable/1.6.x"
-  name: "artefactual.archivematica-src"
-  path: "provisioning/roles/"
 
 - src: "https://github.com/artefactual-labs/ansible-clamav"
   version: "master"
   name: "artefactual.clamav"
-  path: "provisioning/roles/"
+
+- src: "https://github.com/artefactual-labs/ansible-gearman.git"
+  version: "master"
+  name: "artefactual.gearman"
+
+- src: "https://github.com/artefactual-labs/ansible-archivematica-src"
+  version: "stable/1.8.x"
+  name: "artefactual.archivematica-src"
