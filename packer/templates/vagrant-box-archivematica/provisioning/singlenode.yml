@@ -4,8 +4,8 @@
   vars:
     # archivematica-src role
     - archivematica_src_install_devtools: "yes"
-    - archivematica_src_am_version: "qa/1.x"
-    - archivematica_src_ss_version: "qa/0.x"
+    - archivematica_src_am_version: "v1.9.0"
+    - archivematica_src_ss_version: "v0.14.0"
     - archivematica_src_ss_gunicorn: "true"
     - archivematica_src_am_dashboard_gunicorn: "true"
     - archivematica_src_am_multi_venvs: "true"
