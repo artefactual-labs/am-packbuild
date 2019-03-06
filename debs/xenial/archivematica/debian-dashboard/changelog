@@ -1,3 +1,10 @@
+archivematica-dashboard (1:1.9.0-1~16.04) xenial; urgency=high
+
+  * commit: a67d9d30832a313e49a8242d869739690b35e86c
+  * checkout: v1.9.0
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Wed, 06 Mar 2019 15:18:07 +0000
+
 archivematica-dashboard (1:1.8.1-1~16.04) xenial; urgency=high
 
   * commit: e240825332b76f3cc50b66646921fd9b1ab84d4b
