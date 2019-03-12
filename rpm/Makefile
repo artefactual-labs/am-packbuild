@@ -8,7 +8,6 @@ build:
 	make -C ./archivematica
 	make -C ./nailgun
 	make -C ./fits
-	make -C ./bagit
 	make -C ./atool
 	make -C ./jhove
 

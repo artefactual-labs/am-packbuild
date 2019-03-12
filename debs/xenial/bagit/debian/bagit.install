@@ -1,5 +1,0 @@
-src/assembly/bin/* /usr/bin
-src/assembly/bin/*	/usr/share/bagit/bin
-build/install/bagit/bin/* /usr/share/bagit/bin
-src/assembly/conf/* /usr/share/bagit/conf
-build/install/bagit/lib/* /usr/share/bagit/lib

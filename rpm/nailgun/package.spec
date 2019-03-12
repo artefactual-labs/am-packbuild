@@ -4,7 +4,7 @@ Release: 1%{?dist}
 Summary: client, protocol, and server for running Java programs from CLI
 Buildrequires: maven, gcc, java-devel, jpackage-utils, java-headless
 Source: https://github.com/facebook/nailgun/archive/nailgun-all-0.9.3.zip
-License: see /usr/share/doc/bagit-java/LICENSE.txt
+License: Apache License 2.0
 Patch: change-client-name.patch
 Patch1: makefile-change-client-name.patch
 
