@@ -13,7 +13,6 @@ Depends:
 	${misc:Depends},
 	archivematica-common (>=1.6.0),
 	atool,
-	bagit,
 	bulk-extractor,
 	clamav,
 	clamav-daemon,

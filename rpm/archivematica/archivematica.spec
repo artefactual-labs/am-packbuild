@@ -61,7 +61,6 @@ Requires: uuid
 # Packages from Archivematica repo
 Requires: siegfried
 Requires: fits
-Requires: bagit-java
 Requires: atool
 Requires: jhove
 # Packages from https://forensics.cert.org/
