@@ -1,14 +1,15 @@
 ---
 
+# PLEASE NOTE THAT THE PASSWORD VALUES USED HERE ARE NOT SAFE
+
 #
 # atom role
 #
-atom_user: "vagrant"
-atom_group: "vagrant"
+
 atom_environment_type: "development"
 atom_flush_data: "yes"
 atom_devbox: "yes"
-
+atom_path: "/usr/share/nginx/atom"
 atom_repository_url: "https://github.com/artefactual/atom.git"
 atom_repository_version: "qa/2.5.x"
 atom_config_db_hostname: "127.0.0.1"
@@ -18,6 +19,7 @@ atom_config_db_password: "ATOMPASSWORD"
 atom_config_db_port: "3306"
 atom_es_host: "127.0.0.1"
 atom_es_port: "9200"
+atom_es_config_version: "2.5"
 atom_mysql_user_name: "atom-user"
 atom_mysql_user_pass: "ATOMPASSWORD"
 atom_mysql_user_priv: "atom.*:ALL,GRANT"
@@ -76,19 +78,33 @@ nginx_sites:
         return 404;
       }
 
-#
 # elasticsearch role
-#
 
-es_instance_name: "atom_node"
-es_heap_size: "640m"
-es_allow_downgrades: true
-es_major_version: "5.x"
-es_version: "5.5.2"
+elasticsearch_version: "5.6.0"
+elasticsearch_apt_java_package: "openjdk-8-jre-headless"
+elasticsearch_java_home: "/usr/lib/jvm/java-1.8.0-openjdk-amd64"
+elasticsearch_heap_size: "1g"
+elasticsearch_max_open_files: "65535"
+elasticsearch_timezone: "UTC"
+elasticsearch_node_max_local_storage_nodes: "1"
+elasticsearch_index_mapper_dynamic: "true"
+elasticsearch_memory_bootstrap_mlockall: "true"
+elasticsearch_install_java: "true"
+#elasticsearch_thread_pools:
+#  - "thread_pool.write.size: 2"
+#  - "thread_pool.write.queue_size: 1000"
+elasticsearch_network_http_max_content_lengtht: 1024mb
+elasticsearch_discovery_zen_ping_multicast_enabled: "false"
+elasticsearch_max_locked_memory: "unlimited"
+elasticsearch_network_host: "127.0.0.1"
 
 #
 # percona role
 #
+
+mysql_version_major: "5"
+mysql_version_minor: "7"
+
 
 mysql_databases:
   - name: "atom"
@@ -101,5 +117,5 @@ mysql_users:
     priv: "{{ atom_mysql_user_priv }}"
     host: "{{ atom_mysql_user_host }}"
 
-mysql_root_password: "root"
+mysql_root_password: "MYSQLROOTPASSWORD"
 mysql_bind_address: "0.0.0.0"
