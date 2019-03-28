@@ -28,7 +28,11 @@
     {
       "type": "ansible-local",
       "playbook_file": "./provisioning/singlenode.yml",
-      "galaxy_file": "requirements.yml"
+      "galaxy_file": "requirements.yml",
+      "host_vars": "./provisioning/host_vars/",
+      "extra_arguments": [
+        "--extra-vars=@./host_vars/all"
+      ]
     },
     {
       "execute_command": "echo 'vagrant'|{{.Vars}} sudo -S -E bash '{{.Path}}'",
