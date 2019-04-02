@@ -202,9 +202,7 @@ virtualenv /usr/share/archivematica/virtualenvs/archivematica-dashboard
 /usr/share/archivematica/virtualenvs/archivematica-dashboard/bin/pip install -r %{_sourcedir}/%{name}/src/archivematicaCommon/requirements/production.txt
 /usr/share/archivematica/virtualenvs/archivematica-dashboard/bin/pip install -r %{_sourcedir}/%{name}/src/dashboard/src/requirements/production.txt
 virtualenv --relocatable /usr/share/archivematica/virtualenvs/archivematica-dashboard
-cd %{_sourcedir}/%{name}/src/dashboard/frontend/transfer-browser/ && npm install --unsafe-perm 
-
-cd %{_sourcedir}/%{name}/src/dashboard/frontend/appraisal-tab/ && npm install --unsafe-perm
+cd %{_sourcedir}/%{name}/src/dashboard/frontend/ && npm install --unsafe-perm 
 
 find %{_sourcedir}/%{name}/src/dashboard/ | grep static
 cp -rf /usr/share/archivematica/virtualenvs/archivematica-dashboard/* %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-dashboard/
