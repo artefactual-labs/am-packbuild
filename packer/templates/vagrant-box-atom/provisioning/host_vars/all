@@ -24,6 +24,9 @@ atom_mysql_user_name: "atom-user"
 atom_mysql_user_pass: "ATOMPASSWORD"
 atom_mysql_user_priv: "atom.*:ALL,GRANT"
 atom_mysql_user_host: "%"
+atom_user: "vagrant"
+atom_group: "vagrant"
+atom_description: "Access to Memory vagrat box"
 
 #
 # nginx role
@@ -117,5 +120,5 @@ mysql_users:
     priv: "{{ atom_mysql_user_priv }}"
     host: "{{ atom_mysql_user_host }}"
 
-mysql_root_password: "MYSQLROOTPASSWORD"
+mysql_root_password: "root"
 mysql_bind_address: "0.0.0.0"
