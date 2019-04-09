@@ -6,7 +6,7 @@
   path: "roles/"
 
 - src: "https://github.com/artefactual-labs/ansible-percona"
-  version: "master"
+  version: "dev/percona-5.7"
   name: "artefactual.percona"
   path: "roles/"
 
