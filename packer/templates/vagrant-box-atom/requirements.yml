@@ -6,7 +6,7 @@
   path: "roles/"
 
 - src: "https://github.com/artefactual-labs/ansible-percona"
-  version: "dev/percona-5.7"
+  version: "master"
   name: "artefactual.percona"
   path: "roles/"
 
@@ -26,6 +26,6 @@
   path: "roles/"
 
 - src: "https://github.com/artefactual-labs/ansible-atom"
-  version: "wip/centos-php72"
+  version: "master"
   name: "artefactual.atom"
   path: "roles/"
