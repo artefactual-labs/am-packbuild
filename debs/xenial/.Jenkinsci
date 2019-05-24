@@ -1,26 +1,31 @@
+pipeline {
+  agent any
+  parameters {
+  string(defaultValue: 'archivematica', description: '', name: 'PACKAGE')
+  string(defaultValue: 'qa/1.x', description: '', name: 'BRANCH')
+  string(defaultValue: '0F4A4D31', description: 'For production packages, use production key', name: 'GPG_ID')
+  string(defaultValue: '1.8.0', description: '', name: 'VERSION')
+  string(defaultValue: '-beta1', description: '', name: 'RELEASE')
+  string(defaultValue: 'qa/1.x', description: '', name: 'PACKBUILD_BRANCH')
+  string(defaultValue: 'jenkinsci', description: '', name: 'REPOSITORY')
+  }
 
-properties([gitLabConnection(''), [$class: 'RebuildSettings', autoRebuild: false, rebuildDisabled: false],
-parameters([
-  string(defaultValue: 'archivematica', description: '', name: 'PACKAGE'), 
-  string(defaultValue: 'qa/1.x', description: '', name: 'BRANCH'),
-  string(defaultValue: '0F4A4D31', description: 'For production packages, use production key', name: 'GPG_ID'),
-  string(defaultValue: '1.8.0', description: '', name: 'VERSION'),
-  string(defaultValue: '-beta1', description: '', name: 'RELEASE'),
-  string(defaultValue: 'qa/1.x', description: '', name: 'PACKBUILD_BRANCH'),
-  string(defaultValue: 'jenkinsci', description: '', name: 'REPOSITORY')]),
-  pipelineTriggers([])])
-
-node {
+stages {
   stage('Get code') {
+    steps {
     git branch: '${PACKBUILD_BRANCH}', url: 'https://github.com/artefactual-labs/am-packbuild'
+    }
   }
   stage('Build package'){
+   steps {
     sh '''
       cd debs/xenial/${PACKAGE}/
       make PACKAGE=$PACKAGE BRANCH=${BRANCH} VERSION=${VERSION} RELEASE=${RELEASE} GPG_ID=${GPG_ID}
     '''
+   }
   }
   stage('Update repository'){
+   steps {
     sh '''
       cd debs/xenial/${PACKAGE}/
       mkdir -p /srv/repos/am-packbuild/${REPOSITORY}/xenial/
@@ -52,6 +57,7 @@ node {
       rm Release.gpg || true
       gpg -u 0x$GPG_ID --armor --detach-sign --output Release.gpg Release
     '''
+   }
+ }
 }
-
 }
