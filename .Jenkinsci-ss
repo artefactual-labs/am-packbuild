@@ -1,9 +1,7 @@
-
 node {
   stage('Get code') {
     git branch: 'qa/0.x', url: 'https://github.com/artefactual/archivematica-storage-service'
-    properties([disableConcurrentBuilds(),gitLabConnection(''),
-      [$class: 'RebuildSettings',autoRebuild: false, rebuildDisabled: false],
+    properties([disableConcurrentBuilds(),
        pipelineTriggers([pollSCM('*/5 * * * *')])])
   }
   stage ('Set properties') {
@@ -33,9 +31,8 @@ node {
       echo $RPMRELEASE | tee .rpmrelease
 
       # Debian versions can be compared with
-      # if $(dpkg --compare-versions "0.13.0~rc.5" "lt" "0.13.1-1"); then echo true; fi
+      # if $(dpkg --compare-versions "1.7.0~rc.5" "lt" "1.7.1-1"); then echo true; fi
       # For centos, rpmdev-vercmp from package rpmdevtools can be used
-      # Use same repository than archivematica, so 1.8.0 is set instead of "cat .version"     
     '''
     env.PACKAGE = sh(script: "echo archivematica-storage-service", returnStdout: true).trim()
     env.VERSION = sh(script: "cat .version", returnStdout: true).trim()
@@ -76,4 +73,3 @@ node {
   }
 
 }
-

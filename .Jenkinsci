@@ -1,9 +1,7 @@
-
 node {
   stage('Get code') {
     git branch: 'qa/1.x', url: 'https://github.com/artefactual/archivematica'
-    properties([disableConcurrentBuilds(),gitLabConnection(''),
-      [$class: 'RebuildSettings',autoRebuild: false, rebuildDisabled: false],
+    properties([disableConcurrentBuilds(),
        pipelineTriggers([pollSCM('*/5 * * * *')])])
   }
   stage ('Set properties') {
@@ -75,4 +73,3 @@ node {
   }
 
 }
-
