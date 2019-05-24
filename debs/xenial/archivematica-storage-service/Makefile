@@ -55,7 +55,7 @@ deb-clean:
 	@rm -rf $(DOCKER_VOLUME)/repo/
 	@rm -rf $(DOCKER_VOLUME)/src/
 	mkdir -p src/$(PACKAGE)
-	sudo rm -rf src/
+	rm -rf src/
 	@git clone \
 	  --quiet \
  	  --branch $(BRANCH) \
