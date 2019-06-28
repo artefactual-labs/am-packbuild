@@ -1,0 +1,21 @@
+Remove problematic pip dependencies
+Index: archivematica-storage-service/requirements/production.txt
+===================================================================
+--- archivematica-storage-service.orig/requirements/production.txt
++++ archivematica-storage-service/requirements/production.txt
+@@ -56,7 +56,6 @@ oslo.serialization==2.29.1
+ oslo.utils==3.41.0
+ pbr==5.2.0
+ positional==1.2.1
+-psycopg2==2.7.1
+ pyasn1-modules==0.2.5
+ pyasn1==0.4.5
+ pycparser==2.19
+@@ -65,7 +64,6 @@ pyparsing==2.4.0
+ python-dateutil==2.6.1
+ python-gnupg==0.4.0
+ python-keystoneclient==3.10.0
+-python-ldap==3.2.0
+ python-mimeparse==1.6.0
+ python-swiftclient==3.3.0
+ pytz==2019.1
