@@ -4,7 +4,7 @@
   vars:
     # archivematica-src role
     - archivematica_src_install_devtools: "yes"
-    - archivematica_src_am_version: "v1.9.1"
+    - archivematica_src_am_version: "v1.9.2"
     - archivematica_src_ss_version: "v0.14.1"
     - archivematica_src_ss_gunicorn: "true"
     - archivematica_src_am_dashboard_gunicorn: "true"
