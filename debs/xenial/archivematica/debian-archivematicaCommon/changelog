@@ -1,3 +1,10 @@
+archivematica-common (1:1.9.2-1~16.04) xenial; urgency=high
+
+  * commit: 48409e31b72d877b91efefd8c51dfd4c10c70b69
+  * checkout: v1.9.2
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Fri, 28 Jun 2019 17:00:14 +0000
+
 archivematica-common (1:1.9.1-1~16.04) xenial; urgency=high
 
   * commit: 84661775836cf8037ad3b48feb8e02bb80335f0f
