@@ -13,6 +13,16 @@ else
   adduser --uid 333 --group --system --home /var/lib/archivematica/ archivematica
 fi
 
+# Remove dh-virtualenv build path in editable pip requirements and other local/bin files
+# https://github.com/spotify/dh-virtualenv/issues/134
+# https://github.com/archivematica/Issues/issues/903
+for filename in /usr/share/archivematica/virtualenvs/archivematica-storage-service/local/bin/* \
+    /usr/share/archivematica/virtualenvs/archivematica-storage-service/lib/python2.7/site-packages/*.pth \
+    /usr/share/archivematica/virtualenvs/archivematica-storage-service/lib/python2.7/site-packages/*.egg-link ; do
+    if [ -f "$filename" ]; then
+        sed -i "s/\/src\/src\/archivematica-storage-service\/debian\/archivematica-storage-service//g" $filename
+    fi
+done
 
 echo "creating django secret key"
 KEYCMD=$(python /var/archivematica/storage-service/make_key.py 2>&1)
