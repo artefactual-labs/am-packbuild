@@ -18,6 +18,17 @@ pip install --upgrade -r /usr/share/archivematica/dashboard/requirements.txt
 KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 sed -i "s/CHANGE_ME_WITH_A_SECRET_KEY/\"$KEY\"/g" /etc/default/archivematica-dashboard
 
+# Remove dh-virtualenv build path in editable pip requirements and other local/bin files
+# https://github.com/spotify/dh-virtualenv/issues/134
+# https://github.com/archivematica/Issues/issues/903
+for filename in /usr/share/archivematica/virtualenvs/archivematica-dashboard/local/bin/* \
+    /usr/share/archivematica/virtualenvs/archivematica-dashboard/lib/python2.7/site-packages/*.pth \
+    /usr/share/archivematica/virtualenvs/archivematica-dashboard/lib/python2.7/site-packages/*.egg-link ; do
+    if [ -f "$filename" ]; then
+        sed -i "s/\/src\/src\/archivematica\/src\/dashboard\/debian\/archivematica-dashboard//g" $filename
+    fi
+done
+
 # Populate default mysql config
 DBPASS=$(grep "dbc_dbpass=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
 sed -i "s/^\(ARCHIVEMATICA_DASHBOARD_CLIENT_PASSWORD=\).*/\1$DBPASS/g" /etc/default/archivematica-dashboard
