@@ -37,6 +37,7 @@ Requires: archivematica-common
 Requires: tesseract
 Requires: tree
 Requires: p7zip
+Requires: p7zip-plugins
 Requires: ImageMagick
 Requires: ghostscript
 Requires: perl-Image-ExifTool
