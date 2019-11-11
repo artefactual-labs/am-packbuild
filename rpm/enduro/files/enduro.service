@@ -1,0 +1,10 @@
+[Unit]
+Description=Enduro
+After=cadence.service
+
+[Service]
+Type=simple
+Restart=on-failure
+User=enduro
+ExecStart=/usr/bin/enduro --config /etc/enduro.toml
+
