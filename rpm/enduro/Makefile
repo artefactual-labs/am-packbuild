@@ -31,19 +31,17 @@ dev:
 
 
 rpm-build: rpm-clean
-	@echo "==> Downloading siegfried."
+	@echo "==> Download and unpack enduro."
 	mkdir -p $(ENDURO_SRC)
-	git clone --branch v$(VERSION) --depth 1 https://github.com/artefactual-labs/enduro.git $(ENDURO_SRC)
-	cd $(ENDURO_SRC) &&  git rev-parse --verify HEAD
+	wget -q https://github.com/artefactual-labs/enduro/releases/download/v${VERSION}/enduro_${VERSION}_Linux-64bit.tar.gz -O $(ENDURO_SRC)/enduro.tar.gz
+	cd $(ENDURO_SRC) && tar zxf enduro.tar.gz
 
-	@echo "==> Building sources."
-	cd $(ENDURO_SRC) && make enduro-dev
 
 	@echo "==> Preparing environment for rpmbuild."
 	mkdir -p $(RPM_TOPDIR)/{BUILD,RPMS,SRPMS}
 	mkdir -p $(RPM_TOPDIR)/SOURCES/$(NAME)-$(VERSION)
-	cp -p $(ENDURO_SRC)/build/enduro $(RPM_TOPDIR)/SOURCES/$(NAME)-$(VERSION)/
-	cp -p $(ENDURO_SRC)/enduro.toml $(RPM_TOPDIR)/SOURCES/$(NAME)-$(VERSION)/
+	cp -p $(ENDURO_SRC)/enduro_${VERSION}_Linux-64bit/enduro $(RPM_TOPDIR)/SOURCES/$(NAME)-$(VERSION)/
+	cp -p $(ENDURO_SRC)/enduro_${VERSION}_Linux-64bit/enduro.toml $(RPM_TOPDIR)/SOURCES/$(NAME)-$(VERSION)/
 	cp -p files/enduro.service $(RPM_TOPDIR)/SOURCES/$(NAME)-$(VERSION)/
 	tar czf $(RPM_TOPDIR)/SOURCES/$(NAME)-$(VERSION).tar.gz -C $(RPM_TOPDIR)/SOURCES $(NAME)-$(VERSION)
 	cp $(DOCKER_VOLUME)/package.spec $(RPM_TOPDIR)/package.spec
