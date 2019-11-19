@@ -1,3 +1,9 @@
+fits (1.1.0-3~16.04) bionic; urgency=medium
+
+  * Make JVM heap size configurable in /etc/default/fits
+
+ -- Artefactual Sysadmin <sysadmin@artefactual.com>  Tue, 19 Nov 2019 21:57:36 +0100
+
 fits (1.1.0-3~16.04) bionic; urgency=low
 
   * Added systemd init script

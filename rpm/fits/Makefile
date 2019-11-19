@@ -20,7 +20,9 @@ build-docker-image:
 
 build:
 	@echo "==> Building RPM."
-	@docker run --rm --volume "$(shell pwd):/src" $(DOCKER_IMAGE) make -C /src rpm-build
+	@docker run \
+		-e DOCKER_VOLUME="$(DOCKER_VOLUME)/etc" \
+	        --rm --volume "$(shell pwd):/src" $(DOCKER_IMAGE) make -C /src rpm-build
 
 rpm-build: rpm-clean
 	@echo "==> Preparing environment for rpmbuild."
@@ -29,6 +31,7 @@ rpm-build: rpm-clean
 	mkdir -p $(RPM_TOPDIR)/SOURCES/
 	wget -q -O  $(RPM_TOPDIR)/SOURCES/v$(VERSION).zip https://github.com/harvard-lts/fits/archive/$(VERSION).zip
 	cp files/* $(RPM_TOPDIR)/SOURCES/
+	#cp -a $(DOCKER_VOLUME)/etc/ $(RPM_TOPDIR)/etc/
 	rpmbuild $(RPMBUILD_ARGS) -ba --clean $(RPM_TOPDIR)/package.spec
 
 	@echo "==> Copying RPM files."
