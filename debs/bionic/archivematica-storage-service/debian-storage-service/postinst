@@ -35,7 +35,9 @@ sed -i "s/<replace-with-key>/$KEYCMD/g" /etc/archivematica/storage-service.gunic
 ucfr archivematica-storage-service /etc/default/archivematica-storage-service
 ucf --debconf-ok /etc/default/archivematica-storage-service /etc/default/archivematica-storage-service
 
-export $(cat /etc/default/archivematica-storage-service)
+set -a
+source /etc/default/archivematica-storage-service
+set +a
 echo "creating symlink in /usr/lib/archivematica"
 rm -f /usr/lib/archivematica/storage-service
 ln -s -f ${SS_ENV_DIR}/lib/python2.7/site-packages/storage_service/ /usr/lib/archivematica/storage-service

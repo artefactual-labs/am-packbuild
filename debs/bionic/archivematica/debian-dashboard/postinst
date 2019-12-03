@@ -44,7 +44,9 @@ ucfr archivematica-dashboard /etc/default/archivematica-dashboard
 ucf --debconf-ok /etc/default/archivematica-dashboard /etc/default/archivematica-dashboard
 
 #this is required to allow syncdb to work properly
-export $(cat /etc/default/archivematica-dashboard)
+set -a
+source /etc/default/archivematica-dashboard
+set +a
 
 # Fake migrations if necessary.  $2 is old version
 if [[ $2 == '1:1.4.1'* ]]; then
