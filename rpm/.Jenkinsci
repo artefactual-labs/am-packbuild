@@ -13,6 +13,10 @@ pipeline {
 stages {
   stage('Get code') {
     steps {
+     script {
+     currentBuild.displayName = "#${BUILD_NUMBER} ${PACKAGE}"
+     currentBuild.description = "Branch: ${BRANCH} <br> Version: ${VERSION} <br> Release: ${RELEASE} <br> Repository: ${REPOSITORY}"
+      }
     git branch: '${PACKBUILD_BRANCH}', url: 'https://github.com/artefactual-labs/am-packbuild'
     sh '''
         cd rpm/$PACKAGE/
