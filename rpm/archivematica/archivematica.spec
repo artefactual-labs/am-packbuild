@@ -34,10 +34,12 @@ Archivematica MCP server.
 %package mcp-client
 Summary: Archivematica MCP client
 Requires: archivematica-common
+Requires: bzip2
 Requires: tesseract
 Requires: tree
 Requires: p7zip
 Requires: p7zip-plugins
+Requires: pbzip2
 Requires: ImageMagick
 Requires: ghostscript
 Requires: perl-Image-ExifTool
