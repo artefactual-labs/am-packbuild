@@ -73,6 +73,7 @@
         "no_proxy={{user `no_proxy`}}"
       ],
       "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E sh -eux '{{.Path}}'",
+      "expect_disconnect": true,
       "scripts": [
         "../../scripts/ubuntu/update.sh",
         "../../scripts/common/sshd.sh",
@@ -89,7 +90,7 @@
   ],
   "variables": {
     "box_basename": "ubuntu-18.04",
-    "build_timestamp": "{{isotime \"20060102150405\"}}",
+    "build_timestamp": "{{isotime}}",
     "cpus": "2",
     "disk_size": "20960",
     "git_revision": "__unknown_git_revision__",
