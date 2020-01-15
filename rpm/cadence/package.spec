@@ -22,6 +22,9 @@ install -m 0755 cadence-server $RPM_BUILD_ROOT/usr/bin/cadence-server
 install -m 0755 cadence-sql-tool $RPM_BUILD_ROOT/usr/bin/cadence-sql-tool
 install -m 0644 cadence.yaml $RPM_BUILD_ROOT/etc/
 install -m 0644 cadence.service $RPM_BUILD_ROOT/etc/systemd/system/
+mkdir -p $RPM_BUILD_ROOT/usr/share/cadence/migrations/
+cp -rf cadence-migrations/ $RPM_BUILD_ROOT/usr/share/cadence/migrations/
+cp -rf visibility-migrations/ $RPM_BUILD_ROOT/usr/share/cadence/migrations/
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -29,6 +32,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/cadence
 /usr/bin/cadence-server
 /usr/bin/cadence-sql-tool
+/usr/share/cadence/migrations/
 %config /etc/cadence.yaml
 %config /etc/systemd/system/cadence.service
 
