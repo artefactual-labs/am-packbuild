@@ -1,5 +1,5 @@
 NAME          = cadence
-VERSION       ?= 0.9.4
+VERSION       ?= 0.9.5
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
