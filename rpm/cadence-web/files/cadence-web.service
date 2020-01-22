@@ -1,0 +1,11 @@
+[Unit]
+Description=Cadence Web Server
+After=cadence.service
+
+[Service]
+Type=simple
+Restart=on-failure
+User=enduro
+Environment=CADENCE_TCHANNEL_PEERS=localhost:7400
+WorkingDirectory=/usr/share/cadence-web/
+ExecStart=/opt/rh/rh-nodejs10/root/usr/bin/node server.js
