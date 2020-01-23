@@ -5,6 +5,7 @@ DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
 ENDURO_SRC = "/go/src/github.com/artefactual-labs/enduro"
 
+CHANGELOG_DATE = $(shell date "+%a %b %d %Y")
 RPMBUILD_ARGS := \
 	--define "_topdir $(RPM_TOPDIR)" \
 	--define "name $(NAME)" \
@@ -52,7 +53,9 @@ rpm-build: rpm-clean
 	cp -p $(ENDURO_SRC)/enduro_${VERSION}_Linux-64bit/enduro.toml $(RPM_TOPDIR)/SOURCES/$(NAME)-$(VERSION)/
 	cp -p files/enduro.service $(RPM_TOPDIR)/SOURCES/$(NAME)-$(VERSION)/
 	tar czf $(RPM_TOPDIR)/SOURCES/$(NAME)-$(VERSION).tar.gz -C $(RPM_TOPDIR)/SOURCES $(NAME)-$(VERSION)
+	sed -i '2s/^/* $(CHANGELOG_DATE) Artefactual <sysadmin@artefactual.com> - $(VERSION)\n- Changes: https:\/\/github.com\/artefactual-labs\/enduro\/releases\/tag\/v$(VERSION)\n/' $(DOCKER_VOLUME)/changelog
 	cp $(DOCKER_VOLUME)/package.spec $(RPM_TOPDIR)/package.spec
+	cat $(DOCKER_VOLUME)/changelog >> $(RPM_TOPDIR)/package.spec
 
 	@echo "==> Running rpmbuild."
 	rpmbuild $(RPMBUILD_ARGS) -ba --clean $(RPM_TOPDIR)/package.spec
