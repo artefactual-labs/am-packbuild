@@ -1,3 +1,12 @@
+siegfried (1.8.0-1) trusty; urgency=medium
+
+  * Build version v1.8.0-1, with custom archivematica configuration
+  * Use DH_GOPKG=github.com/richardlehane/siegfried/cmd...
+    (See https://github.com/richardlehane/siegfried/pull/98)
+  * Use Go 1.13
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Fri, 24 Jan 2020 12:16:33 +0000
+
 siegfried (1.6.7-2) trusty; urgency=medium
 
   * Build version v1.6.7-2, with custom archivematica configuration
