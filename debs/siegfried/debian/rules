@@ -2,7 +2,7 @@
 
 export DH_OPTIONS
 
-export DH_GOPKG := github.com/richardlehane/siegfried
+export DH_GOPKG := github.com/richardlehane/siegfried/cmd
 
 #export GOROOT := $(CURDIR)/$(BUILD_DIR)/go
 # Tests assume a fixed position for the PRONOM files,

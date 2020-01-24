@@ -1,7 +1,7 @@
 FROM ubuntu:xenial
 
 # Environmnet variables needed during build
-ENV GOVERSION 1.11
+ENV GOVERSION 1.13
 ENV GOOS linux
 ENV GOARCH amd64
 
