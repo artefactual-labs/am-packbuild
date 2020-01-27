@@ -1,6 +1,6 @@
 NAME          = fits
 VERSION       ?= 1.1.0
-RELEASE	      ?= 3~16.04
+RELEASE	      ?= 4~16.04
 GIT_URL	      = https://github.com/harvard-lts/fits
 GPG_ID        ?= 5236CA08
 DEB_TOPDIR    = "/debbuild"
@@ -43,7 +43,7 @@ deb-build: deb-clean
 	cp  $(DEB_TOPDIR)/*.*  $(DOCKER_VOLUME)/build/ 
 
 deb-clean:
-	@echo "==> Cleaning up previous RPMs builds."
+	@echo "==> Cleaning up previous Debs builds."
 	@rm -rf $(DOCKER_VOLUME)/build/
 
 # TODO: Create repo and test it
