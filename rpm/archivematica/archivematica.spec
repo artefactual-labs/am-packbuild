@@ -44,15 +44,13 @@ Requires: ImageMagick
 Requires: ghostscript
 Requires: perl-Image-ExifTool
 Requires: inkscape
-Requires: clamav-server
 Requires: clamav-data
 Requires: clamav-update
 Requires: clamav-filesystem
 Requires: clamav
-Requires: clamav-scanner-systemd
 Requires: clamav-devel
 Requires: clamav-lib
-Requires: clamav-server-systemd
+Requires: clamd
 Requires: libvpx
 Requires: libraw1394
 Requires: libpst
