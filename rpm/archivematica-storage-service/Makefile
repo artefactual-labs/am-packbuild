@@ -6,6 +6,10 @@ RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = $(subst ~,-,"rpmbuild-$(NAME)-$(VERSION)")
 
+CHANGELOG_DATE = $(shell date "+%a %b %d %Y")
+PACKBUILD_HEAD   ?= $(shell git rev-parse HEAD )
+PACKAGE_HEAD   ?= $(shell git ls-remote https://github.com/artefactual/archivematica-storage-service refs/heads/$(BRANCH) | awk '{print $$1}' )
+
 RPMBUILD_ARGS := \
 	--define "_topdir $(RPM_TOPDIR)" \
 	--define "_etcdir $(DOCKER_VOLUME)/etc" \
@@ -31,6 +35,8 @@ build:
                 -e VERSION="$(VERSION)" \
                 -e RELEASE="$(RELEASE)" \
                 -e BRANCH="$(BRANCH)" \
+                -e PACKBUILD_HEAD="$(PACKBUILD_HEAD)" \
+                -e PACKAGE_HEAD="$(PACKAGE_HEAD)" \
 		--rm --volume "$(shell pwd):/$(DOCKER_VOLUME)" $(DOCKER_IMAGE) make -C /src rpm-build
 
 rpm-build: rpm-clean
@@ -38,6 +44,10 @@ rpm-build: rpm-clean
 	mkdir -p $(RPM_TOPDIR)
 	cp $(DOCKER_VOLUME)/package.spec $(RPM_TOPDIR)/package.spec
 	yum-builddep -y $(RPM_TOPDIR)/package.spec
+	# Populate ChangeLog
+	sed -i '2s/^/* $(CHANGELOG_DATE) Artefactual <sysadmin@artefactual.com> - $(VERSION)-$(RELEASE) \n- Packbuild: $(PACKBUILD_HEAD)\n- Storage Service: $(PACKAGE_HEAD)\n/' $(DOCKER_VOLUME)/changelog
+	cat $(DOCKER_VOLUME)/changelog >> $(RPM_TOPDIR)/package.spec
+
 	rpmbuild $(RPMBUILD_ARGS) -ba --clean $(RPM_TOPDIR)/package.spec
 
 	@echo "==> Copying RPM files."
