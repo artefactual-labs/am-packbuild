@@ -1,0 +1,5 @@
+%changelog
+* Wed Jan 09 2019 - sysadmin@artefactual.com
+- Create collectstatic directory in post script
+* Tue Dec 11 2018 - sysadmin@artefactual.com
+- Update collectstatic command: added --clear option

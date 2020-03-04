@@ -277,10 +277,3 @@ systemctl daemon-reload
 if [ x$(semanage port -l | grep http_port_t | grep 7400 | wc -l) == x0 ]; then
   semanage port -a -t http_port_t -p tcp 7400
 fi
-
-%changelog
-* Wed Jan 09 2019 - sysadmin@artefactual.com
-- Create collectstatic directory in post script
-* Tue Dec 11 2018 - sysadmin@artefactual.com
-- Update collectstatic command: added --clear option
-
