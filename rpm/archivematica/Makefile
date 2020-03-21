@@ -11,6 +11,10 @@ CHANGELOG_DATE = $(shell date "+%a %b %d %Y")
 PACKBUILD_HEAD   ?= $(shell git rev-parse HEAD )
 PACKAGE_HEAD   ?= $(shell git ls-remote https://github.com/artefactual/archivematica refs/heads/$(BRANCH) | awk '{print $$1}' )
 
+GIT_REPO ?= "https://github.com/artefactual/archivematica"
+GIT_HOSTNAME :=$(shell echo $(GIT_REPO) | sed -e 's/https:\/\///g' -e 's/git@//g'  -e 's/\:/\//g' | cut -d\/ -f1)
+SSH_SOCKET  ?= $(SSH_AUTH_SOCK)
+
 RPMBUILD_ARGS := \
 	--define "_topdir $(RPM_TOPDIR)" \
 	--define "_etcdir $(DOCKER_VOLUME)/etc" \
@@ -18,7 +22,8 @@ RPMBUILD_ARGS := \
 	--define "name $(PACKAGE)" \
 	--define "rpmversion $(VERSION)" \
 	--define "rpmrelease $(RELEASE)" \
-	--define "branch $(BRANCH)"
+	--define "branch $(BRANCH)" \
+	--define "git_repo $(GIT_REPO)"
 
 .PHONY: build-docker-image build rpm-build rpm-clean rpm-test
 
@@ -31,12 +36,15 @@ build-docker-image:
 build:
 	@echo "==> Building RPM."
 	@docker run \
+		-v $(SSH_SOCKET):"/ssh-agent" \
+		-e SSH_AUTH_SOCK="/ssh-agent" \
                 -e RPM_TOPDIR="$(RPM_TOPDIR)" \
 		-e DOCKER_VOLUME="$(DOCKER_VOLUME)/etc" \
 		-e PACKAGE="$(PACKAGE)" \
 		-e VERSION="$(VERSION)" \
 		-e RELEASE="$(RELEASE)" \
 		-e BRANCH="$(BRANCH)" \
+		-e GIT_REPO="$(GIT_REPO)" \
 		-e PACKBUILD_HEAD="$(PACKBUILD_HEAD)" \
 		-e PACKAGE_HEAD="$(PACKAGE_HEAD)" \
 		--rm --volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) make -C $(DOCKER_VOLUME) rpm-build
@@ -65,8 +73,13 @@ cleanup:
 
 rpm-build: rpm-clean
 	@echo "==> Preparing environment for rpmbuild."
+	# Populate .ssh/known_hosts
+	mkdir -p ~/.ssh/
+	ssh-keyscan -t rsa $(GIT_HOSTNAME) >> ~/.ssh/known_hosts || true
+	# Create needed folders and put files inplace
 	mkdir -p $(RPM_TOPDIR)
 	cp $(DOCKER_VOLUME)/$(PACKAGE).spec $(RPM_TOPDIR)/package.spec
+	# Install dependencies
 	yum-builddep -y $(RPM_TOPDIR)/package.spec
 	# Update changelog
 	sed -i '2s/^/* $(CHANGELOG_DATE) Artefactual <sysadmin@artefactual.com> - $(VERSION)-$(RELEASE) \n- Packbuild: $(PACKBUILD_HEAD)\n- Archivematica: $(PACKAGE_HEAD)\n/' $(DOCKER_VOLUME)/changelog
