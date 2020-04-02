@@ -1,3 +1,10 @@
+archivematica-mcp-client (1:1.11.0-1~16.04) xenial; urgency=high
+
+  * commit: 3e52494735ebfeb0cabc477d95d692034f4b3142
+  * checkout: v1.11.0
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Thu, 02 Apr 2020 12:26:35 +0000
+
 archivematica-mcp-client (1:1.10.1-1~16.04) xenial; urgency=high
 
   * commit: ef3af9fb58ac700dfca2a350095ef13a0c396e9c
