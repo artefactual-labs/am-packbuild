@@ -1,4 +1,7 @@
 %changelog
+* Tue Mar 31 2020 Artefactual <sysadmin@artefactual.com> - 0.16.0-1
+- Packbuild: 7d0527383fb0d11ddd2538c2ba4130f1b293b0ab
+- Archivematica: 3e52494735ebfeb0cabc477d95d692034f4b3142
 * Wed Jan 09 2019 - sysadmin@artefactual.com
 - Create collectstatic directory in post script
 * Tue Dec 11 2018 - sysadmin@artefactual.com
