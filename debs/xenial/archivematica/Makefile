@@ -10,6 +10,10 @@ BRANCH     ?= qa/1.x
 VERSION     ?= 1.8.1
 RELEASE       ?= -1
 BUILD_TYPE         ?= am
+GIT_REPO ?= "https://github.com/artefactual"
+GIT_HOSTNAME :=$(shell echo $(GIT_REPO) | sed -e 's/https:\/\///g' -e 's/git@//g'  -e 's/\:/\//g' | cut -d\/ -f1)
+SSH_SOCKET  ?= $(SSH_AUTH_SOCK)
+
 
 .PHONY: build-docker-image build deb-build deb-clean deb-test update-changelog
 
@@ -22,12 +26,15 @@ build-docker-image: update-changelog
 build:
 	@echo "==> Building deb."
 	@docker run \
+                -v $(SSH_SOCKET):"/ssh-agent" \
+                -e SSH_AUTH_SOCK="/ssh-agent" \
                 -e BRANCH=$(BRANCH) \
 		-e VERSION=$(VERSION) \
 		-e RELEASE=$(RELEASE) \
                 -e BUILD_TYPE=$(BUILD_TYPE) \
                 -e GPG_ID=$(GPG_ID) \
 		-e GPG_KEY \
+		-e GIT_REPO="$(GIT_REPO)" \
 		-e PACKBUILD_EXTRA_ARGS="$(PACKBUILD_EXTRA_ARGS)" \
  		--rm \
                 --volume "$(shell cd ../../ && pwd):$(DEB_TOPDIR)/$(NAME)" \
@@ -43,6 +50,8 @@ deb-build: deb-clean
 	#@cd /debbuild/$(NAME) && ./packbuild.py -r $(BUILD_TYPE) -v $(VERSION) -c $(BRANCH) -k$(GPG_ID) $(PACKBUILD_EXTRA_ARGS) 
 	@cd /debbuild/$(NAME)  
 	@echo "==> Clone code."
+	mkdir -p ~/.ssh/
+	ssh-keyscan -t rsa $(GIT_HOSTNAME) >> ~/.ssh/known_hosts || true
 	mkdir -p src/$(PACKAGE)
 	rm -rf src/
 	@git clone \
@@ -51,7 +60,7 @@ deb-build: deb-clean
  	  --depth 1 \
           --single-branch \
   	  --recurse-submodules \
-    		https://github.com/artefactual/$(PACKAGE)\
+    		$(GIT_REPO)/$(PACKAGE)\
 	  src/$(PACKAGE) 
 	cd src/$(PACKAGE) && git submodule init && \
 		git submodule update && \
