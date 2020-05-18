@@ -6,6 +6,9 @@ DOCKER_IMAGE  ?= $(subst ~,-,"rpmbuild-$(NAME)-$(VERSION)")
 BRANCH     ?= qa/1.x
 VERSION     ?= 1.8.1
 RELEASE       ?= 1
+GIT_REPO ?= "https://github.com/artefactual/archivematica"
+GIT_HOSTNAME :=$(shell echo $(GIT_REPO) | sed -e 's/https:\/\///g' -e 's/git@//g'  -e 's/\:/\//g' | cut -d\/ -f1)
+SSH_SOCKET  ?= $(SSH_AUTH_SOCK)
 
 RPMBUILD_ARGS := \
 	--define "_topdir $(RPM_TOPDIR)" \
@@ -14,7 +17,8 @@ RPMBUILD_ARGS := \
 	--define "name $(PACKAGE)" \
 	--define "rpmversion $(VERSION)" \
 	--define "rpmrelease $(RELEASE)" \
-	--define "branch $(BRANCH)"
+	--define "branch $(BRANCH)" \
+	--define "git_repo $(GIT_REPO)"
 
 .PHONY: build-docker-image build rpm-build rpm-clean rpm-test
 
@@ -27,11 +31,14 @@ build-docker-image:
 build:
 	@echo "==> Building RPM."
 	@docker run \
+		-v $(SSH_SOCKET):"/ssh-agent" \
+                -e SSH_AUTH_SOCK="/ssh-agent" \
                 -e RPM_TOPDIR="$(RPM_TOPDIR)" \
 		-e DOCKER_VOLUME="$(DOCKER_VOLUME)/etc" \
 		-e PACKAGE="$(PACKAGE)" \
 		-e VERSION="$(VERSION)" \
 		-e RELEASE="$(RELEASE)" \
+		-e GIT_REPO="$(GIT_REPO)" \
 		-e BRANCH="$(BRANCH)" \
 		--rm --volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) make -C $(DOCKER_VOLUME) rpm-build
 
@@ -57,6 +64,9 @@ cleanup:
 
 rpm-build: rpm-clean
 	@echo "==> Preparing environment for rpmbuild."
+	# Populate .ssh/known_hosts
+	mkdir -p ~/.ssh/
+	ssh-keyscan -t rsa $(GIT_HOSTNAME) >> ~/.ssh/known_hosts || true
 	mkdir -p $(RPM_TOPDIR)
 	cp $(DOCKER_VOLUME)/$(PACKAGE).spec $(RPM_TOPDIR)/package.spec
 	yum-builddep -y $(RPM_TOPDIR)/package.spec

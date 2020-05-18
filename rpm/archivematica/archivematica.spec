@@ -11,7 +11,7 @@ Release: %{rpmrelease}
 Summary: Archivematica digital preservation system
 Group: Application/System
 License: AGPLv3
-Source0: https://github.com/artefactual/archivematica
+Source0: %{git_repo}
 BuildRequires: git, gcc, openldap-devel, openssl-devel, python-virtualenv, python-pip, mariadb-devel, libxslt-devel, python-devel, libffi-devel, openssl-devel, gcc-c++, postgresql-devel, nodejs
 Requires: archivematica-common
 AutoReq: No
@@ -138,7 +138,7 @@ git clone \
   --depth 1 \
   --single-branch \
   --recurse-submodules \
-    https://github.com/artefactual/archivematica \
+    %{git_repo} \
     %{_sourcedir}/%{name}
 
 
