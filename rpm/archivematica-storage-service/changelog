@@ -1,4 +1,7 @@
 %changelog
+* Fri Jun 12 2020 Artefactual <sysadmin@artefactual.com> - 0.16.1-1
+- Packbuild: 2092ee13770b6730daf8789473a146d7492f996b
+- Storage Service: 21d8ee943b5f0c4882c649a3d9b11ad2e0528b5b
 * Tue Mar 31 2020 Artefactual <sysadmin@artefactual.com> - 0.16.0-1
 - Packbuild: 7d0527383fb0d11ddd2538c2ba4130f1b293b0ab
 - Storage Service: 18b9a77ce1a6789be00159289fb48f4edc46065e
