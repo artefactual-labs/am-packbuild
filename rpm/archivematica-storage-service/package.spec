@@ -22,10 +22,10 @@ The Storage Service is the mechanism by which Archivematica is able to store pac
 /var/archivematica/storage-service/
 /var/archivematica/storage_service/
 /usr/lib/systemd/system/archivematica-storage-service.service
-%config /etc/sysconfig/archivematica-storage-service
-%config /etc/nginx/conf.d/archivematica-storage-service.conf
-%config /etc/archivematica/storage-service.gunicorn-config.py
-%config /etc/archivematica/storageService.logging.json
+%config(noreplace) /etc/sysconfig/archivematica-storage-service
+%config(noreplace) /etc/nginx/conf.d/archivematica-storage-service.conf
+%config(noreplace) /etc/archivematica/storage-service.gunicorn-config.py
+%config(noreplace) /etc/archivematica/storageService.logging.json
 
 %prep
 rm -rf /usr/share/python/archivematica-storage-service
