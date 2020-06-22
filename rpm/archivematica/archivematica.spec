@@ -101,28 +101,28 @@ Archivematica dashboard with Nginx + gunicorn.
 /usr/share/archivematica/virtualenvs/archivematica-mcp-server/
 /usr/lib/archivematica/MCPServer/
 /usr/lib/systemd/system/archivematica-mcp-server.service
-%config /etc/sysconfig/archivematica-mcp-server
-%config /etc/archivematica/serverConfig.conf
-%config /etc/archivematica/serverConfig.logging.json
+%config(noreplace) /etc/sysconfig/archivematica-mcp-server
+%config(noreplace) /etc/archivematica/serverConfig.conf
+%config(noreplace) /etc/archivematica/serverConfig.logging.json
 
 # MCPClient
 %files mcp-client
 /usr/share/archivematica/virtualenvs/archivematica-mcp-client/
 /usr/lib/archivematica/MCPClient/
 /usr/lib/systemd/system/archivematica-mcp-client.service
-%config /etc/sysconfig/archivematica-mcp-client
-%config /etc/archivematica/clientConfig.conf
-%config /etc/archivematica/clientConfig.logging.json
+%config(noreplace) /etc/sysconfig/archivematica-mcp-client
+%config(noreplace) /etc/archivematica/clientConfig.conf
+%config(noreplace) /etc/archivematica/clientConfig.logging.json
 
 # Dashboard
 %files dashboard
 /usr/share/archivematica/virtualenvs/archivematica-dashboard/
 /usr/share/archivematica/dashboard/
 /usr/lib/systemd/system/archivematica-dashboard.service
-%config /etc/sysconfig/archivematica-dashboard
-%config /etc/nginx/conf.d/archivematica-dashboard.conf
-%config /etc/archivematica/dashboard.gunicorn-config.py
-%config /etc/archivematica/dashboard.logging.json
+%config(noreplace) /etc/sysconfig/archivematica-dashboard
+%config(noreplace) /etc/nginx/conf.d/archivematica-dashboard.conf
+%config(noreplace) /etc/archivematica/dashboard.gunicorn-config.py
+%config(noreplace) /etc/archivematica/dashboard.logging.json
 
 #
 # Preparations
