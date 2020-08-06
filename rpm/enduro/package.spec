@@ -26,8 +26,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 /usr/bin/enduro
-%config /etc/enduro.toml
-%config /etc/systemd/system/enduro.service
+%config(noreplace) /etc/enduro.toml
+%config(noreplace) /etc/systemd/system/enduro.service
 
 
 %post
