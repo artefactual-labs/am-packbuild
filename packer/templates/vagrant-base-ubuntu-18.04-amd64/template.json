@@ -35,8 +35,8 @@
       "http_directory": "../../http/ubuntu-18.04",
       "iso_checksum": "{{user `iso_checksum`}}",
       "iso_urls": [
-        "iso/ubuntu-18.04.4-server-amd64.iso",
-        "http://cdimage.ubuntu.com/releases/18.04.4/release/ubuntu-18.04.4-server-amd64.iso"
+        "iso/ubuntu-18.04.5-server-amd64.iso",
+        "http://cdimage.ubuntu.com/releases/18.04.5/release/ubuntu-18.04.5-server-amd64.iso"
        ],
       "output_directory": "../../builds/virtualbox/vagrant-base-ubuntu-18.04-amd64",
       "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now",
@@ -95,12 +95,12 @@
     "headless": "true",
     "http_proxy": "{{env `http_proxy`}}",
     "https_proxy": "{{env `https_proxy`}}",
-    "iso_checksum": "e2ecdace33c939527cbc9e8d23576381c493b071107207d2040af72595f8990b",
-    "iso_name": "ubuntu-18.04.4-server-amd64.iso",
+    "iso_checksum": "8c5fc24894394035402f66f3824beb7234b757dd2b5531379cb310cedfdf0996",
+    "iso_name": "ubuntu-18.04.5-server-amd64.iso",
     "memory": "4096",
     "metadata": "floppy/dummy_metadata.json",
     "mirror": "http://cdimage.ubuntu.com/releases",
-    "mirror_directory": "18.04.4/",
+    "mirror_directory": "18.04.5/",
     "name": "ubuntu-18.04",
     "no_proxy": "{{env `no_proxy`}}",
     "preseed_path": "../../http/ubuntu-18.04/preseed.cfg",
