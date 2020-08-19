@@ -40,7 +40,7 @@ apt-get -y purge libx11-data xauth libxmuu1 libxcb1 libx11-6 libxext6;
 apt-get -y purge ppp pppconfig pppoeconf;
 
 # Delete oddities
-apt-get -y purge popularity-contest installation-report command-not-found command-not-found-data friendly-recovery;
+apt-get -y purge popularity-contest installation-report command-not-found friendly-recovery;
 
 apt-get -y autoremove;
 apt-get -y clean;
@@ -57,5 +57,3 @@ find /var/cache -type f -exec rm -rf {} \;
 # delete any logs that have built up during the install
 #find /var/log/ -name *.log -exec rm -f {} \;
 find /var/log/ -type f -iname '*.log' | grep -v archivematica | xargs -i{} rm -f {}
-
-
