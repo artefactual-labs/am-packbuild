@@ -1,0 +1,99 @@
+acmetool for Debian
+===================
+
+Please refer to the User's Guide for acmetool at
+
+https://hlandau.github.io/acme/userguide
+
+The format of acmetool's state directory is described in
+
+/usr/share/doc/acmetool/SCHEMA.md.gz
+
+For a general overview of Let's Encrypt see
+
+https://letsencrypt.org/how-it-works/
+
+
+Obtaining certificates
+----------------------
+
+Let's Encrypt provides a staging server that may be used to obtain test
+certificates, which is useful for testing your setup repeatedly without
+hitting the various rate limits enforced by the production server. These
+certificates are signed by a fake CA and will not validate in a browser.
+
+To use the staging server, create /var/lib/acme/conf/target with
+
+request:
+  provider: https://acme-staging.api.letsencrypt.org/directory
+
+To switch to the production server, change /var/lib/acme/conf/target to
+
+request:
+  provider: https://acme-v01.api.letsencrypt.org/directory
+
+When requesting certificates for the first time, acmetool registers an
+account on the Let’s Encrypt server and asks for your approval of the
+Let’s Encrypt Subscriber Agreement and (optionally) your email address.
+
+To automate account creation, create /var/lib/acme/conf/responses with
+
+"acme-enter-email": "user@example.com"
+"acme-agreement:https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf": true
+
+You may specify the empty string ("") to register without email address.
+
+To obtain a certificate for a given set of hostnames, create a file
+with an arbitrary name, e.g., /var/lib/acme/desired/example.org with
+
+satisfy:
+  names:
+  - example.org
+  - www.example.org
+
+
+Webroot mode
+------------
+
+To authorize your account for the requested hostnames, acmetool must
+complete one out of multiple challenges that validate your control of
+each hostname. If you are not running a web server on ports 80 and 443,
+acmetool by default listens on either port to answer to challenges.
+
+If you are already running a web server, you may use it to serve
+challenge files that acmetool by default writes to the directory
+/var/run/acme/acme-challenge/. Your web server on port 80 must be
+configured to alias /.well-known/acme-challenge/ to the directory.
+
+For the apache2 web server, this alias is enabled by default.
+
+For the nginx web server, you may include the following snippet
+for each virtual host for which you wish to obtain a certificate:
+
+include snippets/acmetool.conf;
+
+
+Hook scripts
+------------
+
+After obtaining a certificate, acmetool runs any executable files in
+the directory /etc/acme/hooks/, e.g., to reload the nginx web server:
+
+#!/bin/sh
+[ "$1" = "live-updated" ] || exit 42 # unsupported event
+systemctl reload nginx.service
+
+
+Key permissions
+---------------
+
+By default, the directory /var/lib/acme/keys/ is accessible by the user
+root only. For a daemon running under a non-root user, you may run
+
+adduser mydaemon ssl-cert
+
+and create a file /var/lib/acme/conf/perm with
+
+keys 0640 0750 root ssl-cert
+
+to make private keys readable to members of the group ssl-cert.
