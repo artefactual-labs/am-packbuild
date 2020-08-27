@@ -1,6 +1,6 @@
 NAME          = acmetool
 VERSION       ?= 0.2.1
-RELEASE	      ?= 1~18.04
+RELEASE	      ?= 2~18.04
 GIT_URL	      = https://github.com/hlandau/acmetool
 GPG_ID        ?= 5236CA08
 DEB_TOPDIR    = "/debbuild"

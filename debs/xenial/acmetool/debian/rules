@@ -19,8 +19,8 @@ override_dh_auto_build :
 override_dh_auto_test:
 
 override_dh_auto_install:
-	mkdir -p debian/acmetool/bin
-	cp bin/acmetool debian/acmetool/bin/
+	mkdir -p debian/acmetool/usr/bin
+	cp bin/acmetool debian/acmetool/usr/bin/
 
 override_dh_installman:
 	mkdir -p debian/acmetool/usr/share/man/man8
