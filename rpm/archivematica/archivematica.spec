@@ -28,6 +28,9 @@ Common files and libraries for Archivematica.
 %package mcp-server
 Requires: archivematica-common
 Summary: Archivematica MCP server
+AutoReq: No
+AutoProv: No
+
 %description mcp-server
 Archivematica MCP server.
 
@@ -80,9 +83,10 @@ Archivematica MCP client.
 %package dashboard
 Summary: Archivematica dashboard
 Requires: nginx, policycoreutils-python
+AutoReq: No
+AutoProv: No
 %description dashboard
 Archivematica dashboard with Nginx + gunicorn.
-
 
 #
 # Files
@@ -209,6 +213,7 @@ find %{_sourcedir}/%{name}/src/dashboard/ | grep static
 cp -rf /usr/share/archivematica/virtualenvs/archivematica-dashboard/* %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-dashboard/
 
 cp -rf %{_sourcedir}/%{name}/src/dashboard/src/* %{buildroot}/usr/share/archivematica/dashboard/
+
 cp %{_sourcedir}/%{name}/src/dashboard/install/dashboard.gunicorn-config.py %{buildroot}/etc/archivematica/dashboard.gunicorn-config.py
 cp %{_sourcedir}/%{name}/src/dashboard/install/dashboard.logging.json %{buildroot}/etc/archivematica/dashboard.logging.json
 cp %{_etcdir}/archivematica-dashboard.service %{buildroot}/usr/lib/systemd/system/archivematica-dashboard.service
