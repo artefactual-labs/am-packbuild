@@ -214,6 +214,10 @@ cp -rf /usr/share/archivematica/virtualenvs/archivematica-dashboard/* %{buildroo
 
 cp -rf %{_sourcedir}/%{name}/src/dashboard/src/* %{buildroot}/usr/share/archivematica/dashboard/
 
+# Remove font-awesome's symlink and copy its directory from frontend dir
+rm %{buildroot}/usr/share/archivematica/dashboard/media/vendor/font-awesome
+cp -rf %{_sourcedir}/%{name}/src/dashboard/frontend/node_modules/font-awesome %{buildroot}/usr/share/archivematica/dashboard/media/vendor/font-awesome
+
 cp %{_sourcedir}/%{name}/src/dashboard/install/dashboard.gunicorn-config.py %{buildroot}/etc/archivematica/dashboard.gunicorn-config.py
 cp %{_sourcedir}/%{name}/src/dashboard/install/dashboard.logging.json %{buildroot}/etc/archivematica/dashboard.logging.json
 cp %{_etcdir}/archivematica-dashboard.service %{buildroot}/usr/lib/systemd/system/archivematica-dashboard.service
