@@ -11,5 +11,5 @@ RUN wget -O - https://packages.archivematica.org/1.7.x/key.asc |\
     echo "deb [arch=amd64] http://packages.archivematica.org/1.7.x/ubuntu-externals xenial main" >> /etc/apt/sources.list
 
 # Dependencies are also obtained in the debian build script, this speeds up the process of building packages
-RUN apt-get update &&  apt-get install -y libffi-dev libssl-dev libxslt-dev dh-virtualenv python-dev dh-systemd libmysqlclient-dev postgresql-server-dev-9.5
+RUN apt-get update &&  apt-get install -y libffi-dev libssl-dev libxslt-dev dh-virtualenv python-dev dh-systemd libmysqlclient-dev postgresql-server-dev-9.5 libldap2-dev libsasl2-dev
 

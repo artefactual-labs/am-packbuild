@@ -12,3 +12,11 @@ override_dh_virtualenv:
 	# - https://github.com/artefactual/archivematica/issues/1042
 	# - https://github.com/artefactual-labs/am-packbuild/pull/159
 	dh_virtualenv --preinstall "pip==9.0.3" --extra-pip-arg --find-links=lib
+
+# See https://readthedocs.org/projects/dh-virtualenv/downloads/pdf/latest/ (2.3.3 section)
+override_dh_shlibdeps:
+	dh_shlibdeps --exclude=psycopg2
+
+# See https://readthedocs.org/projects/dh-virtualenv/downloads/pdf/latest/ (2.3.3 section)
+override_dh_strip:
+	dh_strip --exclude=psycopg2
