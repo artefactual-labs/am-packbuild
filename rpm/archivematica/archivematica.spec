@@ -148,7 +148,6 @@ git clone \
     %{git_repo} \
     %{_sourcedir}/%{name}
 
-
 #
 # Install
 #
@@ -273,16 +272,28 @@ mkdir -p /var/log/archivematica/dashboard
 # Create Django key
 KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 sed -i "s/CHANGE_ME_WITH_A_SECRET_KEY/\"$KEY\"/g" /etc/sysconfig/archivematica-dashboard
-
-# Run django collectstatic
-mkdir -p /usr/share/archivematica/dashboard/static
-export $(cat /etc/sysconfig/archivematica-dashboard)
-cd /usr/share/archivematica/dashboard
-/usr/share/archivematica/virtualenvs/archivematica-dashboard/bin/python manage.py collectstatic --noinput --clear
-
 chown -R archivematica:archivematica /var/log/archivematica/dashboard
 systemctl daemon-reload
 # Update SELinux policy
 if [ x$(semanage port -l | grep http_port_t | grep 7400 | wc -l) == x0 ]; then
   semanage port -a -t http_port_t -p tcp 7400
 fi
+
+#
+# Posttrans install script
+#
+
+%posttrans dashboard
+# Run django collectstatic
+# This task needs to be run after postun script on upgrades 
+# because the old virtualenv files need to be removed from the old package.
+# https://github.com/archivematica/Issues/issues/1312
+# https://docs.fedoraproject.org/en-US/packaging-guidelines/Scriptlets/#ordering
+mkdir -p /usr/share/archivematica/dashboard/static
+bash -c " \
+  set -a -e -x
+  source /etc/sysconfig/archivematica-dashboard \
+    || (echo 'Environment file not found'; exit 1)
+  cd /usr/share/archivematica/dashboard
+  /usr/share/archivematica/virtualenvs/archivematica-dashboard/bin/python manage.py collectstatic --noinput --clear
+";
