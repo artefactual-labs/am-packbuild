@@ -99,12 +99,6 @@ KEYCMD=$(python /var/archivematica/storage-service/make_key.py 2>&1)
 echo $KEYCMD
 sed -i "s/<replace-with-key>/\"$KEYCMD\"/g" /etc/sysconfig/archivematica-storage-service
 
-# Run django collectstatic task
-cd /usr/lib/archivematica/storage-service
-export $(cat /etc/sysconfig/archivematica-storage-service)
-mkdir -p /usr/lib/archivematica/storage-service/assets
-/usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py collectstatic --noinput --clear
-
 systemctl daemon-reload
 
 # Update SELinux policies
@@ -115,3 +109,17 @@ if [ x$(semanage port -l | grep http_port_t | grep 8001 | wc -l) == x0 ]; then
   semanage port -a -t http_port_t -p tcp 8001
 fi
 
+%posttrans
+# Run django collectstatic
+# This task needs to be run after postun script on upgrades 
+# because the old virtualenv files need to be removed from the old package.
+# https://github.com/archivematica/Issues/issues/1312
+# https://docs.fedoraproject.org/en-US/packaging-guidelines/Scriptlets/#ordering
+mkdir -p /usr/lib/archivematica/storage-service/assets
+bash -c " \
+  set -a -e -x
+  source /etc/sysconfig/archivematica-storage-service \
+    || (echo 'Environment file not found'; exit 1)
+  cd /usr/lib/archivematica/storage-service
+  /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py collectstatic --noinput --clear
+";
