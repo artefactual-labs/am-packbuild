@@ -4,11 +4,28 @@
   vars:
     # archivematica-src role
     - archivematica_src_install_devtools: "yes"
-    - archivematica_src_am_version: "v1.11.2"
-    - archivematica_src_ss_version: "v0.16.1"
+    - archivematica_src_am_version: "v1.12.0"
+    - archivematica_src_ss_version: "v0.17.0"
     - archivematica_src_ss_gunicorn: "true"
     - archivematica_src_am_dashboard_gunicorn: "true"
     - archivematica_src_am_multi_venvs: "true"
+    - archivematica_src_ss_environment:
+        EMAIL_HOST: "localhost"
+        EMAIL_HOST_PASSWORD: ""
+        EMAIL_HOST_USER: ""
+        EMAIL_PORT: "25"
+    - archivematica_src_am_mcpclient_environment:
+        ARCHIVEMATICA_MCPCLIENT_EMAIL_BACKEND: "django.core.mail.backends.smtp.EmailBackend"
+        ARCHIVEMATICA_MCPCLIENT_EMAIL_HOST: "127.0.0.1"
+        ARCHIVEMATICA_MCPCLIENT_EMAIL_PORT: "25"
+        ARCHIVEMATICA_MCPCLIENT_EMAIL_USE_TLS: "False"
+        ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_ELASTICSEARCHTIMEOUT: "300"
+        ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_STORAGE_SERVICE_CLIENT_QUICK_TIMEOUT: "30"
+    - archivematica_src_am_mcpserver_environment:
+        ARCHIVEMATICA_MCPSERVER_MCPSERVER_STORAGE_SERVICE_CLIENT_QUICK_TIMEOUT: "30"
+        ARCHIVEMATICA_MCPSERVER_MCPSERVER_CONCURRENT_PACKAGES: "20"
+    - archivematica_src_am_dashboard_environment:
+        ARCHIVEMATICA_DASHBOARD_DASHBOARD_STORAGE_SERVICE_CLIENT_QUICK_TIMEOUT: "30"
     # elasticsearch role
     - elasticsearch_version: "6.5.4"
     - elasticsearch_apt_java_package: "openjdk-8-jre-headless"
@@ -48,6 +65,9 @@
     - archivematica_src_configure_am_user: "admin"
     - archivematica_src_configure_am_password: "archivematica"
     - archivematica_src_configure_am_email: "admin@example.com"
+    - archivematica_src_configure_am_api_key: "this_is_the_am_api_key"
+    - archivematica_src_configure_ss_api_key: "this_is_the_ss_api_key"
+
 
   pre_tasks:
 
