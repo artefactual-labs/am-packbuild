@@ -3,6 +3,12 @@ case "$PACKER_BUILDER_TYPE" in
   qemu) exit 0 ;;
 esac
 
+# Stop eleasticsearch in case it is up to avoid to set the indices in read-only mode 
+# Because the whiteout tasks are going to use the complete disk
+if (systemctl -q is-active elasticsearch.service); then
+    service elasticsearch stop 
+fi
+
 # Whiteout root
 count=$(df --sync -kP / | tail -n1  | awk -F ' ' '{print $4}')
 count=$(($count-1))
