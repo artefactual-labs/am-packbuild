@@ -1,4 +1,7 @@
 %changelog
+* Tue Oct 06 2020 Artefactual <sysadmin@artefactual.com> - 1.12.0-1
+- Packbuild: b55d0f63b1b369e4c5a71be13d7deeb6bb9ea7b9
+- Archivematica: c5e7a0fb4aaaf5d30d20e46707b66f788d7a0fba
 * Fri Jun 12 2020 Artefactual <sysadmin@artefactual.com> - 1.11.2-1
 - Packbuild: 2092ee13770b6730daf8789473a146d7492f996b
 - Archivematica: 396015a44723e6b2dd2f4d7bed1443514a429c12
