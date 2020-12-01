@@ -13,7 +13,6 @@ Group: Application/System
 License: AGPLv3
 Source0: %{git_repo}
 BuildRequires: git, gcc, openldap-devel, openssl-devel, python-virtualenv, python-pip, mariadb-devel, libxslt-devel, python-devel, libffi-devel, openssl-devel, gcc-c++, postgresql-devel, nodejs
-Requires: archivematica-common
 AutoReq: No
 AutoProv: No
 %description
@@ -21,12 +20,12 @@ Archivematica is a web- and standards-based, open-source application which allow
 
 %package common
 Summary: Archivematica common libraries
-Requires: shadow-utils
+Requires: archivematica, shadow-utils
 %description common
 Common files and libraries for Archivematica.
 
 %package mcp-server
-Requires: archivematica-common
+Requires: archivematica, archivematica-common
 Summary: Archivematica MCP server
 AutoReq: No
 AutoProv: No
@@ -36,7 +35,7 @@ Archivematica MCP server.
 
 %package mcp-client
 Summary: Archivematica MCP client
-Requires: archivematica-common
+Requires: archivematica, archivematica-common
 Requires: bzip2
 Requires: tesseract
 Requires: tree
@@ -82,7 +81,7 @@ Archivematica MCP client.
 
 %package dashboard
 Summary: Archivematica dashboard
-Requires: nginx, policycoreutils-python
+Requires: archivematica, nginx, policycoreutils-python
 AutoReq: No
 AutoProv: No
 %description dashboard
@@ -92,8 +91,9 @@ Archivematica dashboard with Nginx + gunicorn.
 # Files
 #
 
-# There is no need for a main package "archivematica", so we avoid using the
-# unnamed $files tag in this section.
+# Archivematica
+%files
+/usr/share/archivematica/virtualenvs/archivematica/
 
 # Common
 %files common
@@ -102,7 +102,6 @@ Archivematica dashboard with Nginx + gunicorn.
 
 # MCPServer
 %files mcp-server
-/usr/share/archivematica/virtualenvs/archivematica-mcp-server/
 /usr/lib/archivematica/MCPServer/
 /usr/lib/systemd/system/archivematica-mcp-server.service
 %config(noreplace) /etc/sysconfig/archivematica-mcp-server
@@ -111,7 +110,6 @@ Archivematica dashboard with Nginx + gunicorn.
 
 # MCPClient
 %files mcp-client
-/usr/share/archivematica/virtualenvs/archivematica-mcp-client/
 /usr/lib/archivematica/MCPClient/
 /usr/lib/systemd/system/archivematica-mcp-client.service
 %config(noreplace) /etc/sysconfig/archivematica-mcp-client
@@ -120,7 +118,6 @@ Archivematica dashboard with Nginx + gunicorn.
 
 # Dashboard
 %files dashboard
-/usr/share/archivematica/virtualenvs/archivematica-dashboard/
 /usr/share/archivematica/dashboard/
 /usr/lib/systemd/system/archivematica-dashboard.service
 %config(noreplace) /etc/sysconfig/archivematica-dashboard
@@ -158,42 +155,31 @@ mkdir -p \
   %{buildroot}/usr/lib/archivematica/MCPServer \
   %{buildroot}/usr/lib/archivematica/MCPClient \
   %{buildroot}/usr/lib/archivematica/archivematicaCommon \
-  %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-mcp-server \
-  %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-mcp-client \
-  %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-dashboard \
+  %{buildroot}/usr/share/archivematica/virtualenvs/archivematica \
   %{buildroot}/usr/share/archivematica/dashboard \
   %{buildroot}/var/archivematica/sharedDirectory \
   %{buildroot}/etc/sysconfig \
   %{buildroot}/usr/lib/systemd/system \
   %{buildroot}/etc/nginx/conf.d
 
+# Archivematica virtual environment
+virtualenv /usr/share/archivematica/virtualenvs/archivematica
+/usr/share/archivematica/virtualenvs/archivematica/bin/pip install --upgrade pip==20.3
+/usr/share/archivematica/virtualenvs/archivematica/bin/pip install -r %{_sourcedir}/%{name}/requirements.txt
+virtualenv --relocatable /usr/share/archivematica/virtualenvs/archivematica
+cp -rf /usr/share/archivematica/virtualenvs/archivematica/* %{buildroot}/usr/share/archivematica/virtualenvs/archivematica/
+
 # Common
 cp -rf %{_sourcedir}/%{name}/src/archivematicaCommon/lib/* %{buildroot}/usr/lib/archivematica/archivematicaCommon/
 
 # MCPServer
-virtualenv /usr/share/archivematica/virtualenvs/archivematica-mcp-server
-/usr/share/archivematica/virtualenvs/archivematica-mcp-server/bin/pip install --upgrade pip
-/usr/share/archivematica/virtualenvs/archivematica-mcp-server/bin/pip install -r %{_sourcedir}/%{name}/src/archivematicaCommon/requirements/production.txt
-/usr/share/archivematica/virtualenvs/archivematica-mcp-server/bin/pip install -r %{_sourcedir}/%{name}/src/dashboard/src/requirements/production.txt
-/usr/share/archivematica/virtualenvs/archivematica-mcp-server/bin/pip install -r %{_sourcedir}/%{name}/src/MCPServer/requirements/production.txt
-virtualenv --relocatable /usr/share/archivematica/virtualenvs/archivematica-mcp-server
-cp -rf /usr/share/archivematica/virtualenvs/archivematica-mcp-server/* %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-mcp-server/
 cp -rf %{_sourcedir}/%{name}/src/MCPServer/lib/* %{buildroot}/usr/lib/archivematica/MCPServer/
 cp %{_sourcedir}/%{name}/src/MCPServer/install/serverConfig.logging.json %{buildroot}/etc/archivematica/serverConfig.logging.json
 cp %{_sourcedir}/%{name}/src/MCPServer/install/serverConfig.conf %{buildroot}/etc/archivematica/serverConfig.conf
-
 cp %{_etcdir}/archivematica-mcp-server.service %{buildroot}/usr/lib/systemd/system/archivematica-mcp-server.service
 cp %{_etcdir}/archivematica-mcp-server.env %{buildroot}/etc/sysconfig/archivematica-mcp-server
 
 # MCPClient
-virtualenv /usr/share/archivematica/virtualenvs/archivematica-mcp-client
-/usr/share/archivematica/virtualenvs/archivematica-mcp-client/bin/pip install --upgrade pip
-/usr/share/archivematica/virtualenvs/archivematica-mcp-client/bin/pip install -r %{_sourcedir}/%{name}/src/archivematicaCommon/requirements/production.txt
-/usr/share/archivematica/virtualenvs/archivematica-mcp-client/bin/pip install -r %{_sourcedir}/%{name}/src/dashboard/src/requirements/production.txt
-/usr/share/archivematica/virtualenvs/archivematica-mcp-client/bin/pip install -r %{_sourcedir}/%{name}/src/MCPClient/requirements/production.txt
-virtualenv --relocatable /usr/share/archivematica/virtualenvs/archivematica-mcp-client
-cp -rf /usr/share/archivematica/virtualenvs/archivematica-mcp-client/* %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-mcp-client/
-
 cp -rf %{_sourcedir}/%{name}/src/MCPClient/lib/* %{buildroot}/usr/lib/archivematica/MCPClient
 cp %{_sourcedir}/%{name}/src/MCPClient/install/clientConfig.logging.json %{buildroot}/etc/archivematica/clientConfig.logging.json
 cp %{_sourcedir}/%{name}/src/MCPClient/install/clientConfig.conf %{buildroot}/etc/archivematica/clientConfig.conf
@@ -201,28 +187,18 @@ cp %{_etcdir}/archivematica-mcp-client.service %{buildroot}/usr/lib/systemd/syst
 cp %{_etcdir}/archivematica-mcp-client.env %{buildroot}/etc/sysconfig/archivematica-mcp-client
 
 # Dashboard
-virtualenv /usr/share/archivematica/virtualenvs/archivematica-dashboard
-/usr/share/archivematica/virtualenvs/archivematica-dashboard/bin/pip install --upgrade pip
-/usr/share/archivematica/virtualenvs/archivematica-dashboard/bin/pip install -r %{_sourcedir}/%{name}/src/archivematicaCommon/requirements/production.txt
-/usr/share/archivematica/virtualenvs/archivematica-dashboard/bin/pip install -r %{_sourcedir}/%{name}/src/dashboard/src/requirements/production.txt
-virtualenv --relocatable /usr/share/archivematica/virtualenvs/archivematica-dashboard
-cd %{_sourcedir}/%{name}/src/dashboard/frontend/ && npm install --unsafe-perm 
-
-find %{_sourcedir}/%{name}/src/dashboard/ | grep static
-cp -rf /usr/share/archivematica/virtualenvs/archivematica-dashboard/* %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-dashboard/
-
-cp -rf %{_sourcedir}/%{name}/src/dashboard/src/* %{buildroot}/usr/share/archivematica/dashboard/
-
-# Remove font-awesome's symlink and copy its directory from frontend dir
-rm %{buildroot}/usr/share/archivematica/dashboard/media/vendor/font-awesome
-cp -rf %{_sourcedir}/%{name}/src/dashboard/frontend/node_modules/font-awesome %{buildroot}/usr/share/archivematica/dashboard/media/vendor/font-awesome
-
 cp %{_sourcedir}/%{name}/src/dashboard/install/dashboard.gunicorn-config.py %{buildroot}/etc/archivematica/dashboard.gunicorn-config.py
 cp %{_sourcedir}/%{name}/src/dashboard/install/dashboard.logging.json %{buildroot}/etc/archivematica/dashboard.logging.json
 cp %{_etcdir}/archivematica-dashboard.service %{buildroot}/usr/lib/systemd/system/archivematica-dashboard.service
 cp %{_etcdir}/archivematica-dashboard.env %{buildroot}/etc/sysconfig/archivematica-dashboard
 cp %{_etcdir}/dashboard.nginx %{buildroot}/etc/nginx/conf.d/archivematica-dashboard.conf
 
+cd %{_sourcedir}/%{name}/src/dashboard/frontend/ && npm install --unsafe-perm
+find %{_sourcedir}/%{name}/src/dashboard/ | grep static
+cp -rf %{_sourcedir}/%{name}/src/dashboard/src/* %{buildroot}/usr/share/archivematica/dashboard/
+# Remove font-awesome's symlink and copy its directory from frontend dir
+rm %{buildroot}/usr/share/archivematica/dashboard/media/vendor/font-awesome
+cp -rf %{_sourcedir}/%{name}/src/dashboard/frontend/node_modules/font-awesome %{buildroot}/usr/share/archivematica/dashboard/media/vendor/font-awesome
 
 #
 # Clean up build directory
@@ -231,12 +207,10 @@ cp %{_etcdir}/dashboard.nginx %{buildroot}/etc/nginx/conf.d/archivematica-dashbo
 %clean
 rm -rf %{buildroot}
 
-
 #
 # Post install scripts
 #
 
-# Common
 %post common
 
 # Create archivematica user and group
@@ -252,13 +226,13 @@ fi
 # Configure permissions of shared directory
 chown -R archivematica:archivematica /var/archivematica/sharedDirectory
 
-# MCP Server
+# MCPServer
 %post mcp-server
 mkdir -p /var/log/archivematica/MCPServer
 chown -R archivematica:archivematica /var/log/archivematica/MCPServer
 systemctl daemon-reload
 
-# MCP Client
+# MCPClient
 %post mcp-client
 mkdir -p /var/log/archivematica/MCPClient
 chown -R archivematica:archivematica /var/log/archivematica/MCPClient
@@ -266,7 +240,6 @@ systemctl daemon-reload
 
 # Dashboard
 %post dashboard
-
 mkdir -p /var/log/archivematica/dashboard
 
 # Create Django key
@@ -277,13 +250,14 @@ if [ x$(semanage port -l | grep http_port_t | grep 7400 | wc -l) == x0 ]; then
   semanage port -a -t http_port_t -p tcp 7400
 fi
 
+
 #
 # Posttrans install script
 #
 
 %posttrans dashboard
 # Run django collectstatic
-# This task needs to be run after postun script on upgrades 
+# This task needs to be run after postun script on upgrades
 # because the old virtualenv files need to be removed from the old package.
 # https://github.com/archivematica/Issues/issues/1312
 # https://docs.fedoraproject.org/en-US/packaging-guidelines/Scriptlets/#ordering
@@ -293,7 +267,7 @@ bash -c " \
   source /etc/sysconfig/archivematica-dashboard \
     || (echo 'Environment file not found'; exit 1)
   cd /usr/share/archivematica/dashboard
-  /usr/share/archivematica/virtualenvs/archivematica-dashboard/bin/python manage.py collectstatic --noinput --clear
+  /usr/share/archivematica/virtualenvs/archivematica/bin/python manage.py collectstatic --noinput --clear
 ";
 chown -R archivematica:archivematica /var/log/archivematica/dashboard
 systemctl daemon-reload
