@@ -272,8 +272,6 @@ mkdir -p /var/log/archivematica/dashboard
 # Create Django key
 KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 sed -i "s/CHANGE_ME_WITH_A_SECRET_KEY/\"$KEY\"/g" /etc/sysconfig/archivematica-dashboard
-chown -R archivematica:archivematica /var/log/archivematica/dashboard
-systemctl daemon-reload
 # Update SELinux policy
 if [ x$(semanage port -l | grep http_port_t | grep 7400 | wc -l) == x0 ]; then
   semanage port -a -t http_port_t -p tcp 7400
@@ -297,3 +295,5 @@ bash -c " \
   cd /usr/share/archivematica/dashboard
   /usr/share/archivematica/virtualenvs/archivematica-dashboard/bin/python manage.py collectstatic --noinput --clear
 ";
+chown -R archivematica:archivematica /var/log/archivematica/dashboard
+systemctl daemon-reload
