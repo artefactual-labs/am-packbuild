@@ -196,9 +196,6 @@ cp %{_etcdir}/dashboard.nginx %{buildroot}/etc/nginx/conf.d/archivematica-dashbo
 cd %{_sourcedir}/%{name}/src/dashboard/frontend/ && npm install --unsafe-perm
 find %{_sourcedir}/%{name}/src/dashboard/ | grep static
 cp -rf %{_sourcedir}/%{name}/src/dashboard/src/* %{buildroot}/usr/share/archivematica/dashboard/
-# Remove font-awesome's symlink and copy its directory from frontend dir
-rm %{buildroot}/usr/share/archivematica/dashboard/media/vendor/font-awesome
-cp -rf %{_sourcedir}/%{name}/src/dashboard/frontend/node_modules/font-awesome %{buildroot}/usr/share/archivematica/dashboard/media/vendor/font-awesome
 
 #
 # Clean up build directory
