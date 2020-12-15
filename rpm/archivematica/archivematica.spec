@@ -253,6 +253,15 @@ fi
 #
 
 %posttrans dashboard
+# Update old virtual environment paths in configuration files
+sed -i "s/\/usr\/share\/archivematica\/virtualenvs\/archivematica-\(dashboard\|mcp-server\|mcp-client\)\//\/usr\/share\/archivematica\/virtualenvs\/archivematica\//g" \
+  /etc/sysconfig/archivematica-mcp-server \
+  /etc/sysconfig/archivematica-mcp-client \
+  /etc/sysconfig/archivematica-dashboard \
+  /usr/lib/systemd/system/archivematica-mcp-server.service \
+  /usr/lib/systemd/system/archivematica-mcp-client.service \
+  /usr/lib/systemd/system/archivematica-dashboard.service
+systemctl daemon-reload
 # Run django collectstatic
 # This task needs to be run after postun script on upgrades
 # because the old virtualenv files need to be removed from the old package.

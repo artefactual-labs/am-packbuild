@@ -56,9 +56,9 @@ fi
 sudo -u root bash -c 'cat << EOF >> /etc/yum.repos.d/archivematica.repo
 [archivematica-extras]
 name=archivematica-extras
-baseurl=https://packages.archivematica.org/1.7.x/centos-extras
+baseurl=https://packages.archivematica.org/1.12.x/centos-extras
 gpgcheck=1
-gpgkey=https://packages.archivematica.org/1.7.x/key.asc
+gpgkey=https://packages.archivematica.org/1.12.x/key.asc
 enabled=1
 EOF'
 
@@ -156,8 +156,6 @@ sudo -u root systemctl reload nginx
 # MCPClient
 #
 
-sudo -u root rpm -Uvh https://forensics.cert.org/cert-forensics-tools-release-el7.rpm
-sudo -u root rpm -Uvh https://li.nux.ro/download/nux/dextop/el7/x86_64/nux-dextop-release-0-5.el7.nux.noarch.rpm
 sudo -u root yum install -y archivematica-mcp-client
 sudo ln -s /usr/bin/7za /usr/bin/7z
 sudo -u root sed -i 's/^#TCPSocket/TCPSocket/g' /etc/clamd.d/scan.conf
