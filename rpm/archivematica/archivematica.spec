@@ -141,7 +141,6 @@ git clone \
   --branch %{_branch} \
   --depth 1 \
   --single-branch \
-  --recurse-submodules \
     %{git_repo} \
     %{_sourcedir}/%{name}
 
