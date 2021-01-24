@@ -69,6 +69,7 @@ fi
 ${SS_ENV_DIR}/bin/python manage.py migrate
 mkdir -p /usr/lib/archivematica/storage-service/assets
 ${SS_ENV_DIR}/bin/python manage.py collectstatic --noinput --clear
+${SS_ENV_DIR}/bin/python manage.py compilemessages
 ${SS_ENV_DIR}/bin/python manage.py backfill_api_keys
 
 echo "updating directory permissions"

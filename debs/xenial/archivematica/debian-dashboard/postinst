@@ -64,5 +64,7 @@ fi
 mkdir -p /usr/share/archivematica/dashboard/static
 /usr/share/archivematica/dashboard/manage.py collectstatic --noinput --clear
 
+# Compile messages
+cd /usr/share/archivematica/dashboard && ./manage.py compilemessages
 
 #DEBHELPER#
