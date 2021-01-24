@@ -110,8 +110,8 @@ if [ x$(semanage port -l | grep http_port_t | grep 8001 | wc -l) == x0 ]; then
 fi
 
 %posttrans
-# Run django collectstatic
-# This task needs to be run after postun script on upgrades 
+# Run django collectstatic and compilemessages.
+# These tasks need to be run after postrun script on upgrades
 # because the old virtualenv files need to be removed from the old package.
 # https://github.com/archivematica/Issues/issues/1312
 # https://docs.fedoraproject.org/en-US/packaging-guidelines/Scriptlets/#ordering
@@ -122,4 +122,5 @@ bash -c " \
     || (echo 'Environment file not found'; exit 1)
   cd /usr/lib/archivematica/storage-service
   /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py collectstatic --noinput --clear
+  /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py compilemessages
 ";

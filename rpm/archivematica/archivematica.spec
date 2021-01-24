@@ -262,8 +262,8 @@ sed -i "s/\/usr\/share\/archivematica\/virtualenvs\/archivematica-\(dashboard\|m
   /usr/lib/systemd/system/archivematica-mcp-client.service \
   /usr/lib/systemd/system/archivematica-dashboard.service
 systemctl daemon-reload
-# Run django collectstatic
-# This task needs to be run after postun script on upgrades
+# Run django collectstatic and compilemessages.
+# These tasks need to be run after postun script on upgrades
 # because the old virtualenv files need to be removed from the old package.
 # https://github.com/archivematica/Issues/issues/1312
 # https://docs.fedoraproject.org/en-US/packaging-guidelines/Scriptlets/#ordering
@@ -274,6 +274,7 @@ bash -c " \
     || (echo 'Environment file not found'; exit 1)
   cd /usr/share/archivematica/dashboard
   /usr/share/archivematica/virtualenvs/archivematica/bin/python manage.py collectstatic --noinput --clear
+  /usr/share/archivematica/virtualenvs/archivematica/bin/python manage.py compilemessages
 ";
 chown -R archivematica:archivematica /var/log/archivematica/dashboard
 systemctl daemon-reload
