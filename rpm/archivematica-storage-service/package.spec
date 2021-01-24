@@ -39,7 +39,6 @@ git clone \
   --branch %{_branch} \
   --depth 1 \
   --single-branch \
-  --recurse-submodules \
     https://github.com/artefactual/archivematica-storage-service \
     %{_sourcedir}/%{name}
 
