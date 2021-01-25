@@ -4,7 +4,7 @@ DEB_TOPDIR    = "/debbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "debbuild-$(NAME)-$(VERSION)"
 GPG_ID ?= 0F4A4D31
-PACKBUILD_EXTRA_ARGS ?= 
+PACKBUILD_EXTRA_ARGS ?=
 #PACKBUILD_EXTRA_ARGS ?= "-b 1"
 PACKAGE = archivematica-storage-service
 BRANCH     ?= qa/0.x
@@ -37,12 +37,12 @@ build:
 		 $(DOCKER_IMAGE) \
                  make -C $(DOCKER_VOLUME) deb-build
 
-deb-build: 
+deb-build:
 	@echo "==> Install dependencies."
 	# Add GPG if available
 	@if [ -f "$(DOCKER_VOLUME)/GPG-KEY" ]; then gpg --import $(DOCKER_VOLUME)/GPG-KEY; fi
 	@if [ x"$$GPG_KEY" != x ]; then echo "$$GPG_KEY" | gpg --import - ; fi
-	@cd /debbuild/$(NAME)  
+	@cd /debbuild/$(NAME)
 	@echo "==> Clone code."
 	./build.sh
 	mkdir -p repo/
@@ -56,15 +56,11 @@ deb-clean:
 	mkdir -p src/$(PACKAGE)
 	rm -rf src/
 	@git clone \
-	  --quiet \
- 	  --branch $(BRANCH) \
- 	  --depth 1 \
-          --single-branch \
-  	  --recurse-submodules \
-    		https://github.com/artefactual/$(PACKAGE)\
-     	  src/$(PACKAGE) 
-	cd src/$(PACKAGE) && git submodule init && \
-		git submodule update 
+		--quiet \
+		--branch $(BRANCH) \
+		--depth 1 \
+		--single-branch \
+			https://github.com/artefactual/$(PACKAGE) src/$(PACKAGE)
 
 cleanup:
 	@echo "==> Remove artifacts created as root."
