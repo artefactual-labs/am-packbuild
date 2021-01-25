@@ -91,14 +91,16 @@ sudo -u root systemctl start gearmand
 
 
 if [ "${search_enabled}" == "true" ] ; then
-    sudo -u root rpm --import https://packages.elastic.co/GPG-KEY-elasticsearch
+    sudo -u root rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
     sudo -u root bash -c 'cat << EOF > /etc/yum.repos.d/elasticsearch.repo
-[elasticsearch-1.7]
-name=Elasticsearch repository for 1.7 packages
-baseurl=https://packages.elastic.co/elasticsearch/1.7/centos
+[elasticsearch-6.x]
+name=Elasticsearch repository for 6.x packages
+baseurl=https://artifacts.elastic.co/packages/6.x/yum
 gpgcheck=1
-gpgkey=https://packages.elastic.co/GPG-KEY-elasticsearch
+gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
 enabled=1
+autorefresh=1
+type=rpm-md
 EOF'
     sudo -u root yum install -y java-1.8.0-openjdk-headless elasticsearch
     sudo -u root systemctl enable elasticsearch
@@ -108,6 +110,10 @@ fi
 #
 # Archivematica Storage Service
 #
+
+sudo -H -u root mysql -hlocalhost -uroot -e "DROP DATABASE IF EXISTS SS; CREATE DATABASE SS CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+sudo -H -u root mysql -hlocalhost -uroot -e "CREATE USER 'archivematica'@'localhost' IDENTIFIED BY 'demo';"
+sudo -H -u root mysql -hlocalhost -uroot -e "GRANT ALL ON SS.* TO 'archivematica'@'localhost';"
 
 sudo -u root yum install -y python-pip archivematica-storage-service
 sudo -u archivematica bash -c " \
@@ -132,18 +138,17 @@ sudo -u root systemctl start rngd
 sudo -u root yum install -y archivematica-common archivematica-mcp-server archivematica-dashboard
 
 sudo -H -u root mysql -hlocalhost -uroot -e "DROP DATABASE IF EXISTS MCP; CREATE DATABASE MCP CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
-sudo -H -u root mysql -hlocalhost -uroot -e "CREATE USER 'archivematica'@'localhost' IDENTIFIED BY 'demo';"
 sudo -H -u root mysql -hlocalhost -uroot -e "GRANT ALL ON MCP.* TO 'archivematica'@'localhost';"
 
 sudo -u archivematica bash -c " \
   set -a -e -x
   source /etc/sysconfig/archivematica-dashboard
   cd /usr/share/archivematica/dashboard
-  /usr/share/archivematica/virtualenvs/archivematica-dashboard/bin/python manage.py migrate --noinput
+  /usr/share/archivematica/virtualenvs/archivematica/bin/python manage.py migrate --noinput
 ";
 
-sudo sh -c 'echo "ARCHIVEMATICA_DASHBOARD_DASHBOARD_SEARCH_ENABLED=${search_enabled}" >> /etc/sysconfig/archivematica-dashboard'
-sudo sh -c 'echo "ARCHIVEMATICA_MCPSERVER_MCPSERVER_SEARCH_ENABLED=${search_enabled}" >> /etc/sysconfig/archivematica-mcp-server'
+sudo -u root bash -c "echo 'ARCHIVEMATICA_DASHBOARD_DASHBOARD_SEARCH_ENABLED=${search_enabled}' >> /etc/sysconfig/archivematica-dashboard"
+sudo -u root bash -c "echo 'ARCHIVEMATICA_MCPSERVER_MCPSERVER_SEARCH_ENABLED=${search_enabled}' >> /etc/sysconfig/archivematica-mcp-server"
 
 sudo -u root systemctl enable archivematica-mcp-server
 sudo -u root systemctl start archivematica-mcp-server
@@ -157,10 +162,9 @@ sudo -u root systemctl reload nginx
 #
 
 sudo -u root yum install -y archivematica-mcp-client
-sudo ln -s /usr/bin/7za /usr/bin/7z
 sudo -u root sed -i 's/^#TCPSocket/TCPSocket/g' /etc/clamd.d/scan.conf
 sudo -u root sed -i 's/^Example//g' /etc/clamd.d/scan.conf
-sudo sh -c 'echo "ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_SEARCH_ENABLED=${search_enabled}" >> /etc/sysconfig/archivematica-mcp-client'
+sudo -u root bash -c "echo 'ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_SEARCH_ENABLED=${search_enabled}' >> /etc/sysconfig/archivematica-mcp-client"
 
 sudo -u root systemctl enable archivematica-mcp-client
 sudo -u root systemctl start archivematica-mcp-client
