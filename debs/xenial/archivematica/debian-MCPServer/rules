@@ -7,8 +7,7 @@ export DH_VIRTUALENV_INSTALL_ROOT=/usr/share/archivematica/virtualenvs
 	dh $@ --with python-virtualenv --with systemd
 
 override_dh_virtualenv:
-	dh_virtualenv --requirements ../archivematicaCommon/requirements/production.txt --skip-install
-	dh_virtualenv --requirements ../dashboard/src/requirements/production.txt --preinstall "setuptools==44.1.0" --preinstall "wheel==0.35.1" --skip-install
+	dh_virtualenv --requirements ../../requirements.txt --preinstall "setuptools==44.1.0" --preinstall "wheel==0.35.1" --skip-install
 	dh_virtualenv --preinstall "pip==9.0.3" --preinstall "setuptools==44.1.0" --preinstall "wheel==0.35.1" --skip-install
 
 # See https://readthedocs.org/projects/dh-virtualenv/downloads/pdf/latest/ (2.3.3 section)
