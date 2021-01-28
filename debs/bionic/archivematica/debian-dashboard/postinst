@@ -8,8 +8,11 @@ chmod -R g+s $logdir
 
 # TODO Remove this from the postinst of any version that is not updating Django
 # Remove .pyo's so Django uninstalls properly (See https://github.com/pypa/pip/issues/2209)
-echo "Removing Django's .pyo files to aid upgrade"
-find /usr/local/lib/python2.7/dist-packages/django/ -name '*.pyo' -delete
+DJANGO_DIST="/usr/local/lib/python2.7/dist-packages/django/"
+if [ -d ${DJANGO_DIST} ]; then
+    echo "Removing Django's .pyo files to aid upgrade"
+    find ${DJANGO_DIST} -name '*.pyo' -delete
+fi
 
 # Install & upgrade dashboard requirements
 pip install --upgrade -r /usr/share/archivematica/dashboard/requirements.txt
