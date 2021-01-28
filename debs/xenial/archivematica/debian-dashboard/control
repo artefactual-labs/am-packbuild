@@ -24,7 +24,8 @@ Depends:
 	libssl-dev,
 	python-dev,
 	libxml2-dev,
-	libxslt1-dev
+	libxslt1-dev,
+	gettext
 Description: Web Dashboard for Archivematica
   Web based dashboard interface used to control an Archivematica pipeline.
 
