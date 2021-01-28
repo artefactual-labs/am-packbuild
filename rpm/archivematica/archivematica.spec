@@ -81,7 +81,7 @@ Archivematica MCP client.
 
 %package dashboard
 Summary: Archivematica dashboard
-Requires: archivematica, nginx, policycoreutils-python
+Requires: archivematica, nginx, policycoreutils-python, gettext
 AutoReq: No
 AutoProv: No
 %description dashboard
