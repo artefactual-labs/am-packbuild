@@ -1,4 +1,3 @@
-# this file is managed by ansible
 [Unit]
 Description=Archivematica Storage Service
 After=network.target
