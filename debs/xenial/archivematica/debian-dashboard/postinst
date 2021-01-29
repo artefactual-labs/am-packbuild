@@ -1,25 +1,33 @@
 #!/bin/bash
 
+# Runs Django's command-line utility for administrative tasks inside the
+# Python virtual environment bundled with the package.
+function dashboard::manage {
+    # Certain tasks like compilemessages rely on the current directory.
+    pushd /usr/share/archivematica/dashboard
+    /usr/share/archivematica/virtualenvs/archivematica-dashboard/bin/python manage.py "$@"
+    popd
+}
 
+# Create logs directory
 logdir=/var/log/archivematica/dashboard
 mkdir -p $logdir
 chown -R archivematica:archivematica $logdir
 chmod -R g+s $logdir
 
-# TODO Remove this from the postinst of any version that is not updating Django
-# Remove .pyo's so Django uninstalls properly (See https://github.com/pypa/pip/issues/2209)
-DJANGO_DIST="/usr/local/lib/python2.7/dist-packages/django/"
-if [ -d ${DJANGO_DIST} ]; then
-    echo "Removing Django's .pyo files to aid upgrade"
-    find ${DJANGO_DIST} -name '*.pyo' -delete
-fi
-
-# Install & upgrade dashboard requirements
-pip install --upgrade -r /usr/share/archivematica/dashboard/requirements.txt
-
 # Create Django key
 KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 sed -i "s/CHANGE_ME_WITH_A_SECRET_KEY/\"$KEY\"/g" /etc/default/archivematica-dashboard
+
+# Populate default mysql config
+DBPASS=$(grep "dbc_dbpass=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(ARCHIVEMATICA_DASHBOARD_CLIENT_PASSWORD=\).*/\1$DBPASS/g" /etc/default/archivematica-dashboard
+
+DBUSER=$(grep "dbc_dbuser=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(ARCHIVEMATICA_DASHBOARD_CLIENT_USER=\).*/\1$DBUSER/g" /etc/default/archivematica-dashboard
+
+DBNAME=$(grep "dbc_dbname=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(ARCHIVEMATICA_DASHBOARD_CLIENT_DATABASE=\).*/\1$DBNAME/g" /etc/default/archivematica-dashboard
 
 # Remove dh-virtualenv build path in editable pip requirements and other local/bin files
 # https://github.com/spotify/dh-virtualenv/issues/134
@@ -31,16 +39,6 @@ for filename in /usr/share/archivematica/virtualenvs/archivematica-dashboard/loc
         sed -i "s/\/src\/src\/archivematica\/src\/dashboard\/debian\/archivematica-dashboard//g" $filename
     fi
 done
-
-# Populate default mysql config
-DBPASS=$(grep "dbc_dbpass=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
-sed -i "s/^\(ARCHIVEMATICA_DASHBOARD_CLIENT_PASSWORD=\).*/\1$DBPASS/g" /etc/default/archivematica-dashboard
-
-DBUSER=$(grep "dbc_dbuser=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
-sed -i "s/^\(ARCHIVEMATICA_DASHBOARD_CLIENT_USER=\).*/\1$DBUSER/g" /etc/default/archivematica-dashboard
-
-DBNAME=$(grep "dbc_dbname=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
-sed -i "s/^\(ARCHIVEMATICA_DASHBOARD_CLIENT_DATABASE=\).*/\1$DBNAME/g" /etc/default/archivematica-dashboard
 
 # Use ucf to preserve user changes in the default file
 ucfr archivematica-dashboard /etc/default/archivematica-dashboard
@@ -54,20 +52,20 @@ set +a
 # Fake migrations if necessary.  $2 is old version
 if [[ $2 == '1:1.4.1'* ]]; then
     echo 'Faking 1.4.1 database setup'
-    /usr/share/archivematica/dashboard/manage.py migrate --fake --settings='settings.production'
-    /usr/share/archivematica/dashboard/manage.py migrate administration 0001_initial --fake --settings='settings.production'
-    /usr/share/archivematica/dashboard/manage.py migrate main 0002_initial_data --fake --settings='settings.production'
-    /usr/share/archivematica/dashboard/manage.py migrate fpr 0002_initial_data --fake --settings='settings.production'
+    dashboard::manage migrate --fake --settings='settings.production'
+    dashboard::manage migrate administration 0001_initial --fake --settings='settings.production'
+    dashboard::manage migrate main 0002_initial_data --fake --settings='settings.production'
+    dashboard::manage migrate fpr 0002_initial_data --fake --settings='settings.production'
 fi
 
 # Run migrations
-/usr/share/archivematica/dashboard/manage.py migrate --settings='settings.production' --noinput
+dashboard::manage migrate --settings='settings.production' --noinput
 
 # Collect static content
 mkdir -p /usr/share/archivematica/dashboard/static
-/usr/share/archivematica/dashboard/manage.py collectstatic --noinput --clear
+dashboard::manage collectstatic --noinput --clear
 
 # Compile messages
-cd /usr/share/archivematica/dashboard && ./manage.py compilemessages
+dashboard::manage compilemessages
 
 #DEBHELPER#
