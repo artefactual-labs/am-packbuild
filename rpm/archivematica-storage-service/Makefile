@@ -8,13 +8,20 @@ DOCKER_IMAGE  = $(subst ~,-,"rpmbuild-$(NAME)-$(VERSION)")
 
 CHANGELOG_DATE = $(shell date "+%a %b %d %Y")
 PACKBUILD_HEAD   ?= $(shell git rev-parse HEAD )
-PACKAGE_HEAD   ?= $(shell git ls-remote https://github.com/artefactual/archivematica-storage-service refs/heads/$(BRANCH) | awk '{print $$1}' )
+
+GIT_REPO ?= "https://github.com/artefactual/archivematica-storage-service"
+PACKAGE_HEAD   ?= $(shell git ls-remote $(GIT_REPO) refs/heads/$(BRANCH) | awk '{print $$1}' )
+
+GIT_HOSTNAME :=$(shell echo $(GIT_REPO) | sed -e 's/https:\/\///g' -e 's/git@//g'  -e 's/\:/\//g' | cut -d\/ -f1)
+SSH_SOCKET  ?= $(SSH_AUTH_SOCK)
+
 
 RPMBUILD_ARGS := \
 	--define "_topdir $(RPM_TOPDIR)" \
 	--define "_etcdir $(DOCKER_VOLUME)/etc" \
 	--define "_branch $(BRANCH)" \
 	--define "name $(NAME)" \
+	--define "git_repo $(GIT_REPO)" \
 	--define "rpmversion $(VERSION)" \
 	--define "rpmrelease $(RELEASE)"
 
@@ -35,6 +42,7 @@ build:
                 -e VERSION="$(VERSION)" \
                 -e RELEASE="$(RELEASE)" \
                 -e BRANCH="$(BRANCH)" \
+		-e GIT_REPO="$(GIT_REPO)" \
                 -e PACKBUILD_HEAD="$(PACKBUILD_HEAD)" \
                 -e PACKAGE_HEAD="$(PACKAGE_HEAD)" \
 		--rm --volume "$(shell pwd):/$(DOCKER_VOLUME)" $(DOCKER_IMAGE) make -C /src rpm-build
