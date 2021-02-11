@@ -9,9 +9,9 @@ RELEASE       ?= 1
 
 CHANGELOG_DATE = $(shell date "+%a %b %d %Y")
 PACKBUILD_HEAD   ?= $(shell git rev-parse HEAD )
-PACKAGE_HEAD   ?= $(shell git ls-remote https://github.com/artefactual/archivematica refs/heads/$(BRANCH) | awk '{print $$1}' )
 
 GIT_REPO ?= "https://github.com/artefactual/archivematica"
+PACKAGE_HEAD   ?= $(shell git ls-remote $(GIT_REPO) refs/heads/$(BRANCH) | awk '{print $$1}' )
 GIT_HOSTNAME :=$(shell echo $(GIT_REPO) | sed -e 's/https:\/\///g' -e 's/git@//g'  -e 's/\:/\//g' | cut -d\/ -f1)
 SSH_SOCKET  ?= $(SSH_AUTH_SOCK)
 
