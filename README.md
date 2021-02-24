@@ -64,7 +64,7 @@ For Ubuntu packages:
 
 This needs to be repeated for each Ubuntu release and package. More info about
 managing Ubuntu repositories using reprepro can be found
-[https://wiki.archivematica.org/Release_Process#Build_deb.2Frpm_packages](here)
+[here](https://wiki.archivematica.org/Release_Process#Build_deb.2Frpm_packages).
 
 
 ### Test package
