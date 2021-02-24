@@ -1,6 +1,6 @@
-LANG="en_US.UTF-8"
-LC_ALL="en_US.UTF-8"
-LC_LANG="en_US.UTF-8"
+LANG=en_US.UTF-8
+LC_ALL=en_US.UTF-8
+LC_LANG=en_US.UTF-8
 
 SS_DB_NAME=/var/archivematica/storage-service/storage.db
 DJANGO_ALLOWED_HOSTS=*
