@@ -4,7 +4,7 @@ RUN apt-get update && \
     apt-get install -y dpkg-dev git build-essential wget debhelper \
     devscripts equivs quilt apt-transport-https python-minimal
 
-RUN wget -O /tmp/pip.py https://bootstrap.pypa.io/2.7/get-pip.py && python /tmp/pip.py
+RUN wget -O /tmp/pip.py https://bootstrap.pypa.io/pip/2.7/get-pip.py && python /tmp/pip.py
 
 RUN wget -O - https://packages.archivematica.org/1.7.x/key.asc |\
     apt-key add - && \
