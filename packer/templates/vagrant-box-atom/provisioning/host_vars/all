@@ -8,7 +8,6 @@
 
 atom_environment_type: "development"
 atom_flush_data: "yes"
-atom_devbox: "yes"
 atom_path: "/usr/share/nginx/atom"
 atom_repository_url: "https://github.com/artefactual/atom.git"
 atom_repository_version: "qa/2.x"
