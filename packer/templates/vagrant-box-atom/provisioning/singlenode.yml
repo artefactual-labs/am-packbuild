@@ -1,8 +1,6 @@
 ---
 - hosts: "all"
 
-
-
   roles:
 
     - role: "artefactual.elasticsearch"
@@ -29,11 +27,6 @@
       become: "yes"
       tags:
         - "nginx"
-
-    - role: "geerlingguy.composer"
-      become: "yes"
-      tags:
-        - "composer"
 
     - role: "artefactual.atom"
       become: "yes"

@@ -21,8 +21,7 @@
     {
       "execute_command": "echo 'vagrant'|{{.Vars}} sudo -S -E bash '{{.Path}}'",
       "scripts": [
-        "../../scripts/ubuntu/ansible.sh",
-        "../../scripts/ubuntu/php-cli.sh"
+        "../../scripts/ubuntu/ansible.sh"
       ],
       "type": "shell"
     },
