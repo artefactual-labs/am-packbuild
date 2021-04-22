@@ -1,0 +1,18 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    excon (0.80.1)
+    log4r (1.1.10)
+    vagrant_cloud (3.0.4)
+      excon (~> 0.73)
+      log4r (~> 1.1.10)
+
+PLATFORMS
+  ruby
+  x86_64-linux
+
+DEPENDENCIES
+  vagrant_cloud (= 3.0.4)
+
+BUNDLED WITH
+   2.2.16
