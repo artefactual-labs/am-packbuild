@@ -27,6 +27,7 @@ atom_mysql_user_host: "%"
 atom_user: "vagrant"
 atom_group: "vagrant"
 atom_description: "Access to Memory vagrant box"
+atom_csrf_protection: "yes"
 
 #
 # nginx role
