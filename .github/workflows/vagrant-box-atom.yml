@@ -1,0 +1,36 @@
+name: AtoM Vagrant box
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version
+        required: true
+      description:
+        description: Description
+        required: true
+jobs: 
+  vagrant-box-atom:
+    name: Build and upload
+    runs-on: macos-10.15
+    env:
+      PACKER_CACHE_DIR: ${{ github.workspace }}/.packer_cache
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+    - name: Build
+      run: |
+        cd ${{ github.workspace }}/packer/templates/vagrant-base-ubuntu-20.04-amd64
+        packer build -on-error=abort template.json
+        cd ${{ github.workspace }}/packer/templates/vagrant-box-atom
+        packer build -on-error=abort template.json
+        mv ${{ github.workspace }}/packer/builds/virtualbox/vagrant-atom.box \
+          ${{ github.workspace }}/atom-vagrant-${{ github.event.inputs.version }}.box
+    - name: Upload
+      run: |
+        cd ${{ github.workspace }}/tools/vagrant-box-atom
+        bundle install
+        ruby upload.rb \
+          '${{ github.workspace }}/atom-vagrant-${{ github.event.inputs.version }}.box' \
+          '${{ secrets.VAGRANT_CLOUD }}' \
+          '${{ github.event.inputs.version }}' \
+          '${{ github.event.inputs.description }}'
