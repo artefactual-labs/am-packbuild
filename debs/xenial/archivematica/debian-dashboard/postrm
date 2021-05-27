@@ -1,9 +1,0 @@
-#!/bin/sh
-
-if [ "$1" = "purge" ]; then
-    rm -f /etc/default/archivematica-dashboard
-    if which ucf >/dev/null 2>&1; then
-        ucf --purge /etc/default/archivematica-dashboard
-        ucfr --purge archivematica-dashboard /etc/default/archivematica-dashboard
-    fi
-fi

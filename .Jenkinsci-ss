@@ -62,14 +62,4 @@ node {
       string(name: 'REPOSITORY', value: "${REPOSITORY}")]
   }
 
-  stage('Build xenial packages') {
-    build job: 'am-packbuild/xenial-jenkinsci', parameters: [
-      string(name: 'PACKAGE', value: "${PACKAGE}"),
-      string(name: 'BRANCH', value: 'qa/0.x'),
-      string(name: 'GPG_ID', value: '0F4A4D31'),
-      string(name: 'VERSION', value: "${VERSION}"),
-      string(name: 'RELEASE', value: "${RELEASE}"),
-      string(name: 'REPOSITORY', value: "${REPOSITORY}")]
-  }
-
 }

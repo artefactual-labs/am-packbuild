@@ -1,7 +1,0 @@
-#!/bin/sh
-
-. /usr/share/debconf/confmodule
-. /usr/share/dbconfig-common/dpkg/prerm.mysql 
-dbc_go archivematica-mcp-server $@
-
-#DEBHELPER#

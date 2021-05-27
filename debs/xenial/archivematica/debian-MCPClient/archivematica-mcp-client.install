@@ -1,3 +1,0 @@
-lib/* /usr/lib/archivematica/MCPClient/
-install/clientConfig.logging.json /etc/archivematica/
-install/clientConfig.conf /etc/archivematica/

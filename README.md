@@ -8,11 +8,11 @@ CentOS 7 packages:
 
 This also builds a local repository that you can use later from `rpm-testing`.
 
-We don't have a single target yet for Xenial/Trusty packages but you can build
-the packages individually, for example:
+We don't have a single target yet for Debian packages but you can build them
+individually, for example:
 
-    make -C debs/xenial/archivematica
-    make -C debs/xenial/archivematica-storage-service
+    make -C debs/bionic/archivematica
+    make -C debs/bionic/archivematica-storage-service
 
 #### Using parameters
 
