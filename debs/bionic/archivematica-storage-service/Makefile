@@ -1,68 +1,68 @@
 NAME          = am-packbuild
-PACKAGE	      ?= archivematica
+PACKAGE       = archivematica-storage-service
 DEB_TOPDIR    = "/debbuild"
 DOCKER_VOLUME = "/src"
-DOCKER_IMAGE  = "debbuild-$(NAME)-$(VERSION)"
-GPG_ID ?= 0F4A4D31
-PACKBUILD_EXTRA_ARGS ?=
-#PACKBUILD_EXTRA_ARGS ?= "-b 1"
-PACKAGE = archivematica-storage-service
-BRANCH     ?= qa/0.x
-VERSION     ?= 0.13.0
-RELEASE       ?= -3
-BUILD_TYPE         ?= ss
+DOCKER_IMAGE  = "debbuild-$(NAME)-$(PACKAGE)-$(VERSION)"
+GPG_ID        ?= 0F4A4D31
+BRANCH        ?= qa/0.x
+VERSION       ?= 0.18.0
+RELEASE       ?= -1
+GIT_REPO      = "https://github.com/artefactual/archivematica-storage-service"
 
-.PHONY: build-docker-image build deb-build deb-clean deb-test update-changelog
+.DEFAULT_GOAL := build
 
-all: build-docker-image deb-clean build
-
-build-docker-image: update-changelog
+.PHONY: build-docker-image
+build-docker-image:
 	@echo "==> Building Docker image with build environment."
 	@docker build --rm --tag "$(DOCKER_IMAGE)" .
 
-build:
+.PHONY: build
+build: build-docker-image
 	@echo "==> Building deb."
 	@docker run \
-                -e BRANCH=$(BRANCH) \
+		-e BRANCH=$(BRANCH) \
 		-e VERSION=$(VERSION) \
 		-e RELEASE=$(RELEASE) \
 		-e PACKAGE=$(PACKAGE) \
-                -e BUILD_TYPE=$(BUILD_TYPE) \
-                -e GPG_ID=$(GPG_ID) \
+		-e GPG_ID=$(GPG_ID) \
 		-e GPG_KEY \
-		-e PACKBUILD_EXTRA_ARGS="$(PACKBUILD_EXTRA_ARGS)" \
+		-e GIT_REPO="$(GIT_REPO)" \
  		--rm \
-                --volume "$(shell cd ../../ && pwd):$(DEB_TOPDIR)/$(NAME)" \
+		--volume "$(shell cd ../../ && pwd):$(DEB_TOPDIR)/$(NAME)" \
 		--volume "$(shell pwd):$(DOCKER_VOLUME)" \
-		 $(DOCKER_IMAGE) \
-                 make -C $(DOCKER_VOLUME) deb-build
+		$(DOCKER_IMAGE) \
+			make -C $(DOCKER_VOLUME) deb-build
 
-deb-build:
-	@echo "==> Install dependencies."
-	# Add GPG if available
-	@if [ -f "$(DOCKER_VOLUME)/GPG-KEY" ]; then gpg --import $(DOCKER_VOLUME)/GPG-KEY; fi
-	@if [ x"$$GPG_KEY" != x ]; then echo "$$GPG_KEY" | gpg --import - ; fi
+.PHONY: deb-build
+deb-build: deb-clean git-clone import-gpg-key
 	@cd /debbuild/$(NAME)
-	@echo "==> Clone code."
 	./build.sh
 	mkdir -p repo/
 	cp -rf src/archivematica-*.* repo
-	cd  repo && dpkg-scanpackages . | gzip > Packages.gz
+	cd repo && dpkg-scanpackages . | gzip > Packages.gz
 
-deb-clean:
-	@echo "==> Cleaning up previous builds."
-	@rm -rf $(DOCKER_VOLUME)/repo/
-	@rm -rf $(DOCKER_VOLUME)/src/
-	mkdir -p src/$(PACKAGE)
-	rm -rf src/
+.PHONY: import-gpg-key
+import-gpg-key:
+	@if [ -f "$(DOCKER_VOLUME)/GPG-KEY" ]; then gpg --import $(DOCKER_VOLUME)/GPG-KEY; fi
+	@if [ x"$$GPG_KEY" != x ]; then echo "$$GPG_KEY" | gpg --import - ; fi
+
+.PHONY: git-clone
+git-clone:
 	@git clone \
 		--quiet \
 		--branch $(BRANCH) \
 		--depth 1 \
 		--single-branch \
-			https://github.com/artefactual/$(PACKAGE) src/$(PACKAGE)
+			$(GIT_REPO) src/$(PACKAGE)
 
-cleanup:
+.PHONY: deb-clean
+deb-clean:
+	@echo "==> Cleaning up previous builds."
+	@rm -rf $(DOCKER_VOLUME)/repo/
+	@rm -rf $(DOCKER_VOLUME)/src/
+
+.PHONY: cleanup
+cleanup: build-docker-image
 	@echo "==> Remove artifacts created as root."
 	@docker run -i \
 		--rm \
@@ -70,6 +70,3 @@ cleanup:
 		--volume "$(shell pwd):$(DOCKER_VOLUME)" \
 		$(DOCKER_IMAGE) \
 		rm -rf /src/repo/ /src/src/
-
-deb-test:
-	@docker run --rm --volume="$(shell pwd):$(DOCKER_VOLUME)" ubuntu:trusty echo "Create repo and install package"

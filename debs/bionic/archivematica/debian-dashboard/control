@@ -1,30 +1,21 @@
 Source: archivematica-dashboard
 Section: utils
 Priority: extra
-Maintainer: Santiago Collazo <sysadmin@artefactual.com>
-Build-Depends: debhelper (>= 9), libffi-dev, libssl-dev
+Maintainer: Artefactual Systems Inc. <sysadmin@artefactual.com>
+Build-Depends:
+	debhelper,
+	dh-systemd
 Standards-Version: 3.9.8
-Homepage: http://archivematica.org
+X-Python-Version: 3.6
 
 Package: archivematica-dashboard
 Architecture: any
-Depends: 
+Depends:
 	${shlibs:Depends},
 	${misc:Depends},
+	archivematica-common (>= 1.13.0),
 	git,
 	nginx,
-	python (>= 2.7.3),
-	python-pip,
-	python-dateutil,
-	python-simplejson,
-	libffi-dev,
-	libldap2-dev,
-	libsasl2-dev,
-	libssl-dev,
-	python-dev,
-	libxml2-dev,
-	libxslt1-dev,
 	gettext
-Description: Web Dashboard for Archivematica
-  Web based dashboard interface used to control an Archivematica pipeline.
-
+Description: Archivematida Dashboard (web-based interface).
+Homepage: https://www.archivematica.org

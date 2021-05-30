@@ -1,27 +1,37 @@
-#!/bin/bash -x
+#!/usr/bin/env bash
+
+set -euxo
 
 BASE="$(pwd)"
-SOURCE=${BASE}/src/archivematica/src/
+SOURCE=${BASE}/src/archivematica
 export DEBFULLNAME="Artefactual Systems"
 export DEBEMAIL="sysadmin@artefactual.com"
+export DEB_BUILD_OPTIONS="noddebs"
 
-cd $SOURCE/dashboard/frontend/
-npm install --unsafe-perm
-
-cd $SOURCE
+# Create archivematica package.
+pushd ${SOURCE}
 COMMIT=$(git rev-parse HEAD)
+cp -rf ${BASE}/debian-archivematica debian
+yes | mk-build-deps -i debian/control
+dch -v 1:${VERSION}${RELEASE}~18.04 commit: $(echo $COMMIT)
+dch -v 1:${VERSION}${RELEASE}~18.04 checkout: $(echo $BRANCH)
+dch -r --distribution bionic --urgency high ignored
+dpkg-buildpackage -us -uc
+popd
 
-# Update changelog for bionic
-for i in dashboard MCPClient MCPServer archivematicaCommon
-	do
-	cd "${SOURCE}/$i/"
+# Install front-end node modules.
+pushd $SOURCE/src/dashboard/frontend/
+npm install --unsafe-perm
+popd
+
+# Create child packages.
+for i in dashboard MCPClient MCPServer archivematicaCommon; do
+	pushd "${SOURCE}/src/$i"
 	cp -rf $BASE/debian-$i debian
 	yes | mk-build-deps -i debian/control
 	dch -v 1:${VERSION}${RELEASE}~18.04 commit: $(echo $COMMIT)
-	dch -v 1:${VERSION}${RELEASE}~18.04 checkout: $(echo $BRANCH) 
-	dch -r --distribution bionic --urgency high ignored		
-	QUILT_PATCHES="debian/patches" quilt push -a || true
+	dch -v 1:${VERSION}${RELEASE}~18.04 checkout: $(echo $BRANCH)
+	dch -r --distribution bionic --urgency high ignored
 	dpkg-buildpackage -us -uc
-	cd $SOURCE
-	done
-
+	popd
+done

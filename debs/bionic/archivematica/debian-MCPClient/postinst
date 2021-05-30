@@ -5,17 +5,6 @@ mkdir -p $logdir
 chown -R archivematica:archivematica $logdir
 chmod -R g+s $logdir
 
-# Remove dh-virtualenv build path in editable pip requirements and other local/bin files
-# https://github.com/spotify/dh-virtualenv/issues/134
-# https://github.com/archivematica/Issues/issues/903
-for filename in /usr/share/archivematica/virtualenvs/archivematica-mcp-client/local/bin/* \
-    /usr/share/archivematica/virtualenvs/archivematica-mcp-client/lib/python2.7/site-packages/*.pth \
-    /usr/share/archivematica/virtualenvs/archivematica-mcp-client/lib/python2.7/site-packages/*.egg-link ; do
-    if [ -f "$filename" ]; then
-        sed -i "s/\/src\/src\/archivematica\/src\/MCPClient\/debian\/archivematica-mcp-client//g" $filename
-    fi
-done
-
 # Populate default mysql config
 DBPASS=$(grep "dbc_dbpass=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
 sed -i "s/^\(ARCHIVEMATICA_MCPCLIENT_CLIENT_PASSWORD=\).*/\1$DBPASS/g" /etc/default/archivematica-mcp-client

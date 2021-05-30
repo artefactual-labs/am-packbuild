@@ -1,18 +1,22 @@
-Source: archivematica-common
+Source: archivematica
 Section: utils
 Priority: extra
 Maintainer: Artefactual Systems Inc. <sysadmin@artefactual.com>
 Build-Depends:
-	debhelper
+	debhelper,
+	dh-virtualenv,
+	python3.6-dev,
+	libmysqlclient-dev,
+	libffi-dev,
+	libldap2-dev,
+	libsasl2-dev,
+	libssl-dev,
+	libxml2-dev,
+	libxslt1-dev,
 Standards-Version: 3.9.8
 X-Python-Version: 3.6
 
-Package: archivematica-common
+Package: archivematica
 Architecture: amd64
-Depends:
-	${misc:Depends},
-	python3,
-	python3-distutils,
-	archivematica (>= 1.13.0)
 Description: Archivematica shared libraries.
 Homepage: https://www.archivematica.org

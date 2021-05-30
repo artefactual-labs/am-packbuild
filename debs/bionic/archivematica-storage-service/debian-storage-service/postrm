@@ -1,11 +1,8 @@
 #!/bin/bash
 
-#postrm 
-#run after the package is uninstalled
-
 echo "postrm" $1
+
 if [ $1 = "remove" ]; then
-    #clean up storage service directories
     rm -rf /usr/share/python/archivematica-storage-service
     rm -rf /usr/share/archivematica/virtualenvs/archivematica-storage-service
     rm -rf /var/archivematica/storage*

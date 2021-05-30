@@ -1,15 +1,30 @@
 FROM ubuntu:bionic
 
-RUN apt-get update && \
-    apt-get install -y dpkg-dev git build-essential wget debhelper \
-    devscripts equivs quilt apt-transport-https python-minimal
+ENV DEBIAN_FRONTEND noninteractive
 
-RUN wget -O /tmp/pip.py https://bootstrap.pypa.io/pip/2.7/get-pip.py && python /tmp/pip.py
-
-RUN wget -O - https://packages.archivematica.org/1.7.x/key.asc |\
-    apt-key add - && \
-    echo "deb [arch=amd64] http://packages.archivematica.org/1.7.x/ubuntu-externals xenial main" >> /etc/apt/sources.list
-
-# Dependencies are also obtained in the debian build script, this speeds up the process of building packages
-RUN apt-get update &&  apt-get install -y libffi-dev libssl-dev libxslt-dev dh-virtualenv python-dev dh-systemd libmysqlclient-dev postgresql-server-dev-10 libldap2-dev libsasl2-dev
-
+RUN apt-get update \
+	&& apt-get install -y \
+		dpkg-dev \
+		git \
+		build-essential \
+		debhelper \
+		devscripts \
+		equivs \
+		apt-transport-https \
+		python3.6-dev \
+		python3.6-distutils \
+		libffi-dev \
+		libssl-dev \
+		libxslt-dev \
+		dh-systemd \
+		libmysqlclient-dev \
+		postgresql-server-dev-10 \
+		libldap2-dev \
+		libsasl2-dev \
+		software-properties-common \
+	&& add-apt-repository ppa:jyrki-pulliainen/dh-virtualenv \
+	&& apt-get install -y dh-virtualenv \
+	&& rm -rf /var/lib/apt/lists/* \
+	&& update-alternatives --install /usr/bin/python python /usr/bin/python3.6 1 \
+	&& update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 1 \
+	&& curl -s https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py && python /tmp/get-pip.py
