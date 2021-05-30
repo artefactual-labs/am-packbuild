@@ -1,17 +1,18 @@
 Source: archivematica-mcp-client
 Section: utils
 Priority: extra
-Maintainer: Santiago Collazo <sysadmin@artefactual.com>
-Build-Depends: debhelper (>= 9)
+Maintainer: Artefactual Systems Inc. <sysadmin@artefactual.com>
+Build-Depends:
+	debhelper,
+	dh-systemd
 Standards-Version: 3.9.8
-Homepage: http://archivematica.org
+X-Python-Version: 3.6
 
 Package: archivematica-mcp-client
-Architecture: i386 amd64
+Architecture: amd64
 Depends:
-	${shlibs:Depends},
 	${misc:Depends},
-	archivematica-common (>=1.8.0),
+	archivematica-common (>= 1.13.0),
 	atool,
 	bulk-extractor,
 	clamav,
@@ -25,6 +26,7 @@ Depends:
 	jhove,
 	libimage-exiftool-perl,
 	libxml2-utils,
+	libmysqlclient-dev,
 	logapp,
 	md5deep,
 	mediaconch (>= 18.03),
@@ -37,11 +39,12 @@ Depends:
 	postfix,
 	pst-utils,
 	rsync,
-	siegfried (>=1.7),
+	siegfried (>= 1.7),
 	sleuthkit,
 	tesseract-ocr,
 	tree,
 	ufraw,
 	unrar-free,
 	uuid
-Description: MCP Client for Archivematica
+Description: Archivematica MCPClient (distributed worker)
+Homepage: https://www.archivematica.org

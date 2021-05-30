@@ -4,10 +4,10 @@ export LC_ALL=C.UTF-8
 export DH_VIRTUALENV_INSTALL_ROOT=/usr/share/archivematica/virtualenvs
 
 %:
-	dh $@ --with python-virtualenv --with systemd
+	dh $@ --with python-virtualenv
 
 override_dh_virtualenv:
-	dh_virtualenv --python=python3 --requirements=requirements/production-py3.txt --skip-install
+	dh_virtualenv --python=python3 --requirements=requirements-py3.txt --skip-install
 
 # See https://readthedocs.org/projects/dh-virtualenv/downloads/pdf/latest/ (2.3.3 section)
 override_dh_shlibdeps:

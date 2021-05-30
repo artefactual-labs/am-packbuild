@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 SS_ENV_DIR="/usr/share/archivematica/virtualenvs/archivematica-storage-service"
 
@@ -13,17 +13,6 @@ else
   adduser --uid 333 --group --system --home /var/lib/archivematica/ archivematica
 fi
 
-# Remove dh-virtualenv build path in editable pip requirements and other local/bin files
-# https://github.com/spotify/dh-virtualenv/issues/134
-# https://github.com/archivematica/Issues/issues/903
-for filename in /usr/share/archivematica/virtualenvs/archivematica-storage-service/local/bin/* \
-    /usr/share/archivematica/virtualenvs/archivematica-storage-service/lib/python2.7/site-packages/*.pth \
-    /usr/share/archivematica/virtualenvs/archivematica-storage-service/lib/python2.7/site-packages/*.egg-link ; do
-    if [ -f "$filename" ]; then
-        sed -i "s/\/src\/src\/archivematica-storage-service\/debian\/archivematica-storage-service//g" $filename
-    fi
-done
-
 echo "creating django secret key"
 KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 50 | head -n 1)
 sed -i "s/CHANGE_ME_WITH_A_SECRET_KEY/\"$KEY\"/g" /etc/default/archivematica-storage-service
@@ -37,31 +26,12 @@ source /etc/default/archivematica-storage-service
 set +a
 echo "creating symlink in /usr/lib/archivematica"
 rm -f /usr/lib/archivematica/storage-service
-ln -s -f ${SS_ENV_DIR}/lib/python2.7/site-packages/storage_service/ /usr/lib/archivematica/storage-service
+ln -s -f ${SS_ENV_DIR}/lib/python3.6/site-packages/storage_service/ /usr/lib/archivematica/storage-service
 
 cd /usr/lib/archivematica/storage-service
 
 echo "configuring django database and static files"
-find /usr/lib/archivematica/storage-service/ -name '*.pyc'  -delete
-# 0.3.0 will automatically fake the first migration
-if [[ $2 == '0.7.'* || $2 == '0.6.'* || $2 == '0.5.'* || $2 == '0.4.'* ]]; then
-    echo 'Faking the 0.4 migration'
-    ${SS_ENV_DIR}/bin/python manage.py migrate locations 0002_v0_4 --fake
-fi
-if [[ $2 == '0.7.'* || $2 == '0.6.'* || $2 == '0.5.'* ]]; then
-    echo 'Faking 0.5 migration'
-    ${SS_ENV_DIR}/bin/python manage.py migrate locations 0003_v0_5 --fake
-fi
-
-if [[ $2 == '0.7.'* || $2 == '0.6.'* ]]; then
-    echo 'No migrations in 0.6'
-fi
-
-if [[ $2 == '1:0.7.'* ]]; then
-    echo 'Faking 0.7 migration'
-    ${SS_ENV_DIR}/bin/python manage.py migrate locations 0004_v0_7 --fake
-    ${SS_ENV_DIR}/bin/python manage.py migrate --fake-initial
-fi
+find /usr/lib/archivematica/storage-service/ -name '*.pyc' -delete
 
 ${SS_ENV_DIR}/bin/python manage.py migrate
 mkdir -p /usr/lib/archivematica/storage-service/assets
