@@ -1,4 +1,4 @@
-archivematica (1:1.13.0-1~18.04) bionic; urgency=high
+archivematica (1:1.13.0~rc.1+3.g66ce19de~18.04) bionic; urgency=high
 
   * commit: 66ce19defafa1539fe3163df1cf41e36838d2e3d
   * checkout: v1.13.0
