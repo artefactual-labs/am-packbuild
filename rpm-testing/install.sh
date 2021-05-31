@@ -115,12 +115,12 @@ sudo -H -u root mysql -hlocalhost -uroot -e "DROP DATABASE IF EXISTS SS; CREATE 
 sudo -H -u root mysql -hlocalhost -uroot -e "CREATE USER 'archivematica'@'localhost' IDENTIFIED BY 'demo';"
 sudo -H -u root mysql -hlocalhost -uroot -e "GRANT ALL ON SS.* TO 'archivematica'@'localhost';"
 
-sudo -u root yum install -y python-pip archivematica-storage-service
+sudo -u root yum install -y python36-pip archivematica-storage-service
 sudo -u archivematica bash -c " \
   set -a -e -x
   source /etc/sysconfig/archivematica-storage-service
   cd /usr/lib/archivematica/storage-service
-  /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py migrate
+  /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python3.6 manage.py migrate
 ";
 
 sudo -u root systemctl enable archivematica-storage-service
@@ -144,7 +144,7 @@ sudo -u archivematica bash -c " \
   set -a -e -x
   source /etc/sysconfig/archivematica-dashboard
   cd /usr/share/archivematica/dashboard
-  /usr/share/archivematica/virtualenvs/archivematica/bin/python manage.py migrate --noinput
+  /usr/share/archivematica/virtualenvs/archivematica/bin/python3.6 manage.py migrate --noinput
 ";
 
 sudo -u root bash -c "echo 'ARCHIVEMATICA_DASHBOARD_DASHBOARD_SEARCH_ENABLED=${search_enabled}' >> /etc/sysconfig/archivematica-dashboard"
