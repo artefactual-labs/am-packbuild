@@ -16,7 +16,7 @@ chown -R archivematica:archivematica $logdir
 chmod -R g+s $logdir
 
 # Create Django key
-KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 50 | head -n 1)
 sed -i "s/CHANGE_ME_WITH_A_SECRET_KEY/\"$KEY\"/g" /etc/default/archivematica-dashboard
 
 # Populate default mysql config
