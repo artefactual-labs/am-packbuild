@@ -1,11 +1,10 @@
 PACKAGE ?= archivematica
-RPM_TOPDIR = "/rpmbuild"
-DOCKER_VOLUME = "/src"
-DOCKER_IMAGE ?= $(subst ~,-,"rpmbuild-$(NAME)-$(VERSION)")
-
 BRANCH ?= qa/1.x
 VERSION ?= 1.13.0
 RELEASE ?= 1
+RPM_TOPDIR = "/rpmbuild"
+DOCKER_VOLUME = "/src"
+DOCKER_IMAGE ?= $(subst ~,-,"rpmbuild-$(PACKAGE)-$(VERSION)")
 
 GIT_REPO ?= "https://github.com/artefactual/archivematica"
 GIT_HOSTNAME :=$(shell echo $(GIT_REPO) | sed -e 's/https:\/\///g' -e 's/git@//g'  -e 's/\:/\//g' | cut -d\/ -f1)
