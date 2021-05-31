@@ -25,11 +25,8 @@ for filename in /usr/share/archivematica/virtualenvs/archivematica-storage-servi
 done
 
 echo "creating django secret key"
-KEYCMD=$(python /var/archivematica/storage-service/make_key.py 2>&1)
-echo $KEYCMD
-
-sed -i "s/CHANGE_ME_WITH_A_SECRET_KEY/\"$KEYCMD\"/g" /etc/default/archivematica-storage-service
-sed -i "s/<replace-with-key>/$KEYCMD/g" /etc/archivematica/storage-service.gunicorn-config.py
+KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 50 | head -n 1)
+sed -i "s/CHANGE_ME_WITH_A_SECRET_KEY/\"$KEY\"/g" /etc/default/archivematica-storage-service
 
 # Use ucf to preserve user changes in the default file
 ucfr archivematica-storage-service /etc/default/archivematica-storage-service
