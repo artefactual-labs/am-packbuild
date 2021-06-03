@@ -5,7 +5,7 @@
 function dashboard::manage {
     # Certain tasks like compilemessages rely on the current directory.
     pushd /usr/share/archivematica/dashboard
-    /usr/share/archivematica/virtualenvs/archivematica/python manage.py "$@"
+    /usr/share/archivematica/virtualenvs/archivematica/bin/python manage.py "$@"
     popd
 }
 
