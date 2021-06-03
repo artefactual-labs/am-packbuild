@@ -18,5 +18,5 @@ X-Python-Version: 3.6
 
 Package: archivematica
 Architecture: amd64
-Description: Archivematica shared libraries.
+Description: Standards-based digital preservation system.
 Homepage: https://www.archivematica.org
