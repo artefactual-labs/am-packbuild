@@ -21,7 +21,7 @@
     {
       "execute_command": "echo 'vagrant'|{{.Vars}} sudo -S -E bash '{{.Path}}'",
       "scripts": [
-        "../../scripts/ubuntu/ansible.sh"
+        "../../scripts/ubuntu/ansible-bionic.sh"
       ],
       "type": "shell"
     },
@@ -29,15 +29,14 @@
       "type": "ansible-local",
       "playbook_file": "./provisioning/singlenode.yml",
       "galaxy_file": "requirements.yml",
-      "host_vars": "./provisioning/host_vars/",
-      "extra_arguments": [
-        "--extra-vars=@./host_vars/all"
-      ]
+      "group_vars": "./provisioning/group_vars/",
+      "inventory_groups": "servers"
     },
     {
       "execute_command": "echo 'vagrant'|{{.Vars}} sudo -S -E bash '{{.Path}}'",
       "scripts": [
-        "../../scripts/ubuntu/dashboard-init.sh",
+        "../../scripts/ubuntu/storage-service-init.sh",
+        "./motd.sh",
         "../../scripts/ubuntu/cleanup.sh",
         "../../scripts/common/minimize.sh"
       ],
