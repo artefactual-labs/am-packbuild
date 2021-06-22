@@ -13,6 +13,7 @@ Group: Application/System
 License: AGPLv3
 Source0: %{git_repo}
 BuildRequires: git, gcc, openldap-devel, openssl-devel, python36-virtualenv, python36-pip, mariadb-devel, libxslt-devel, python36-devel, python36-distutils-extra, python36-setuptools, libffi-devel, openssl-devel, gcc-c++, postgresql-devel, nodejs
+Requires: python36-devel
 AutoReq: No
 AutoProv: No
 %description

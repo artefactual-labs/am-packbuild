@@ -115,7 +115,7 @@ sudo -H -u root mysql -hlocalhost -uroot -e "DROP DATABASE IF EXISTS SS; CREATE 
 sudo -H -u root mysql -hlocalhost -uroot -e "CREATE USER 'archivematica'@'localhost' IDENTIFIED BY 'demo';"
 sudo -H -u root mysql -hlocalhost -uroot -e "GRANT ALL ON SS.* TO 'archivematica'@'localhost';"
 
-sudo -u root yum install -y python36-pip archivematica-storage-service
+sudo -u root yum install -y archivematica-storage-service
 sudo -u archivematica bash -c " \
   set -a -e -x
   source /etc/sysconfig/archivematica-storage-service
