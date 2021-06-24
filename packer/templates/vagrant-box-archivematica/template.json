@@ -35,7 +35,6 @@
     {
       "execute_command": "echo 'vagrant'|{{.Vars}} sudo -S -E bash '{{.Path}}'",
       "scripts": [
-        "../../scripts/ubuntu/storage-service-init.sh",
         "./motd.sh",
         "../../scripts/ubuntu/cleanup.sh",
         "../../scripts/common/minimize.sh"
