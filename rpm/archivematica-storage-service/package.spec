@@ -56,7 +56,7 @@ mkdir -p \
 
 virtualenv-3.6 /usr/share/archivematica/virtualenvs/archivematica-storage-service
 /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/pip install --upgrade pip
-/usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/pip install -r %{_sourcedir}/%{name}/requirements/production-py3.txt
+/usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/pip install -r %{_sourcedir}/%{name}/requirements/production.txt
 virtualenv-3.6 --relocatable /usr/share/archivematica/virtualenvs/archivematica-storage-service
 cp -rf /usr/share/archivematica/virtualenvs/archivematica-storage-service/* %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-storage-service/
 
