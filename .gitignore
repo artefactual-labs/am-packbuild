@@ -55,5 +55,5 @@ docs/_build/
 target/
 
 # deb build artifacts
-debs/*/*/repo
-debs/*/*/src
+debs/**/repo
+debs/**/src
