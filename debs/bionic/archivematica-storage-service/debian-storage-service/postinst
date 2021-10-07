@@ -28,11 +28,10 @@ echo "creating symlink in /usr/lib/archivematica"
 rm -f /usr/lib/archivematica/storage-service
 ln -s -f ${SS_ENV_DIR}/lib/python3.6/site-packages/storage_service/ /usr/lib/archivematica/storage-service
 
-cd /usr/lib/archivematica/storage-service
-
-echo "configuring django database and static files"
 find /usr/lib/archivematica/storage-service/ -name '*.pyc' -delete
 
+echo "configuring django database and static files"
+cd /usr/lib/archivematica/storage-service
 ${SS_ENV_DIR}/bin/python manage.py migrate
 mkdir -p /usr/lib/archivematica/storage-service/assets
 ${SS_ENV_DIR}/bin/python manage.py collectstatic --noinput --clear
