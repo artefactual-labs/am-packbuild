@@ -1,6 +1,8 @@
 [Unit]
 Description=Archivematica Storage Service
-After=network.target
+After=network.target mariadb.service
+StartLimitInterval=200
+StartLimitBurst=5
 
 [Service]
 PIDFile=/run/archivematica-storage-service_gunicorn.pid
@@ -12,6 +14,8 @@ ExecStart=/usr/share/archivematica/virtualenvs/archivematica-storage-service/bin
 ExecReload=/bin/kill -s HUP $MAINPID
 ExecStop=/bin/kill -s TERM $MAINPID
 PrivateTmp=true
+Restart=always
+RestartSec=30
 
 [Install]
 WantedBy=multi-user.target
