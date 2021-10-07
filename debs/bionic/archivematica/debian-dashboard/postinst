@@ -33,6 +33,8 @@ sed -i "s/^\(ARCHIVEMATICA_DASHBOARD_CLIENT_DATABASE=\).*/\1$DBNAME/g" /etc/defa
 ucfr archivematica-dashboard /etc/default/archivematica-dashboard
 ucf --debconf-ok /etc/default/archivematica-dashboard /etc/default/archivematica-dashboard
 
+find /usr/share/archivematica/dashboard/ -name '*.pyc' -delete
+
 #this is required to allow syncdb to work properly
 set -a
 source /etc/default/archivematica-dashboard

@@ -19,5 +19,7 @@ sed -i "s/^\(ARCHIVEMATICA_MCPCLIENT_CLIENT_DATABASE=\).*/\1$DBNAME/g" /etc/defa
 ucfr archivematica-mcp-client /etc/default/archivematica-mcp-client
 ucf --debconf-ok /etc/default/archivematica-mcp-client /etc/default/archivematica-mcp-client
 
+find /usr/lib/archivematica/MCPClient/ -name '*.pyc' -delete
+
 #DEBHELPER#
 
