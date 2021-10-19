@@ -1,4 +1,10 @@
 %changelog
+* Tue Oct 19 2021 Artefactual <sysadmin@artefactual.com> - 0.18.1-1
+- Packbuild: af5513e91169e5ccc32173e6e490acdc15960df3
+- Storage Service: 0fb9d0a89524d6485e7f2fbce2ed868ebdf38f45
+* Fri Jul 09 2021 Artefactual <sysadmin@artefactual.com> - 0.18.0-1
+- Packbuild: 630e083276204ad6a61df9bf7bbc82a568d2ae6e
+- Storage Service: e30f9db92f4d870c21e8515480776c38c3d46e5d
 * Thu Jan 07 2021 Artefactual <sysadmin@artefactual.com> - 0.17.1-1
 - Packbuild: 89f86ab2b5557b490b41b87e42a12a085c8cc186
 - Storage Service: f02b9149863efe3e883806b7d470ab3c55273d03
