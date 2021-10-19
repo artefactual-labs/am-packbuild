@@ -1,3 +1,17 @@
+archivematica-dashboard (1:1.13.1-1~18.04) bionic; urgency=high
+
+  * commit: 220fbcae4dc6072fbc0e8e74cfb0a326962b21b2
+  * checkout: v1.13.1
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Tue, 19 Oct 2021 15:10:53 +0000
+
+archivematica-dashboard (1:1.13.0-1~18.04) bionic; urgency=high
+
+  * commit: 2a83f0c47243881e363cb3db031e51b089c4094a
+  * checkout: v1.13.0
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Fri, 09 Jul 2021 19:04:50 +0000
+
 archivematica-dashboard (1:1.12.1-1~18.04) bionic; urgency=high
 
   * commit: a31f218ceabc5bbe996775b82b9c9861b2f406d9
