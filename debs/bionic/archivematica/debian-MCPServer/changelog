@@ -1,3 +1,10 @@
+archivematica-mcp-server (1:1.13.2-1~18.04) bionic; urgency=high
+
+  * commit: 4f4605453d5a8796f6a739fa9664921bdb3418f2
+  * checkout: v1.13.2
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Mon, 13 Dec 2021 10:01:33 +0000
+
 archivematica-mcp-server (1:1.13.1-1~18.04) bionic; urgency=high
 
   * commit: 220fbcae4dc6072fbc0e8e74cfb0a326962b21b2
