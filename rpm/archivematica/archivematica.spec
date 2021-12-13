@@ -173,6 +173,7 @@ cp -rf %{_sourcedir}/%{name}/src/archivematicaCommon/lib/* %{buildroot}/usr/lib/
 # MCPServer
 virtualenv /usr/share/archivematica/virtualenvs/archivematica-mcp-server
 /usr/share/archivematica/virtualenvs/archivematica-mcp-server/bin/pip install --upgrade pip
+/usr/share/archivematica/virtualenvs/archivematica-mcp-server/bin/pip install --upgrade setuptools_scm
 /usr/share/archivematica/virtualenvs/archivematica-mcp-server/bin/pip install -r %{_sourcedir}/%{name}/src/archivematicaCommon/requirements/production.txt
 /usr/share/archivematica/virtualenvs/archivematica-mcp-server/bin/pip install -r %{_sourcedir}/%{name}/src/dashboard/src/requirements/production.txt
 /usr/share/archivematica/virtualenvs/archivematica-mcp-server/bin/pip install -r %{_sourcedir}/%{name}/src/MCPServer/requirements/production.txt
