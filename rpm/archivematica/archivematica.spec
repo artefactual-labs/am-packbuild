@@ -251,6 +251,9 @@ fi
 #
 # Posttrans install script
 #
+%posttrans mcp-client
+# Update PYTHONPATH in configuration file
+sed -i "s/^PYTHONPATH=.*$/PYTHONPATH=\/usr\/lib\/archivematica\/MCPClient:\/usr\/lib\/archivematica\/MCPClient\/clientScripts:\/usr\/lib\/archivematica\/archivematicaCommon\/:\/usr\/share\/archivematica\/dashboard\//g" /etc/sysconfig/archivematica-mcp-client
 
 %posttrans dashboard
 # Update old virtual environment paths in configuration files
