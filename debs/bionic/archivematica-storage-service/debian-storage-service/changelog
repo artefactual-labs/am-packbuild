@@ -1,3 +1,10 @@
+archivematica-storage-service (1:0.19.0-1~18.04) bionic; urgency=high
+
+  * commit: ab64d17f8220428091699870f6a14ac8dc45136b
+  * checkout: v0.19.0
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Tue, 01 Mar 2022 18:08:06 +0000
+
 archivematica-storage-service (1:0.18.1-1~18.04) bionic; urgency=high
 
   * commit: 0fb9d0a89524d6485e7f2fbce2ed868ebdf38f45
