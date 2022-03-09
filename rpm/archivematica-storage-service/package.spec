@@ -8,8 +8,8 @@ Summary: Archivematica Storage Service
 Group: Application/System
 License: AGPLv3
 Source0: %{git_repo}
-BuildRequires: git, gcc, libffi-devel, openssl-devel, libxslt-devel, python36-virtualenv, python36-pip, python36-devel, python36-distutils-extra, python36-setuptools, mariadb-devel, postgresql-devel, gcc-c++, openldap-devel
-Requires: gnupg, libxslt-devel, policycoreutils-python, python36-devel, rng-tools, rsync, nginx, unar, p7zip, shadow-utils, gettext
+BuildRequires: git, gcc, libffi-devel, openssl-devel, libxslt-devel, python-virtualenv, python-pip, mariadb-devel, postgresql-devel, gcc-c++, openldap-devel
+Requires: gnupg, libxslt-devel, policycoreutils-python, rng-tools, rsync, nginx, unar, p7zip, shadow-utils, gettext
 AutoReq: No
 AutoProv: No
 %description
@@ -54,13 +54,14 @@ mkdir -p \
   %{buildroot}/etc/sysconfig/ \
   %{buildroot}/etc/nginx/conf.d
 
-virtualenv-3.6 /usr/share/archivematica/virtualenvs/archivematica-storage-service
+virtualenv /usr/share/archivematica/virtualenvs/archivematica-storage-service
 /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/pip install --upgrade pip
 /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/pip install -r %{_sourcedir}/%{name}/requirements/production.txt
-virtualenv-3.6 --relocatable /usr/share/archivematica/virtualenvs/archivematica-storage-service
+virtualenv --relocatable /usr/share/archivematica/virtualenvs/archivematica-storage-service
 cp -rf /usr/share/archivematica/virtualenvs/archivematica-storage-service/* %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-storage-service/
 
 cp -rf %{_sourcedir}/%{name}/storage_service/* %{buildroot}/usr/lib/archivematica/storage-service/
+cp %{_sourcedir}/%{name}/install/make_key.py %{buildroot}/var/archivematica/storage-service/
 cp %{_sourcedir}/%{name}/install/storage-service.gunicorn-config.py %{buildroot}/etc/archivematica/storage-service.gunicorn-config.py 
 cp %{_sourcedir}/%{name}/install/storageService.logging.json %{buildroot}/etc/archivematica/storageService.logging.json
 cp %{_etcdir}/archivematica-storage-service.service %{buildroot}/usr/lib/systemd/system/archivematica-storage-service.service
@@ -93,8 +94,9 @@ chmod 770 /var/archivematica/storage-service/
 chmod 750 /var/lib/archivematica/
 
 # Create Django secret key
-KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 50 | head -n 1)
-sed -i "s/CHANGE_ME_WITH_A_SECRET_KEY/\"$KEY\"/g" /etc/sysconfig/archivematica-storage-service
+KEYCMD=$(python /var/archivematica/storage-service/make_key.py 2>&1)
+echo $KEYCMD
+sed -i "s/<replace-with-key>/\"$KEYCMD\"/g" /etc/sysconfig/archivematica-storage-service
 
 systemctl daemon-reload
 
@@ -118,6 +120,6 @@ bash -c " \
   source /etc/sysconfig/archivematica-storage-service \
     || (echo 'Environment file not found'; exit 1)
   cd /usr/lib/archivematica/storage-service
-  /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python3.6 manage.py collectstatic --noinput --clear
-  /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python3.6 manage.py compilemessages
+  /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py collectstatic --noinput --clear
+  /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py compilemessages
 ";

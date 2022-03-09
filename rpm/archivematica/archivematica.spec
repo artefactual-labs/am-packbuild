@@ -12,8 +12,8 @@ Summary: Archivematica digital preservation system
 Group: Application/System
 License: AGPLv3
 Source0: %{git_repo}
-BuildRequires: git, gcc, openldap-devel, openssl-devel, python36-virtualenv, python36-pip, mariadb-devel, libxslt-devel, python36-devel, python36-distutils-extra, python36-setuptools, libffi-devel, openssl-devel, gcc-c++, postgresql-devel, nodejs
 Requires: python36-devel
+BuildRequires: git, gcc, openldap-devel, openssl-devel, python-virtualenv, python-pip, mariadb-devel, libxslt-devel, python-devel, libffi-devel, openssl-devel, gcc-c++, postgresql-devel, nodejs
 AutoReq: No
 AutoProv: No
 %description
@@ -163,10 +163,10 @@ mkdir -p \
   %{buildroot}/etc/nginx/conf.d
 
 # Archivematica virtual environment
-virtualenv-3.6 /usr/share/archivematica/virtualenvs/archivematica
-/usr/share/archivematica/virtualenvs/archivematica/bin/pip install --upgrade pip
-/usr/share/archivematica/virtualenvs/archivematica/bin/pip install -r %{_sourcedir}/%{name}/requirements-py3.txt
-virtualenv-3.6 --relocatable /usr/share/archivematica/virtualenvs/archivematica
+virtualenv /usr/share/archivematica/virtualenvs/archivematica
+/usr/share/archivematica/virtualenvs/archivematica/bin/pip install --upgrade pip==20.3
+/usr/share/archivematica/virtualenvs/archivematica/bin/pip install -r %{_sourcedir}/%{name}/requirements.txt
+virtualenv --relocatable /usr/share/archivematica/virtualenvs/archivematica
 cp -rf /usr/share/archivematica/virtualenvs/archivematica/* %{buildroot}/usr/share/archivematica/virtualenvs/archivematica/
 
 # Common
@@ -240,7 +240,7 @@ systemctl daemon-reload
 mkdir -p /var/log/archivematica/dashboard
 
 # Create Django key
-KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 50 | head -n 1)
+KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 sed -i "s/CHANGE_ME_WITH_A_SECRET_KEY/\"$KEY\"/g" /etc/sysconfig/archivematica-dashboard
 # Update SELinux policy
 if [ x$(semanage port -l | grep http_port_t | grep 7400 | wc -l) == x0 ]; then
@@ -276,8 +276,8 @@ bash -c " \
   source /etc/sysconfig/archivematica-dashboard \
     || (echo 'Environment file not found'; exit 1)
   cd /usr/share/archivematica/dashboard
-  /usr/share/archivematica/virtualenvs/archivematica/bin/python3.6 manage.py collectstatic --noinput --clear
-  /usr/share/archivematica/virtualenvs/archivematica/bin/python3.6 manage.py compilemessages
+  /usr/share/archivematica/virtualenvs/archivematica/bin/python manage.py collectstatic --noinput --clear
+  /usr/share/archivematica/virtualenvs/archivematica/bin/python manage.py compilemessages
 ";
 chown -R archivematica:archivematica /var/log/archivematica/dashboard
 systemctl daemon-reload

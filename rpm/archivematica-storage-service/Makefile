@@ -1,7 +1,7 @@
 NAME          = archivematica-storage-service
-BRANCH        ?= qa/0.x
-VERSION       ?= 0.19.0
-RELEASE       ?= 1
+BRANCH        ?= qa/1.x
+VERSION       ?= 0.13.0
+RELEASE       ?= 3
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = $(subst ~,-,"rpmbuild-$(NAME)-$(VERSION)")
