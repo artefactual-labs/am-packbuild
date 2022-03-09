@@ -164,7 +164,8 @@ mkdir -p \
 
 # Archivematica virtual environment
 virtualenv /usr/share/archivematica/virtualenvs/archivematica
-/usr/share/archivematica/virtualenvs/archivematica/bin/pip install --upgrade pip==20.3
+/usr/share/archivematica/virtualenvs/archivematica/bin/python -m pip install --upgrade pip
+/usr/share/archivematica/virtualenvs/archivematica/bin/python -m pip install --upgrade setuptools
 /usr/share/archivematica/virtualenvs/archivematica/bin/pip install -r %{_sourcedir}/%{name}/requirements.txt
 virtualenv --relocatable /usr/share/archivematica/virtualenvs/archivematica
 cp -rf /usr/share/archivematica/virtualenvs/archivematica/* %{buildroot}/usr/share/archivematica/virtualenvs/archivematica/
