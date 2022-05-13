@@ -5,6 +5,12 @@ After=cadence.service
 [Service]
 Type=simple
 Restart=on-failure
-User=enduro
-ExecStart=/usr/bin/enduro --config /etc/enduro.toml
+User=archivematica
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=EnduroStdout
+SyslogFacility=local1
+ExecStart=/usr/local/bin/enduro --config /etc/enduro.toml
 
+[Install]
+WantedBy=multi-user.target

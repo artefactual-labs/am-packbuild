@@ -1,5 +1,5 @@
 NAME          = cadence
-VERSION       ?= 0.9.5
+VERSION       ?= 0.19.2
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
@@ -13,14 +13,14 @@ RPMBUILD_ARGS := \
 
 .PHONY: build-docker-image build rpm-build rpm-clean rpm-test
 
-all: build-docker-image extract build
+all: build-docker-image extract build clean-docker-extracted-files
 
 build-docker-image:
 	@echo "==> Building Docker image with build environment."
 	@docker build --tag "${DOCKER_IMAGE}" .
 
 extract:
-	@echo "==> Exctract files from cadence docker image"
+	@echo "==> Extract files from cadence docker image"
 	docker cp ${CTID}:/usr/local/bin/cadence files/
 	docker cp ${CTID}:/usr/local/bin/cadence-server files/
 	docker cp ${CTID}:/usr/local/bin/cadence-sql-tool files/
@@ -30,10 +30,10 @@ extract:
 build:
 	@echo "==> Building RPM inside Docker container."
 	@docker run --rm -e VERSION="$(VERSION)" \
-		         -e CTID="${CTID}" \
-			--volume "$(shell pwd):$(DOCKER_VOLUME)" \
-			$(DOCKER_IMAGE) \
-			make -C $(DOCKER_VOLUME) rpm-build
+		-e CTID="${CTID}" \
+		--volume "$(shell pwd):$(DOCKER_VOLUME)" \
+		$(DOCKER_IMAGE) \
+		make -C $(DOCKER_VOLUME) rpm-build
 
 dev:
 	@echo "==> Building RPM inside Docker container."
@@ -44,8 +44,16 @@ cleanup:
 	@docker run -i  \
                 --rm \
                 --volume "$(shell pwd):$(DOCKER_VOLUME)" \
-                 $(DOCKER_IMAGE) \
+                $(DOCKER_IMAGE) \
                 bash -c "rm -rf /src/*.rpm"
+
+clean-docker-extracted-files:
+	@echo "==> Cleaning extracted files from docker."
+	rm -rf files/cadence \
+		files/cadence-server \
+		files/cadence-sql-tool \
+		files/cadence-migrations \
+		files/visibility-migrations
 
 rpm-build: rpm-clean
 	@echo "==> Preparing environment for rpmbuild."

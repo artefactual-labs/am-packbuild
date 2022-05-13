@@ -1,5 +1,5 @@
 NAME          = enduro
-VERSION       ?= 0.6.0
+VERSION       ?= 0.36.2
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
