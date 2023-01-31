@@ -1,0 +1,66 @@
+pipeline {
+  agent  { label "master" }
+  parameters {
+  string(defaultValue: 'archivematica', description: '', name: 'PACKAGE')
+  string(defaultValue: 'qa/1.x', description: '', name: 'BRANCH')
+  string(defaultValue: '', description: '', name: 'GIT_REPO')
+  string(defaultValue: '0F4A4D31', description: 'For production packages, use production key', name: 'GPG_ID')
+  string(defaultValue: '1.8.0', description: '', name: 'VERSION')
+  string(defaultValue: '-beta1', description: '', name: 'RELEASE')
+  string(defaultValue: 'qa/1.x', description: '', name: 'PACKBUILD_BRANCH')
+  string(defaultValue: 'jenkinsci', description: '', name: 'REPOSITORY')
+  }
+
+stages {
+  stage('Get code') {
+    steps {
+     script {
+     currentBuild.displayName = "#${BUILD_NUMBER} ${PACKAGE}"
+     currentBuild.description = "Branch: ${BRANCH} <br> Version: ${VERSION} <br> Release: ${RELEASE} <br> Repository: ${REPOSITORY}"
+      }
+
+      git branch: '${PACKBUILD_BRANCH}', url: 'https://github.com/artefactual-labs/am-packbuild'
+    }
+  }
+  stage('Build package'){
+    steps {
+      sh '''
+        cd debs/bionic/${PACKAGE}/
+        make PACKAGE=$PACKAGE BRANCH=${BRANCH} VERSION=${VERSION} RELEASE=${RELEASE} GPG_ID=${GPG_ID}
+      '''
+    }
+  }
+  stage('Update repository'){
+    steps {
+      sh '''
+        cd debs/bionic/${PACKAGE}/
+        mkdir -p /srv/repos/am-packbuild/${REPOSITORY}/bionic/
+        find . -iname '*.dsc' \
+          -o -iname '*.deb' \
+          -o -iname '*.build' \
+          -o -iname '*.changes' \
+          -o -iname '*.xz' | grep -v "build-deps" | xargs -I{} cp --remove-destination {}  /srv/repos/am-packbuild/${REPOSITORY}/bionic/
+        make cleanup
+        cd /srv/repos/am-packbuild/${REPOSITORY}/bionic/
+        dpkg-scanpackages . /dev/null > Packages
+        gzip -9c Packages > Packages.gz
+
+        echo "Archive: bionic" > Release
+        echo "Origin: jenkins-ci-archivematica.org" >> Release
+        echo "Date: $(date -R -u)" >> Release
+        echo "Label: Archivematica development repo" >> Release
+        echo "Archivematica: amd64" >> Release
+        echo "SHA256:" >> Release
+
+        printf ' '$(sha256sum Packages | cut --delimiter=' ' --fields=1)' %16d Packages\n' \
+         $(wc --bytes Packages | cut --delimiter=' ' --fields=1) >> Release
+        printf ' '$(sha256sum Packages.gz | cut --delimiter=' ' --fields=1)' %16d Packages.gz' \
+         $(wc --bytes Packages.gz | cut --delimiter=' ' --fields=1) >> Release
+
+        rm Release.gpg || true
+        gpg -u 0x$GPG_ID --armor --detach-sign --output Release.gpg Release || true
+      '''
+     }
+   }
+ }
+}

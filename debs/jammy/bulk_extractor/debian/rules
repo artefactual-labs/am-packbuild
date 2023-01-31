@@ -1,0 +1,20 @@
+#!/usr/bin/make -f
+
+# output every command that modifies files on the build system.
+#export DH_VERBOSE = 1
+
+#export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+#export CPLUS_INCLUDE_PATH=${CPLUSE_INCLUDE_PATH}:/usr/include/c++/11
+
+# It is needed because long long atomic operations are not directly
+# supported by all processor architectures (like armel)
+ifneq (,$(filter $(DEB_HOST_ARCH), armel m68k mips mipsel powerpc powerpcspe sh4))
+	export LIBS=-Wl,--as-needed -latomic -Wl,--no-as-needed
+endif
+
+%:
+	dh $@ -with autoreconf
+# make check is broken in the 1.5.5 release; re-enable in next release
+# https://github.com/simsong/bulk_extractor/commit/1518072d5dbbf9fbb6f3841833241fdeaa2507b6
+#override_dh_auto_test:
+

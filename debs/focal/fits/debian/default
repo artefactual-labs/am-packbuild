@@ -1,0 +1,6 @@
+# Limit max memory usage for fips-nailgun
+# This would limit it to 1 GB:
+# MAX_JAVA_HEAP_SIZE="1g"
+
+MAX_JAVA_HEAP_SIZE="1g"
+
