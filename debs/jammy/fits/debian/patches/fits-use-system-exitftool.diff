@@ -1,0 +1,11 @@
+--- fits/src/edu/harvard/hul/ois/fits/tools/exiftool/Exiftool.java	2017-05-19 15:42:04.188608830 +0200
++++ fits/src/edu/harvard/hul/ois/fits/tools/exiftool/Exiftool.java.orig	2017-05-19 15:41:04.768586115 +0200
+@@ -41,7 +41,7 @@
+ 	private boolean osIsWindows = false;
+ 	private boolean osHasPerl = false;
+ 	private List<String> winCommand = new ArrayList<String>(Arrays.asList(Fits.FITS_TOOLS_DIR+"exiftool/windows/exiftool.exe"));
+-	private List<String> unixCommand = new ArrayList<String>(Arrays.asList("perl",Fits.FITS_TOOLS_DIR+"exiftool/perl/exiftool"));
++	private List<String> unixCommand = new ArrayList<String>(Arrays.asList("perl","/usr/bin/exiftool"));
+ 	private List<String> perlTestCommand = Arrays.asList("which", "perl");
+ 	private final static String TOOL_NAME = "Exiftool";
+ 	private boolean enabled = true;

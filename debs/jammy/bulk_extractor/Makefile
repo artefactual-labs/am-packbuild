@@ -1,12 +1,13 @@
 NAME          = bulk_extractor
-VERSION       ?= 1.5.5
-RELEASE	      ?= 1~18.04
-SRC_URL       = http://downloads.digitalcorpora.org/downloads/bulk_extractor/bulk_extractor-1.5.5.tar.gz
-SRC_SHA256    = 297a57808c12b81b8e0d82222cf57245ad988804ab467eb0a70cf8669594e8ed
+VERSION       ?= 2.0.0
+RELEASE	      ?= 1~22.04
+GIT_URL	      = https://github.com/simsong/bulk_extractor
+GIT_BRANCH    = 2.0.0
 DEB_TOPDIR    = "/debbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "debbuild-$(NAME)-$(VERSION)"
 GPG_ID        ?= 5236CA08
+DISTRO_CODENAME = jammy
 
 .PHONY: build-docker-image build deb-build deb-clean deb-test update-changelog
 
@@ -14,11 +15,11 @@ all: build-docker-image build
 
 build-docker-image:
 	@echo "==> Building Docker image with build environment."
-	@docker build --tag "$(DOCKER_IMAGE)" --build-arg SRC_URL="$(SRC_URL)" --build-arg SRC_VERSION="$(VERSION)" --build-arg SRC_SHA256="$(SRC_SHA256)" --build-arg PACKAGE="$(NAME)" .
+	@docker build --tag "$(DOCKER_IMAGE)" --build-arg GIT_URL="$(GIT_URL)" --build-arg GIT_BRANCH=v"$(GIT_BRANCH)" --build-arg PACKAGE="$(NAME)" .
 
 update-changelog:
 	@echo "==> Update changelog."
-	@dch -v $(VERSION)-$(RELEASE) -D bionic "New upstream release"
+	@dch -v $(VERSION)-$(RELEASE) -D $(DISTRO_CODENAME) "New upstream release"
 
 build:
 	@echo "==> Building deb."
@@ -28,10 +29,13 @@ build:
 		--volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) make -C $(DOCKER_VOLUME) deb-build
 
 deb-build: deb-clean
+	@echo "===> Install gpg key"
+	if [ -f "$(DOCKER_VOLUME)/GPG-KEY" ]; then gpg --import $(DOCKER_VOLUME)/GPG-KEY; fi
+	if [ x"$$GPG_KEY" != x ]; then echo "$$GPG_KEY" | gpg --import - ; fi
 	@echo "==> Install dependencies."
 	cd /debbuild/$(NAME) && yes | mk-build-deps --install debian/control
 	@echo "==> Update changelog."
-	cd /debbuild/$(NAME) && dch -v $(VERSION)-$(RELEASE) -D bionic "New upstream release"
+	cd /debbuild/$(NAME) && dch -v $(VERSION)-$(RELEASE) -D $(DISTRO_CODENAME) "New upstream release"
 
 	@echo "==> Run bootstrap.sh."
 	cd /debbuild/$(NAME) && sh bootstrap.sh
@@ -42,12 +46,9 @@ deb-build: deb-clean
 	cp  $(DEB_TOPDIR)/*.*  $(DOCKER_VOLUME)/build/ 
 
 deb-clean:
-	@echo "===> Install gpg key"
-	if [ -f "$(DOCKER_VOLUME)/GPG-KEY" ]; then gpg --import $(DOCKER_VOLUME)/GPG-KEY; fi
-	if [ x"$$GPG_KEY" != x ]; then echo "$$GPG_KEY" | gpg --import - ; fi
 	@echo "==> Cleaning up previous RPMs builds."
 	@rm -rf $(DOCKER_VOLUME)/build/
 
 # TODO: Create repo and test it
 deb-test:
-	@docker run --rm --volume="$(shell pwd):$(DOCKER_VOLUME)" ubuntu:trusty echo "Create repo and install package"
+	@docker run --rm --volume="$(shell pwd):$(DOCKER_VOLUME)" ubuntu:$(DISTRO_CODENAME) echo "Create repo and install package"
