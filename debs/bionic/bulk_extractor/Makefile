@@ -6,6 +6,7 @@ SRC_SHA256    = 297a57808c12b81b8e0d82222cf57245ad988804ab467eb0a70cf8669594e8ed
 DEB_TOPDIR    = "/debbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "debbuild-$(NAME)-$(VERSION)"
+GPG_ID        ?= 5236CA08
 
 .PHONY: build-docker-image build deb-build deb-clean deb-test update-changelog
 
@@ -21,7 +22,10 @@ update-changelog:
 
 build:
 	@echo "==> Building deb."
-	@docker run --rm --volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) make -C $(DOCKER_VOLUME) deb-build
+	@docker run --rm \
+		-e GPG_ID=$(GPG_ID) \
+		-e GPG_KEY \
+		--volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) make -C $(DOCKER_VOLUME) deb-build
 
 deb-build: deb-clean
 	@echo "==> Install dependencies."
@@ -38,6 +42,9 @@ deb-build: deb-clean
 	cp  $(DEB_TOPDIR)/*.*  $(DOCKER_VOLUME)/build/ 
 
 deb-clean:
+	@echo "===> Install gpg key"
+	if [ -f "$(DOCKER_VOLUME)/GPG-KEY" ]; then gpg --import $(DOCKER_VOLUME)/GPG-KEY; fi
+	if [ x"$$GPG_KEY" != x ]; then echo "$$GPG_KEY" | gpg --import - ; fi
 	@echo "==> Cleaning up previous RPMs builds."
 	@rm -rf $(DOCKER_VOLUME)/build/
 

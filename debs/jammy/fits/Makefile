@@ -6,6 +6,7 @@ GPG_ID        ?= 5236CA08
 DEB_TOPDIR    = "/debbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "debbuild-$(NAME)-$(VERSION)"
+DISTRO_CODENAME = jammy
 
 .PHONY: build-docker-image build deb-build deb-clean deb-test update-changelog
 
@@ -17,7 +18,7 @@ build-docker-image:
 
 update-changelog:
 	@echo "==> Update changelog."
-	@dch -v $(VERSION)-$(RELEASE) -D jammy "New upstream release"
+	@dch -v $(VERSION)-$(RELEASE) -D $(DISTRO_CODENAME) "New upstream release"
 
 build:
 	@echo "==> Building deb."
@@ -35,7 +36,7 @@ deb-build: deb-clean
 	@echo "==> Install dependencies."
 	cd /debbuild/$(NAME) && yes | mk-build-deps --install debian/control
 	@echo "==> Update changelog."
-	cd /debbuild/$(NAME) && dch -v $(VERSION)-$(RELEASE) -D jammy "New upstream release"
+	cd /debbuild/$(NAME) && dch -v $(VERSION)-$(RELEASE) -D $(DISTRO_CODENAME) "New upstream release"
 	@echo "==> Build package."
 	cd /debbuild/$(NAME) && dpkg-buildpackage -k$(GPG_ID)
 	@echo "==> Copying built  files."
@@ -48,4 +49,4 @@ deb-clean:
 
 # TODO: Create repo and test it
 deb-test:
-	@docker run --rm --volume="$(shell pwd):$(DOCKER_VOLUME)" ubuntu:jammy echo "Create repo and install package"
+	@docker run --rm --volume="$(shell pwd):$(DOCKER_VOLUME)" ubuntu:$(DISTRO_CODENAME) echo "Create repo and install package"
