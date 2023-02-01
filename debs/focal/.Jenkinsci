@@ -9,7 +9,7 @@ pipeline {
   string(defaultValue: '-beta1', description: '', name: 'RELEASE')
   string(defaultValue: 'qa/1.x', description: '', name: 'PACKBUILD_BRANCH')
   string(defaultValue: 'jenkinsci', description: '', name: 'REPOSITORY')
-  string(defaultValue: 'jammy', description: '', name: 'DISTRO_CODENAME')
+  string(defaultValue: 'focal', description: '', name: 'DISTRO_CODENAME')
   }
 
 stages {
