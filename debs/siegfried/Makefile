@@ -1,13 +1,14 @@
 NAME          = siegfried
 PACKAGE       = siegfried
-VERSION       ?= 1.8.0
+VERSION       ?= 1.9.6
 RELEASE       ?= 1
-BRANCH        ?= v1.8.0
+BRANCH        ?= v1.9.6
 GIT_URL       = https://github.com/richardlehane/siegfried/
 DEB_TOPDIR    = "/debbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "debbuild-$(NAME)-$(VERSION)"
 GPG_ID        ?= 0F4A4D31
+DISTRO_CODENAME = xenial
 .PHONY: build-docker-image build deb-build deb-clean deb-test
 
 all: build-docker-image get-code build
@@ -37,7 +38,7 @@ deb-build:
 	@cp debian src/$(PACKAGE) -rf
 	@cd src/$(PACKAGE) && \
 	dch -v ${VERSION}-${RELEASE} Commit $(shell cat src/$(PACKAGE)/.git/HEAD) && \
-	dch -r --distribution trusty --urgency medium ignored && \
+	dch -r --distribution $(DISTRO_CODENAME) --urgency medium ignored && \
 	yes | mk-build-deps --install debian/control
 	@echo "==> Build package."
 	cd src/$(PACKAGE) && PATH=${PATH} GOPATH=${GOPATH} dpkg-buildpackage -k${GPG_ID}
@@ -57,4 +58,4 @@ get-code:
 		src/$(PACKAGE)
 
 deb-test:
-	@docker run --rm --volume="$(shell pwd):$(DOCKER_VOLUME)" ubuntu:trusty echo "Create repo and install package"
+	@docker run --rm --volume="$(shell pwd):$(DOCKER_VOLUME)" ubuntu:$(DISTRO_CODENAME) echo "Create repo and install package"

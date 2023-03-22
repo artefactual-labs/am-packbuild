@@ -2,7 +2,9 @@
 
 export DH_OPTIONS
 
+export GOFLAGS := -buildvcs=false -tags=archivematica
 export DH_GOPKG := github.com/richardlehane/siegfried/cmd
+export GOCACHE := /tmp/go-builds
 
 #export GOROOT := $(CURDIR)/$(BUILD_DIR)/go
 # Tests assume a fixed position for the PRONOM files,
