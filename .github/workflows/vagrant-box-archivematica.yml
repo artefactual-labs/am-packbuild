@@ -11,12 +11,12 @@ on:
 jobs: 
   vagrant-box-archivematica:
     name: Build and upload
-    runs-on: macos-10.15
+    runs-on: macos-latest
     env:
       PACKER_CACHE_DIR: ${{ github.workspace }}/.packer_cache
     steps:
     - name: Check out code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Build
       run: |
         cd ${{ github.workspace }}/packer/templates/vagrant-base-ubuntu-18.04-amd64
