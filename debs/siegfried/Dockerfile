@@ -1,9 +1,10 @@
 FROM ubuntu:xenial
 
 # Environmnet variables needed during build
-ENV GOVERSION 1.13
+ENV GOVERSION 1.19
 ENV GOOS linux
 ENV GOARCH amd64
+ARG DEBIAN_FRONTEND=noninteractive
 
 # Environment variables needed during runtime
 ENV GOPATH /go
@@ -15,9 +16,6 @@ RUN apt-get update && \
     curl -sO https://storage.googleapis.com/golang/go${GOVERSION}.${GOOS}-${GOARCH}.tar.gz && \
     tar -C /usr/local -xzf go${GOVERSION}.${GOOS}-${GOARCH}.tar.gz && \
     rm go${GOVERSION}.${GOOS}-${GOARCH}.tar.gz
-
-# dh-golang doesn't support parameters, and we need to run it with -tags archivematica
-ADD files/golang.pm /usr/share/perl5/Debian/Debhelper/Buildsystem/golang.pm
 
 # Install build dependencies
 

@@ -28,3 +28,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin/roy
 /usr/bin/sf
 /usr/share/siegfried
+
+%changelog
+* Wed Mar 22 2023 sysadmin@artefactual.com
+- Update to v1.9.6
