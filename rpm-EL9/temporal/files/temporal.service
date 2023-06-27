@@ -1,0 +1,12 @@
+[Unit]
+Description=Temporal
+After=mysqld.service
+
+[Service]
+Type=simple
+Restart=on-failure
+User=temporal
+ExecStart=/usr/bin/temporal-server --root=/etc/temporal --env=archivematica start --services=frontend,matching,history,worker
+
+[Install]
+WantedBy=enduro.service
