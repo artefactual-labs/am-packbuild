@@ -56,13 +56,18 @@ virtualenv -p python3.9 /usr/share/archivematica/virtualenvs/a3m
 /usr/share/archivematica/virtualenvs/a3m/bin/pip install -r %{_sourcedir}/%{name}/requirements.txt
 cd %{_sourcedir}/%{name} && /usr/share/archivematica/virtualenvs/a3m/bin/python setup.py install
 virtualenv --relocatable /usr/share/archivematica/virtualenvs/a3m
+
 cp -rf /usr/share/archivematica/virtualenvs/a3m/* %{buildroot}/usr/share/archivematica/virtualenvs/a3m/
 
-pathfix.py -ni /usr/bin/python3.9 %{buildroot}/usr/share/archivematica/virtualenvs/a3m/lib/python3.9/site-packages/sqlparse/cli.py
-pathfix.py -ni /usr/bin/python3.9 %{buildroot}/usr/share/archivematica/virtualenvs/a3m/lib/python3.9/site-packages/django/bin/django-admin.py
-pathfix.py -ni /usr/bin/python3.9 %{buildroot}/usr/share/archivematica/virtualenvs/a3m/lib/python3.9/site-packages/django/conf/project_template/manage.py-tpl
-pathfix.py -ni /usr/bin/python3.9 %{buildroot}/usr/share/archivematica/virtualenvs/a3m/lib/python3.9/site-packages/google/protobuf/internal/_parameterized.py
-pathfix.py -ni /usr/bin/python3.9 %{buildroot}/usr/share/archivematica/virtualenvs/a3m/*
+pathfix.py -pni /usr/share/archivematica/virtualenvs/a3m/bin/python3.9 \
+      %{buildroot}/usr/share/archivematica/virtualenvs/a3m/lib/python3.9/site-packages/sqlparse/cli.py \
+      %{buildroot}/usr/share/archivematica/virtualenvs/a3m/lib/python3.9/site-packages/django/bin/django-admin.py \
+      %{buildroot}/usr/share/archivematica/virtualenvs/a3m/lib/python3.9/site-packages/django/conf/project_template/manage.py-tpl \
+      %{buildroot}/usr/share/archivematica/virtualenvs/a3m/lib/python3.9/site-packages/google/protobuf/internal/_parameterized.py \
+      %{buildroot}/usr/share/archivematica/virtualenvs/a3m/lib/python3.9/site-packages/a3m-0.5.0-py3.9.egg/a3m/externals/fiwalk_plugins/pronom_ident.py \
+      %{buildroot}/usr/share/archivematica/virtualenvs/a3m/bin/a3m \
+      %{buildroot}/usr/share/archivematica/virtualenvs/a3m/bin/a3md
+
 
 %clean
 rm -rf %{buildroot}
@@ -71,8 +76,6 @@ rm -rf %{buildroot}
 %post
 ln -sf /usr/share/archivematica/virtualenvs/a3m/bin/a3m /usr/bin/a3m
 ln -sf /usr/share/archivematica/virtualenvs/a3m/bin/a3md /usr/bin/a3md
-pathfix.py -pni '/usr/share/archivematica/virtualenvs/a3m/bin/python3.9' /usr/share/archivematica/virtualenvs/a3m/bin/a3m
-pathfix.py -pni '/usr/share/archivematica/virtualenvs/a3m/bin/python3.9' /usr/share/archivematica/virtualenvs/a3m/bin/a3md
 
 
 %changelog
