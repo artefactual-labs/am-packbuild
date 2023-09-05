@@ -11,7 +11,7 @@ License: AGPLv3
 Source0: https://github.com/artefactual-labs/a3m/
 Url: https://github.com/artefactual-labs/a3m
 Vendor: Artefactual Systems Inc. <info@artefactual.com>
-BuildRequires: python39-pip, python39, python3-virtualenv
+BuildRequires: python39-pip, python39, python39-rpm-macros, python3-virtualenv
 Requires: python39-pip
 AutoReq: No
 AutoProv: No
