@@ -5,16 +5,28 @@
 Name: a3m
 Version: %{rpmversion}
 Release: %{rpmrelease}
-Summary: Archivematica Storage Service
+Summary: Lightweight Archivematica
 Group: Application/System
 License: AGPLv3
 Source0: https://github.com/artefactual-labs/a3m/
+Url: https://github.com/artefactual-labs/a3m
+Vendor: Artefactual Systems Inc. <info@artefactual.com>
 BuildRequires: python39-pip, python39, python3-virtualenv
 Requires: python39-pip
 AutoReq: No
 AutoProv: No
+
 %description
-a3m
+*a3m* is a lightweight version of Archivematica focused on AIP creation. It has
+neither external dependencies, integration with access sytems, search
+capabilities nor a graphical interface.
+
+All functionality is made available as a `gRPC <https://grpc.io/docs/>`_ service
+with a minimal set of methods and strongly typed messages. a3m can be executed
+as a standalone process or be embedded as part of your application.
+
+For more documentation, please see https://a3m.readthedocs.io.
+
 
 %files
 /usr/share/archivematica/virtualenvs/a3m/
