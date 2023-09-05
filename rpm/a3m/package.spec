@@ -58,11 +58,11 @@ rm -rf %{buildroot}
 
 %post
 ln -sf /usr/share/archivematica/virtualenvs/a3m/bin/a3m /usr/bin/a3m
+ln -sf /usr/share/archivematica/virtualenvs/a3m/bin/a3md /usr/bin/a3md
 pathfix.py -pni '/usr/share/archivematica/virtualenvs/a3m/bin/python3.9' /usr/share/archivematica/virtualenvs/a3m/bin/a3m
+pathfix.py -pni '/usr/share/archivematica/virtualenvs/a3m/bin/python3.9' /usr/share/archivematica/virtualenvs/a3m/bin/a3md
 
 
 %changelog
-* Wed Jan 09 2019 - sysadmin@artefactual.com
-- Create collectstatic directory in post script
-* Tue Dec 11 2018 - sysadmin@artefactual.com
-- Update collectstatic command: added --clear option
+* Tue Sep 05 2022 - sysadmin@artefactual.com
+- Create initial a3m package
