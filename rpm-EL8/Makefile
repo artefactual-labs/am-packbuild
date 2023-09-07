@@ -15,7 +15,7 @@ build:
 createrepo: cleanrepo
 	mkdir -p $(YUM_REPOSITORY) || true
 	find . -name "*.rpm" | xargs -IF cp -f F $(YUM_REPOSITORY)
-	docker run --rm --volume "$(YUM_REPOSITORY):/yum-repository" rockylinux:9 bash -c "yum install -y createrepo && createrepo /yum-repository"
+	docker run --rm --volume "$(YUM_REPOSITORY):/yum-repository" rockylinux:8 bash -c "yum install -y createrepo && createrepo /yum-repository"
 
 clean: cleanrepo
 	find . -name "*.rpm" -delete
