@@ -11,10 +11,42 @@ License: AGPLv3
 Source0: https://github.com/artefactual-labs/a3m/
 Url: https://github.com/artefactual-labs/a3m
 Vendor: Artefactual Systems Inc. <info@artefactual.com>
-BuildRequires: python39-pip, python39, python39-rpm-macros, python3-virtualenv
-Requires: python39-pip
+BuildRequires: python3-pip, python3, python3-rpm-macros
+Requires: python3-pip
 AutoReq: No
 AutoProv: No
+
+
+
+Requires: bzip2
+Requires: tesseract
+Requires: tree
+#Requires: p7zip
+#Requires: p7zip-plugins
+Requires: pbzip2
+#Requires: ImageMagick
+Requires: ghostscript
+#Requires: perl-Image-ExifTool
+Requires: inkscape
+Requires: libvpx
+#Requires: libraw1394
+#Requires: libpst
+#Requires: openjpeg
+#Requires: mediainfo
+#Requires: mediaconch
+#Requires: md5deep
+Requires: uuid
+# Packages from Archivematica repo
+Requires: siegfried
+#Requires: atool
+Requires: jhove
+# Packages from https://forensics.cert.org/
+Requires: bulk_extractor
+# Requires: sleuthkit
+Requires: libewf
+# Packages from Nux repo
+# Requires: ffmpeg
+# Requires: ufraw
 
 %description
 *a3m* is a lightweight version of Archivematica focused on AIP creation. It has
@@ -51,11 +83,11 @@ git clone \
 mkdir -p \
   %{buildroot}/usr/share/archivematica/virtualenvs/a3m/ 
 
-virtualenv -p python3.9 /usr/share/archivematica/virtualenvs/a3m
+python3 -m venv /usr/share/archivematica/virtualenvs/a3m
 /usr/share/archivematica/virtualenvs/a3m/bin/pip install --upgrade pip
 /usr/share/archivematica/virtualenvs/a3m/bin/pip install -r %{_sourcedir}/%{name}/requirements.txt
 cd %{_sourcedir}/%{name} && /usr/share/archivematica/virtualenvs/a3m/bin/python setup.py install
-virtualenv --relocatable /usr/share/archivematica/virtualenvs/a3m
+python3 -m venv  /usr/share/archivematica/virtualenvs/a3m
 
 cp -rf /usr/share/archivematica/virtualenvs/a3m/* %{buildroot}/usr/share/archivematica/virtualenvs/a3m/
 

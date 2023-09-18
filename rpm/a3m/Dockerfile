@@ -1,4 +1,4 @@
-FROM rockylinux:8
+FROM rockylinux:9
 
-RUN yum -y install rpm-build make git epel-release python39 python39-pip python3-virtualenv \
-                   python39-rpm-macros
+RUN yum -y install rpm-build make git epel-release python3 python3-pip \
+                   python3-rpm-macros python3-devel
