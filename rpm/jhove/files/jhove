@@ -1,0 +1,26 @@
+#!/usr/bin/sh
+
+jar_list=""
+for i in $(find /usr/share/jhove/bin/ -name jhove*jar); do
+     if [ -z "$jar_list" ]
+     then
+          jar_list=${i}
+     else
+          jar_list=${jar_list}:${i}
+     fi
+done
+
+extra_jar_list=""
+for i in $(find /usr/share/jhove/bin/ -name *.jar ! -name jhove*jar);do
+     if [ -z "$extra_jar_list" ]
+     then
+          extra_jar_list=${i}
+     else
+          extra_jar_list=${extra_jar_list}:${i}
+     fi
+done
+
+CONFIG="/usr/share/jhove/conf/jhove.conf"
+
+# Set class path and invoke Java
+java -Xss1024k -classpath "${jar_list}:${extra_jar_list}" edu.harvard.hul.ois.jhove.Jhove -c "${CONFIG}" "${@}"

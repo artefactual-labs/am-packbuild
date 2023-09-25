@@ -1,8 +1,9 @@
-FROM ubuntu:bionic
+FROM ubuntu:focal
 
 ARG GIT_URL
 ARG GIT_BRANCH
 ARG PACKAGE
+ARG DEBIAN_FRONTEND=noninteractive
 
 
 RUN apt-get update && \

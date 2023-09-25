@@ -1,6 +1,6 @@
 NAME          = jhove
 VERSION       ?= 1.26.1
-RELEASE	      ?= 1~18.04
+RELEASE	      ?= 1~20.04
 GIT_URL	      = https://github.com/openpreserve/jhove
 DEB_TOPDIR    = "/debbuild"
 DOCKER_VOLUME = "/src"
@@ -55,4 +55,4 @@ deb-clean:
 
 # TODO: Create repo and test it
 deb-test:
-	@docker run --rm --volume="$(shell pwd):$(DOCKER_VOLUME)" ubuntu:bionic echo "Create repo and install package"
+	@docker run --rm --volume="$(shell pwd):$(DOCKER_VOLUME)" ubuntu:focal echo "Create repo and install package"
