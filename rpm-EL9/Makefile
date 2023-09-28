@@ -11,6 +11,7 @@ build:
 	make -C ./cadence-web
 	make -C ./enduro
 	make -C ./temporal
+	make -C ./tctl
 
 createrepo: cleanrepo
 	mkdir -p $(YUM_REPOSITORY) || true

@@ -1,9 +1,9 @@
-NAME          = enduro
-VERSION       ?= 0.41.1
+NAME          = tctl
+VERSION       ?= 1.18.0
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
-ENDURO_SRC = "/go/src/github.com/artefactual-labs/enduro"
+TCTL_SRC = "/go/src/github.com/temporalio/tctl"
 
 CHANGELOG_DATE = $(shell date "+%a %b %d %Y")
 RPMBUILD_ARGS := \
@@ -40,20 +40,19 @@ cleanup:
 
 
 rpm-build: rpm-clean
-	@echo "==> Download and unpack enduro."
-	mkdir -p $(ENDURO_SRC)
-	wget -q https://github.com/artefactual-labs/enduro/releases/download/v${VERSION}/enduro_${VERSION}_Linux-64bit.tar.gz -O $(ENDURO_SRC)/enduro.tar.gz
-	cd $(ENDURO_SRC) && tar zxf enduro.tar.gz
+	@echo "==> Download and unpack tctl."
+	mkdir -p $(TCTL_SRC)
+	wget -q https://github.com/temporalio/tctl/releases/download/v${VERSION}/tctl_${VERSION}_linux_amd64.tar.gz -O $(TCTL_SRC)/tctl.tar.gz
+	cd $(TCTL_SRC) && tar zxf tctl.tar.gz
 
 
 	@echo "==> Preparing environment for rpmbuild."
 	mkdir -p $(RPM_TOPDIR)/{BUILD,RPMS,SRPMS}
 	mkdir -p $(RPM_TOPDIR)/SOURCES/$(NAME)-$(VERSION)
-	cp -p $(ENDURO_SRC)/enduro_${VERSION}_Linux-64bit/enduro $(RPM_TOPDIR)/SOURCES/$(NAME)-$(VERSION)/
-	cp -p $(ENDURO_SRC)/enduro_${VERSION}_Linux-64bit/enduro.toml $(RPM_TOPDIR)/SOURCES/$(NAME)-$(VERSION)/
-	cp -p files/enduro.service $(RPM_TOPDIR)/SOURCES/$(NAME)-$(VERSION)/
+	cp -p $(TCTL_SRC)/tctl $(RPM_TOPDIR)/SOURCES/$(NAME)-$(VERSION)/
+	cp -p $(TCTL_SRC)/tctl-authorization-plugin $(RPM_TOPDIR)/SOURCES/$(NAME)-$(VERSION)/
 	tar czf $(RPM_TOPDIR)/SOURCES/$(NAME)-$(VERSION).tar.gz -C $(RPM_TOPDIR)/SOURCES $(NAME)-$(VERSION)
-	sed -i '2s/^/* $(CHANGELOG_DATE) Artefactual <sysadmin@artefactual.com> - $(VERSION)\n- Changes: https:\/\/github.com\/artefactual-labs\/enduro\/releases\/tag\/v$(VERSION)\n/' $(DOCKER_VOLUME)/changelog
+	sed -i '2s/^/* $(CHANGELOG_DATE) Artefactual <sysadmin@artefactual.com> - $(VERSION)\n- Changes: Added v$(VERSION) version\n/' $(DOCKER_VOLUME)/changelog
 	cp $(DOCKER_VOLUME)/package.spec $(RPM_TOPDIR)/package.spec
 	cat $(DOCKER_VOLUME)/changelog >> $(RPM_TOPDIR)/package.spec
 
