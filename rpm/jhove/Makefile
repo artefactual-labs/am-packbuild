@@ -1,5 +1,5 @@
 NAME          = jhove
-VERSION       = 1.20.1
+VERSION       = 1.26.1
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
@@ -26,9 +26,9 @@ rpm-build: rpm-clean
 	@echo "==> Preparing environment for rpmbuild."
 	mkdir -p $(RPM_TOPDIR)
 	cp $(DOCKER_VOLUME)/package.spec $(RPM_TOPDIR)/package.spec
-	mkdir -p $(RPM_TOPDIR)/SOURCES/
+	mkdir -p $(RPM_TOPDIR)/SOURCES/files
 	wget -O $(RPM_TOPDIR)/SOURCES/$(VERSION).zip https://github.com/openpreserve/jhove/archive/v$(VERSION).zip
-	cp files/* $(RPM_TOPDIR)/SOURCES/
+	cp files/* $(RPM_TOPDIR)/SOURCES/files
 	rpmbuild $(RPMBUILD_ARGS) -ba --clean $(RPM_TOPDIR)/package.spec
 
 	@echo "==> Copying RPM files."
