@@ -43,19 +43,19 @@ node {
   }
 
   stage('Build rpm packages') {
-    build job: 'am-packbuild/rpm-jenkinsci', parameters: [
+    build job: 'am-packbuild/rpm-EL9-jenkinsci', parameters: [
       string(name: 'PACKAGE', value: "${PACKAGE}"),
-      string(name: 'BRANCH', value: 'qa/0.x'),
+      string(name: 'BRANCH', value: 'stable/0.21.x'),
       string(name: 'GPG_ID', value: '0F4A4D31'),
       string(name: 'VERSION', value: "${RPMVERSION}"),
       string(name: 'RELEASE', value: "${RPMRELEASE}"),
       string(name: 'REPOSITORY', value: "${REPOSITORY}")]
   }
 
-  stage('Build bionic packages') {
-    build job: 'am-packbuild/bionic-jenkinsci', parameters: [
+  stage('Build deb packages') {
+    build job: 'am-packbuild/jammy-jenkinsci', parameters: [
       string(name: 'PACKAGE', value: "${PACKAGE}"),
-      string(name: 'BRANCH', value: 'qa/0.x'),
+      string(name: 'BRANCH', value: 'stable/0.21.x'),
       string(name: 'GPG_ID', value: '0F4A4D31'),
       string(name: 'VERSION', value: "${VERSION}"),
       string(name: 'RELEASE', value: "${RELEASE}"),
