@@ -1,13 +1,7 @@
 This Vagrant environment is based on the official Ubuntu 22.04 Vagrant box
-`ubuntu/jammy64` which does not include the VirtualBox Guest Additions yet. We will
-be using the `vagrant-vbguest` plugin to make sure that they're installed
-before we reach the provisioning stage.
+`ubuntu/jammy64`.
 
 ### Instructions
-
-Install the `vagrant-vbguest` plugin:
-
-    $ vagrant plugin install vagrant-vbguest
 
 Provision the Vagrant box using our official repository:
 
