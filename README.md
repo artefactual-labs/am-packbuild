@@ -4,7 +4,7 @@ You need Docker installed and running.
 
 CentOS 7 packages:
 
-    make -C rpm
+    make -C rpm-EL7
 
 This also builds a local repository that you can use later from `rpm-testing`.
 
