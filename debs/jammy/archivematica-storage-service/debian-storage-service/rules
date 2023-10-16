@@ -1,0 +1,10 @@
+#!/usr/bin/make -f
+
+export LC_ALL=C.UTF-8
+export DH_VIRTUALENV_INSTALL_ROOT=/usr/share/archivematica/virtualenvs
+
+%:
+	dh $@ --with python-virtualenv --with systemd
+
+override_dh_virtualenv:
+	dh_virtualenv --python=python3 --requirements=requirements.txt --skip-install

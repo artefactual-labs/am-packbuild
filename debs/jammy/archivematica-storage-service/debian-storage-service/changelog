@@ -1,0 +1,137 @@
+archivematica-storage-service (1:0.21.0-1~22.04) jammy; urgency=high
+
+  * commit: be3ee9639d9d1ece056a63f025a0e8a5e92f6f09
+  * checkout: v0.21.0-rc.3
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Tue, 3 Oct 2023 00:00:00 +0000
+
+archivematica-storage-service (1:0.20.0-1~18.04) bionic; urgency=high
+
+  * commit: 9e4e5b891ba2fcc61c70aa7ec21ca5c2f1ee01a2
+  * checkout: v0.20.0
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Wed, 14 Jun 2023 03:55:14 +0000
+
+archivematica-storage-service (1:0.19.0-1~18.04) bionic; urgency=high
+
+  * commit: ab64d17f8220428091699870f6a14ac8dc45136b
+  * checkout: v0.19.0
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Tue, 01 Mar 2022 18:08:06 +0000
+
+archivematica-storage-service (1:0.18.1-1~18.04) bionic; urgency=high
+
+  * commit: 0fb9d0a89524d6485e7f2fbce2ed868ebdf38f45
+  * checkout: v0.18.1
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Tue, 19 Oct 2021 15:08:48 +0000
+
+archivematica-storage-service (1:0.18.0-1~18.04) bionic; urgency=high
+
+  * commit: e30f9db92f4d870c21e8515480776c38c3d46e5d
+  * checkout: v0.18.0
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Fri, 09 Jul 2021 19:02:51 +0000
+
+archivematica-storage-service (1:0.17.1-1~18.04) bionic; urgency=high
+
+  * commit: f02b9149863efe3e883806b7d470ab3c55273d03
+  * checkout: v0.17.1
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Thu, 07 Jan 2021 10:09:51 +0000
+
+archivematica-storage-service (1:0.17.0-1~18.04) bionic; urgency=high
+
+  * commit: 6bf42f090b779e436203d24dc76e26f4c051e73d
+  * checkout: v0.17.0
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Tue, 06 Oct 2020 16:34:38 +0000
+
+archivematica-storage-service (1:0.16.1-1~18.04) bionic; urgency=high
+
+  * commit: 21d8ee943b5f0c4882c649a3d9b11ad2e0528b5b
+  * checkout: v0.16.1
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Fri, 12 Jun 2020 08:47:04 +0000
+
+archivematica-storage-service (1:0.16.0-1~18.04) bionic; urgency=high
+
+  * commit: 18b9a77ce1a6789be00159289fb48f4edc46065e
+  * checkout: v0.16.0
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Tue, 31 Mar 2020 19:17:25 +0000
+
+archivematica-storage-service (1:0.15.1-1~18.04) bionic; urgency=high
+
+  * commit: 26e473ded1db0c4a0d00e7730f5a48f136995111
+  * checkout: v0.15.1
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Tue, 22 Oct 2019 19:41:56 +0000
+
+archivematica-storage-service (1:0.15.0-1~18.04) bionic; urgency=high
+
+  * commit: 83d7b5a7da79c158cb99bd0e3426b92fdde0d3f0
+  * checkout: stable/0.15.x
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Thu, 05 Sep 2019 09:51:34 +0000
+
+archivematica-storage-service (1:0.14.1-1~18.04) bionic; urgency=high
+
+  * commit: 946a513da208f96c87b00f0ae86ad011d7e9baac
+  * checkout: v0.14.1
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Wed, 10 Apr 2019 08:08:29 +0000
+
+archivematica-storage-service (1:0.14.0-1~18.04) bionic; urgency=high
+
+  * commit: d83d383f44dd258f6ba4c1b5a879ca22270e2ae6
+  * checkout: v0.14.0
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Wed, 06 Mar 2019 14:14:24 +0000
+
+archivematica-storage-service (1:0.13.0-1~18.04) bionic; urgency=high
+
+  * commit: 8863492193a8f07e89fa6f1a27ad9889be4de822
+  * checkout: v0.13.0
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Tue, 20 Nov 2018 09:30:11 +0000
+
+archivematica-storage-service (1:0.12.0-1~16.04) xenial; urgency=high
+
+  * commit: 07ae87501b93f4c917f1c0a49dc76ba5c369039d
+  * checkout: v0.12.0
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Tue, 11 Sep 2018 21:08:27 +0000
+
+archivematica-storage-service (1:0.11.0-1~16.04) xenial; urgency=high
+
+  * commit: 5a6ce126fec6afea9947714da30ad8533bfc5620
+  * checkout: v0.11.0
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Tue, 01 May 2018 21:18:57 +0000
+
+archivematica-storage-service (1:0.10.1-2~16.04) trusty; urgency=high
+
+  * commit: 1afb22aa7c05d1ba43dc531536b8e49dfe4c2da8
+  * checkout: stable/0.10.x
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Mon, 31 Jul 2017 09:24:16 +0000
+
+archivematica-storage-service (1:0.9.1-1~14.04) trusty; urgency=high
+
+  * commit: 35e24cb7a69f1c7cfd79a8ffafdc9ccd4f8e7e35
+  * checkout: v0.9.1
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Wed, 24 Aug 2016 09:25:25 +0000
+
+archivematica-storage-service (0.5.0.rc.4-1~precise1) precise; urgency=high
+
+  * Archivematica Storage Service 0.5.0 release adding DuraCloud integration
+
+ -- Justin Simpson <jsimpson@artefactual.com>  Thu, 23 Oct 2014 15:05:34 -0700
+
+ archivematica-storage-service (0.4.0-1~precise1) precise; urgency=high
+
+  * Archivematica Storage Service 0.4.0 release
+
+ -- Justin Simpson <jsimpson@artefactual.com>  Wed, 10 Sep 2014 18:05:34 -0700

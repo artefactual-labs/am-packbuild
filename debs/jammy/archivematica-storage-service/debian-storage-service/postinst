@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+SS_ENV_DIR="/usr/share/archivematica/virtualenvs/archivematica-storage-service"
+
+echo "postinst called with:" $1 $2
+
+echo "creating archivematica user"
+userID=`id -u archivematica`
+
+if [ "${userID}" = 333 ]; then
+  echo "User archivematica exists"
+else
+  adduser --uid 333 --group --system --home /var/lib/archivematica/ archivematica
+fi
+
+echo "creating django secret key"
+KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 50 | head -n 1)
+sed -i "s/CHANGE_ME_WITH_A_SECRET_KEY/\"$KEY\"/g" /etc/default/archivematica-storage-service
+
+# Use ucf to preserve user changes in the default file
+ucfr archivematica-storage-service /etc/default/archivematica-storage-service
+ucf --debconf-ok /etc/default/archivematica-storage-service /etc/default/archivematica-storage-service
+
+set -a
+source /etc/default/archivematica-storage-service
+set +a
+echo "creating symlink in /usr/lib/archivematica"
+rm -f /usr/lib/archivematica/storage-service
+
+find /usr/lib/archivematica/storage-service/ -name '*.pyc' -delete
+
+echo "configuring django database and static files"
+cd /usr/lib/archivematica/storage-service
+${SS_ENV_DIR}/bin/python manage.py migrate
+mkdir -p /usr/lib/archivematica/storage-service/assets
+${SS_ENV_DIR}/bin/python manage.py collectstatic --noinput --clear
+${SS_ENV_DIR}/bin/python manage.py compilemessages
+${SS_ENV_DIR}/bin/python manage.py backfill_api_keys
+
+echo "updating directory permissions"
+chown -R archivematica:archivematica /var/archivematica/storage-service
+chown -R archivematica:archivematica /var/archivematica/.storage-service
+chown -R archivematica:archivematica ${SS_ENV_DIR}
+mkdir -p /var/log/archivematica/storage-service
+chown -R archivematica:archivematica /var/log/archivematica/storage-service
+
+rm -f /tmp/storage_service.log
+
+#DEBHELPER#

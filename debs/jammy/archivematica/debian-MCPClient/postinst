@@ -1,0 +1,25 @@
+#!/bin/sh
+
+logdir=/var/log/archivematica/MCPClient
+mkdir -p $logdir
+chown -R archivematica:archivematica $logdir
+chmod -R g+s $logdir
+
+# Populate default mysql config
+DBPASS=$(grep "dbc_dbpass=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(ARCHIVEMATICA_MCPCLIENT_CLIENT_PASSWORD=\).*/\1$DBPASS/g" /etc/default/archivematica-mcp-client
+
+DBUSER=$(grep "dbc_dbuser=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(ARCHIVEMATICA_MCPCLIENT_CLIENT_USER=\).*/\1$DBUSER/g" /etc/default/archivematica-mcp-client
+
+DBNAME=$(grep "dbc_dbname=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(ARCHIVEMATICA_MCPCLIENT_CLIENT_DATABASE=\).*/\1$DBNAME/g" /etc/default/archivematica-mcp-client
+
+# Use ucf to preserve user changes in the default file
+ucfr archivematica-mcp-client /etc/default/archivematica-mcp-client
+ucf --debconf-ok /etc/default/archivematica-mcp-client /etc/default/archivematica-mcp-client
+
+find /usr/lib/archivematica/MCPClient/ -name '*.pyc' -delete
+
+#DEBHELPER#
+

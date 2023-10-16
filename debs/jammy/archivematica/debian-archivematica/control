@@ -1,0 +1,23 @@
+Source: archivematica
+Section: utils
+Priority: extra
+Maintainer: Artefactual Systems Inc. <sysadmin@artefactual.com>
+Build-Depends:
+	debhelper,
+	dh-virtualenv,
+	python3-dev,
+	libmysqlclient-dev,
+	libffi-dev,
+	libldap2-dev,
+	libsasl2-dev,
+	libssl-dev,
+	libxml2-dev,
+	libxslt1-dev,
+	pkg-config,
+Standards-Version: 3.9.8
+X-Python3-Version: >= 3.8
+
+Package: archivematica
+Architecture: amd64
+Description: Standards-based digital preservation system.
+Homepage: https://www.archivematica.org
