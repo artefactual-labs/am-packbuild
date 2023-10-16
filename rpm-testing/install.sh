@@ -38,7 +38,7 @@ if [ "${local_repository}" == "true" ] ; then
     sudo -u root bash -c 'cat << EOF > /etc/yum.repos.d/archivematica.repo
 [archivematica]
 name=archivematica
-baseurl=file:///am-packbuild/rpm/_yum_repository/
+baseurl=file:///am-packbuild/rpm-EL7/_yum_repository/
 enabled=1
 gpgcheck=0
 EOF'
