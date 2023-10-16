@@ -1,0 +1,46 @@
+name: Archivematica Debian Packages Test
+on:
+  push:
+    branches:
+      - "dev/prep-1.15-take-two"
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+    - name: Build
+      run: |
+        make -C ${{ github.workspace }}/debs/jammy
+    - name: Save package repository
+      uses: actions/upload-artifact@v3
+      with:
+        name: repository
+        path: |
+          debs/jammy/_deb_repository
+  test:
+    name: Test
+    needs: build
+    runs-on: macos-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+    - name: Restore package repository
+      uses: actions/download-artifact@v3
+      with:
+        name: repository
+        path: debs/jammy/_deb_repository
+    - name: Update vbox networks
+      run: |
+        sudo mkdir -p /etc/vbox/
+        echo "* 192.168.33.0/24" | sudo tee -a /etc/vbox/networks.conf
+    - name: Start
+      run: |
+        vagrant up
+      working-directory: ./deb-testing
+      env:
+        LOCAL_REPOSITORY: yes
+    - name: Test
+      run: |
+        echo "Call AM and SS APIs"
