@@ -1,0 +1,29 @@
+%changelog
+* Wed Jun 14 2023 Artefactual <sysadmin@artefactual.com> - 0.20.0-1
+- Packbuild: 6dc92382d5041daacb8dd8865853ae4f579c6b1b
+- Storage Service: 9e4e5b891ba2fcc61c70aa7ec21ca5c2f1ee01a2
+* Fri Feb 25 2022 Artefactual <sysadmin@artefactual.com> - 0.19.0-1
+- Packbuild: 4fc45c4652a5f0f706d04cfc5eb43463c985517e
+- Storage Service: ab64d17f8220428091699870f6a14ac8dc45136b
+* Tue Oct 19 2021 Artefactual <sysadmin@artefactual.com> - 0.18.1-1
+- Packbuild: af5513e91169e5ccc32173e6e490acdc15960df3
+- Storage Service: 0fb9d0a89524d6485e7f2fbce2ed868ebdf38f45
+* Fri Jul 09 2021 Artefactual <sysadmin@artefactual.com> - 0.18.0-1
+- Packbuild: 630e083276204ad6a61df9bf7bbc82a568d2ae6e
+- Storage Service: e30f9db92f4d870c21e8515480776c38c3d46e5d
+* Thu Jan 07 2021 Artefactual <sysadmin@artefactual.com> - 0.17.1-1
+- Packbuild: 89f86ab2b5557b490b41b87e42a12a085c8cc186
+- Storage Service: f02b9149863efe3e883806b7d470ab3c55273d03
+* Tue Oct 06 2020 Artefactual <sysadmin@artefactual.com> - 0.17.0-1
+- Packbuild: b55d0f63b1b369e4c5a71be13d7deeb6bb9ea7b9
+- Storage Service: 6bf42f090b779e436203d24dc76e26f4c051e73d
+* Fri Jun 12 2020 Artefactual <sysadmin@artefactual.com> - 0.16.1-1
+- Packbuild: 2092ee13770b6730daf8789473a146d7492f996b
+- Storage Service: 21d8ee943b5f0c4882c649a3d9b11ad2e0528b5b
+* Tue Mar 31 2020 Artefactual <sysadmin@artefactual.com> - 0.16.0-1
+- Packbuild: 7d0527383fb0d11ddd2538c2ba4130f1b293b0ab
+- Storage Service: 18b9a77ce1a6789be00159289fb48f4edc46065e
+* Wed Jan 09 2019 - sysadmin@artefactual.com
+- Create collectstatic directory in post script
+* Tue Dec 11 2018 - sysadmin@artefactual.com
+- Update collectstatic command: added --clear option

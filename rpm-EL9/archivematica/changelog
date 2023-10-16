@@ -1,0 +1,35 @@
+%changelog
+* Wed Jun 14 2023 Artefactual <sysadmin@artefactual.com> - 1.14.0-1
+- Packbuild: 6dc92382d5041daacb8dd8865853ae4f579c6b1b
+- Archivematica: 56388245da256fb8f5a5871874fac2f7a7c5d8e0
+* Mon Jan 17 2022 Artefactual <sysadmin@artefactual.com> - 1.13.2-2
+- Packbuild: b9a00510e6462314c46814ba9526e84ea7ffb13c
+- Archivematica: 4f4605453d5a8796f6a739fa9664921bdb3418f2
+* Mon Dec 13 2021 Artefactual <sysadmin@artefactual.com> - 1.13.2-1
+- Packbuild: 1daa162c9d095541160ea8736203c87d39c88ff6
+- Archivematica: 4f4605453d5a8796f6a739fa9664921bdb3418f2
+* Tue Oct 19 2021 Artefactual <sysadmin@artefactual.com> - 1.13.1-1
+- Packbuild: af5513e91169e5ccc32173e6e490acdc15960df3
+- Archivematica: 220fbcae4dc6072fbc0e8e74cfb0a326962b21b2
+* Fri Jul 09 2021 Artefactual <sysadmin@artefactual.com> - 1.13.0-1
+- Packbuild: 630e083276204ad6a61df9bf7bbc82a568d2ae6e
+- Archivematica: 2a83f0c47243881e363cb3db031e51b089c4094a
+* Thu Jan 07 2021 Artefactual <sysadmin@artefactual.com> - 1.12.1-1
+- Packbuild: 89f86ab2b5557b490b41b87e42a12a085c8cc186
+- Archivematica: a31f218ceabc5bbe996775b82b9c9861b2f406d9
+* Tue Oct 06 2020 Artefactual <sysadmin@artefactual.com> - 1.12.0-1
+- Packbuild: b55d0f63b1b369e4c5a71be13d7deeb6bb9ea7b9
+- Archivematica: c5e7a0fb4aaaf5d30d20e46707b66f788d7a0fba
+* Fri Jun 12 2020 Artefactual <sysadmin@artefactual.com> - 1.11.2-1
+- Packbuild: 2092ee13770b6730daf8789473a146d7492f996b
+- Archivematica: 396015a44723e6b2dd2f4d7bed1443514a429c12
+* Fri Jun 12 2020 Artefactual <sysadmin@artefactual.com> - 1.11.1-1
+- Packbuild: 53f22efb52fc2309c0433d49787534918e487522
+- Archivematica: 0722067836c3430f2a371f15583be633a6db7fe5
+* Tue Mar 31 2020 Artefactual <sysadmin@artefactual.com> - 1.11.0-1
+- Packbuild: 7d0527383fb0d11ddd2538c2ba4130f1b293b0ab
+- Archivematica: 3e52494735ebfeb0cabc477d95d692034f4b3142
+* Wed Jan 09 2019 - sysadmin@artefactual.com
+- Create collectstatic directory in post script
+* Tue Dec 11 2018 - sysadmin@artefactual.com
+- Update collectstatic command: added --clear option
