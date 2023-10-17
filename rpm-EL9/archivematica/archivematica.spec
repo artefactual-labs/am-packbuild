@@ -144,6 +144,10 @@ git clone \
     %{git_repo} \
     %{_sourcedir}/%{name}
 
+# This prevents build conflicts with Python packages that provide shared
+# object (*.so) files and are common to AM and SS, for example lxml.
+%define _build_id_links none
+
 #
 # Install
 #

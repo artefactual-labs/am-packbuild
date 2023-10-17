@@ -16,7 +16,6 @@ AutoProv: No
 %description
 The Storage Service is the mechanism by which Archivematica is able to store packages and manage file locations, such as transfer source locations.
 
-
 %files
 /usr/share/archivematica/virtualenvs/archivematica-storage-service/
 /usr/lib/archivematica/storage-service/
@@ -43,6 +42,9 @@ git clone \
     %{git_repo} \
     %{_sourcedir}/%{name}
 
+# This prevents build conflicts with Python packages that provide shared
+# object (*.so) files and are common to AM and SS, for example lxml.
+%define _build_id_links none
 
 %install
 mkdir -p \
