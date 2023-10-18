@@ -3,6 +3,8 @@ YUM_REPOSITORY = "$(shell pwd)/_yum_repository"
 all: build createrepo
 
 build:
+	make -C ./archivematica
+	make -C ./archivematica-storage-service
 	make -C ./siegfried
 	make -C ./nailgun
 	make -C ./fits

@@ -1,0 +1,7 @@
+#!/usr/bin/make -f
+
+export LC_ALL=C.UTF-8
+export DH_VIRTUALENV_INSTALL_ROOT=/usr/share/archivematica/virtualenvs
+
+%:
+	dh $@

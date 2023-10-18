@@ -4,9 +4,9 @@ You need Docker installed and running.
 
 CentOS 7 packages:
 
-    make -C rpm
+    make -C rpm-EL7
 
-This also builds a local repository that you can use later from `rpm-testing`.
+This also builds a local repository that you can use later from `rpm-EL7-testing`.
 
 We don't have a single target yet for Debian packages but you can build them
 individually, for example:
@@ -69,7 +69,7 @@ managing Ubuntu repositories using reprepro can be found
 
 ### Test package
 
-CentOS 7 packages: see the [./rpm-testing](rpm-testing) directory for more
+CentOS 7 packages: see the [./rpm-EL7-testing](rpm-EL7-testing) directory for more
 details.
 
 Ubuntu packages: this is work in progress (see #127).

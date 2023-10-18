@@ -1,0 +1,20 @@
+Source: archivematica-dashboard
+Section: utils
+Priority: extra
+Maintainer: Artefactual Systems Inc. <sysadmin@artefactual.com>
+Build-Depends:
+	debhelper,
+Standards-Version: 3.9.8
+X-Python3-Version: >= 3.8
+
+Package: archivematica-dashboard
+Architecture: any
+Depends:
+	${shlibs:Depends},
+	${misc:Depends},
+	archivematica-common (>= 1.15.0),
+	git,
+	nginx,
+	gettext
+Description: Archivematida Dashboard (web-based interface).
+Homepage: https://www.archivematica.org
