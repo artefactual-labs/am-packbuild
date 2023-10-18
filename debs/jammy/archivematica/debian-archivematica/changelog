@@ -1,9 +1,9 @@
-archivematica (1:1.15.0-1~22.04) jammy; urgency=high
+archivematica (1:1.14.1-1~18.04) bionic; urgency=high
 
-  * commit: 5bb75543980548d87f685ee6b5fa725582f56583
-  * checkout: v1.15.0-rc.4
+  * commit: bcdcadd19698b77f51e4552c4e899e2aa9a5b237
+  * checkout: v1.14.1
 
- -- Artefactual Systems <sysadmin@artefactual.com>  Tue, 3 Oct 2023 00:00:00 +0000
+ -- Artefactual Systems <sysadmin@artefactual.com>  Wed, 19 Jul 2023 18:06:50 +0000
 
 archivematica (1:1.14.0-1~18.04) bionic; urgency=high
 

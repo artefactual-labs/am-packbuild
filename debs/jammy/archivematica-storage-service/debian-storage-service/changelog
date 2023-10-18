@@ -1,10 +1,3 @@
-archivematica-storage-service (1:0.21.0-1~22.04) jammy; urgency=high
-
-  * commit: be3ee9639d9d1ece056a63f025a0e8a5e92f6f09
-  * checkout: v0.21.0-rc.3
-
- -- Artefactual Systems <sysadmin@artefactual.com>  Tue, 3 Oct 2023 00:00:00 +0000
-
 archivematica-storage-service (1:0.20.0-1~18.04) bionic; urgency=high
 
   * commit: 9e4e5b891ba2fcc61c70aa7ec21ca5c2f1ee01a2
