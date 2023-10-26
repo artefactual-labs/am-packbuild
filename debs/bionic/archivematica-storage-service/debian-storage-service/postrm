@@ -2,6 +2,15 @@
 
 echo "postrm" $1
 
+# source debconf stuff
+. /usr/share/debconf/confmodule
+
+# source dbconfig-common shell library, and call the hook function
+if [ -f /usr/share/dbconfig-common/dpkg/postrm.mysql ]; then
+        . /usr/share/dbconfig-common/dpkg/postrm.mysql
+        dbc_go archivematica-storage-service $@
+fi
+
 if [ $1 = "remove" ]; then
     rm -rf /usr/share/python/archivematica-storage-service
     rm -rf /usr/share/archivematica/virtualenvs/archivematica-storage-service
