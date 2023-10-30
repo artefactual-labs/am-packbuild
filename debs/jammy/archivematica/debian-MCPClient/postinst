@@ -15,6 +15,12 @@ sed -i "s/^\(ARCHIVEMATICA_MCPCLIENT_CLIENT_USER=\).*/\1$DBUSER/g" /etc/default/
 DBNAME=$(grep "dbc_dbname=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
 sed -i "s/^\(ARCHIVEMATICA_MCPCLIENT_CLIENT_DATABASE=\).*/\1$DBNAME/g" /etc/default/archivematica-mcp-client
 
+DBSERVER=$(grep "dbc_dbserver=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(ARCHIVEMATICA_MCPCLIENT_CLIENT_HOST=\).*/\1$DBSERVER/g" /etc/default/archivematica-mcp-client
+
+DBPORT=$(grep "dbc_dbport=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(ARCHIVEMATICA_MCPCLIENT_CLIENT_PORT=\).*/\1$DBPORT/g" /etc/default/archivematica-mcp-client
+
 # Use ucf to preserve user changes in the default file
 ucfr archivematica-mcp-client /etc/default/archivematica-mcp-client
 ucf --debconf-ok /etc/default/archivematica-mcp-client /etc/default/archivematica-mcp-client

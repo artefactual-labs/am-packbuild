@@ -1,12 +1,17 @@
 #!/bin/sh
 # source debconf stuff
 . /usr/share/debconf/confmodule
-. /usr/share/dbconfig-common/dpkg/postinst.mysql
 
-# Set the default database encoding to UTF8
-dbc_mysql_createdb_encoding="UTF8"
+# Set the default database encoding to utf8mb4
+dbc_mysql_createdb_encoding="utf8mb4"
 
 dbc_go archivematica-mcp-server $@
+
+# source dbconfig-common shell library, and call the hook function
+if [ -f /usr/share/dbconfig-common/dpkg/postinst.mysql ]; then
+	. /usr/share/dbconfig-common/dpkg/postinst.mysql
+	dbc_go archivematica-mcp-server $@
+fi
 
 # Create sharedDirectory and rsync content
 mkdir -p /var/archivematica/sharedDirectory/
@@ -27,6 +32,12 @@ sed -i "s/^\(ARCHIVEMATICA_MCPSERVER_CLIENT_USER=\).*/\1$DBUSER/g" /etc/default/
 
 DBNAME=$(grep "dbc_dbname=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
 sed -i "s/^\(ARCHIVEMATICA_MCPSERVER_CLIENT_DATABASE=\).*/\1$DBNAME/g" /etc/default/archivematica-mcp-server
+
+DBSERVER=$(grep "dbc_dbserver=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(ARCHIVEMATICA_MCPSERVER_CLIENT_HOST=\).*/\1$DBSERVER/g" /etc/default/archivematica-mcp-server
+￼
+DBPORT=$(grep "dbc_dbport=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(ARCHIVEMATICA_MCPSERVER_CLIENT_PORT=\).*/\1$DBPORT/g" /etc/default/archivematica-mcp-server
 
 # Use ucf to preserve user changes in the default file
 ucfr archivematica-mcp-server /etc/default/archivematica-mcp-server
