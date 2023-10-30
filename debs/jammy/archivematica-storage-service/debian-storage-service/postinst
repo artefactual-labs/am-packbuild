@@ -1,5 +1,18 @@
 #!/usr/bin/env bash
 
+
+# source debconf stuff
+. /usr/share/debconf/confmodule
+
+# Set the default database encoding to utf8mb4
+dbc_mysql_createdb_encoding="utf8mb4"
+
+# source dbconfig-common shell library, and call the hook function
+if [ -f /usr/share/dbconfig-common/dpkg/postinst.mysql ]; then
+	. /usr/share/dbconfig-common/dpkg/postinst.mysql
+	dbc_go archivematica-storage-service $@
+fi
+
 SS_ENV_DIR="/usr/share/archivematica/virtualenvs/archivematica-storage-service"
 
 echo "postinst called with:" $1 $2
@@ -13,6 +26,15 @@ else
   adduser --uid 333 --group --system --home /var/lib/archivematica/ archivematica
 fi
 
+
+# Populate default mysql config
+DBPASS=$(grep "dbc_dbpass=" /etc/dbconfig-common/archivematica-storage-service.conf| cut -d\= -f2- | tr -d \')
+DBUSER=$(grep "dbc_dbuser=" /etc/dbconfig-common/archivematica-storage-service.conf| cut -d\= -f2- | tr -d \')
+DBSERVER=$(grep "dbc_dbserver=" /etc/dbconfig-common/archivematica-storage-service.conf| cut -d\= -f2- | tr -d \')
+DBPORT=$(grep "dbc_dbport=" /etc/dbconfig-common/archivematica-storage-service.conf| cut -d\= -f2- | tr -d \')
+DBNAME=$(grep "dbc_dbname=" /etc/dbconfig-common/archivematica-storage-service.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(SS_DB_URL\=mysql\:\/\/\).*/\1${DBUSER}:${DBPASS}\@${DBSERVER}\:${DBPORT}\/${DBNAME}/g" /etc/default/archivematica-storage-service
+
 echo "creating django secret key"
 KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 50 | head -n 1)
 sed -i "s/CHANGE_ME_WITH_A_SECRET_KEY/\"$KEY\"/g" /etc/default/archivematica-storage-service
@@ -24,8 +46,6 @@ ucf --debconf-ok /etc/default/archivematica-storage-service /etc/default/archive
 set -a
 source /etc/default/archivematica-storage-service
 set +a
-echo "creating symlink in /usr/lib/archivematica"
-rm -f /usr/lib/archivematica/storage-service
 
 find /usr/lib/archivematica/storage-service/ -name '*.pyc' -delete
 
