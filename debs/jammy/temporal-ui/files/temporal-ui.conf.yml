@@ -1,0 +1,3 @@
+temporalGrpcAddress: localhost:7936
+port: 8080
+enableUi: true

@@ -1,0 +1,12 @@
+[Unit]
+Description=Temporal UI
+After=temporal
+
+[Service]
+Type=simple
+Restart=on-failure
+User=temporal
+ExecStart=/usr/bin/temporal-ui --root=/etc/temporal-ui --env=archivematica start
+
+[Install]
+WantedBy=temporal-ui.service

@@ -1,0 +1,28 @@
+#!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+
+
+%:
+	dh $@ --with-systemd
+
+override_dh_auto_build:
+# Skip the Go build step since the binary is already compiled in Makefile
+
+override_dh_auto_test:
+
+override_dh_auto_install:
+	mv -v temporal-ui.conf.yml temporal.yml # Rename temporal-ui.conf.yml
+	mv -v ui-server temporal-ui             # Rename temporal-ui binary
+	dh_install temporal-ui /usr/bin/  # Copy the binary in /usr/bin
+	dh_install temporal.yml /etc/temporal-ui/config/ 
+#	dh_install temporal-ui.service /etc/systemd/system/
+
+override_dh_installsystemd:
+	dh_installsystemd --name=temporal-ui --restart-after-upgrade
+
+override_dh_systemd_enable:
+	dh_systemd_enable --name=temporal-ui
+
+

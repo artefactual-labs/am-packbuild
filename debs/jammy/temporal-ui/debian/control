@@ -1,0 +1,12 @@
+Source: temporal-ui
+Maintainer: Artefactual Systems <sysadmin@artefactual.com>
+Section: misc
+Priority: optional
+Standards-Version: 4.5.1
+Build-Depends: debhelper (>= 10.2.3~)
+Testsuite: autopkgtest-pkg-go
+
+Package: temporal-ui
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: The Temporal Web UI provides users with Workflow Execution state and metadata for debugging purposes.
