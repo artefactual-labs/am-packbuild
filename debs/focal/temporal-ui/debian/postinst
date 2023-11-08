@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+# Automatically added by dh_installsystemd
+if [ "$1" = "configure" ] && [ -x "/bin/systemctl" ]; then
+    systemctl daemon-reload || true
+fi
+
+# End of automatically added section
+
+if [ "$1" = "configure" ]; then
+# Use ucf to preserve user changes in the default file
+    ucfr temporal-ui /etc/temporal-ui/config/temporal.yml
+    ucf --debconf-ok /etc/temporal-ui/config/temporal.yml /etc/temporal-ui/config/temporal.yml
+fi

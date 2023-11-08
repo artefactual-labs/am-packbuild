@@ -13,6 +13,7 @@ build:
 	make -C ./cadence-web
 	make -C ./enduro
 	make -C ./temporal
+	make -C ./temporal-ui
 	make -C ./tctl
 
 createrepo: cleanrepo
