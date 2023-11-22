@@ -21,5 +21,5 @@ RUN apt-get update \
 		pkg-config \
         python3-dev \
 		software-properties-common \
-	&& curl -sL https://deb.nodesource.com/setup_14.x | bash - && apt-get install -y nodejs \
+	&& curl -sL https://deb.nodesource.com/setup_20.x | bash - && apt-get install -y nodejs \
 	&& rm -rf /var/lib/apt/lists/*
