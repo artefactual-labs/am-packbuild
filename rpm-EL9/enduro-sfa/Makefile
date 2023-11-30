@@ -21,7 +21,7 @@ build-docker-image:
 
 build:
 	@echo "==> Building RPM inside Docker container."
-	@docker run -i -t \
+	@docker run \
 	       -e BRANCH="$(BRANCH)" \
 		--rm --volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) make -C $(DOCKER_VOLUME) rpm-build
 
