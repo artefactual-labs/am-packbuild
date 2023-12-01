@@ -58,6 +58,10 @@ install -Dpm 644 %{name}.service %{buildroot}%{_unitdir}/%{name}-a3m-worker.serv
 install -Dpm 644 %{name}.service %{buildroot}%{_unitdir}/%{name}-am-worker.service
 mkdir -p %{buildroot}/usr/lib/enduro-dashboard
 cp -a dashboard/dist/* %{buildroot}/usr/lib/enduro-dashboard/
+mkdir -p %{buildroot}/var/lib/enduro
+cp -a hack/sampledata/xsd/* %{buildroot}/var/lib/enduro/
+
+
 
 %check
 # go test should be here... :)
@@ -86,6 +90,7 @@ cp -a dashboard/dist/* %{buildroot}/usr/lib/enduro-dashboard/
 %{_bindir}/%{name}-am-worker
 %{_unitdir}/%{name}-am-worker.service
 %config(noreplace) %{_sysconfdir}/%{name}/enduro.toml
+/var/lib/enduro/
 
 
 %files dashboard
