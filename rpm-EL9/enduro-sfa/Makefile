@@ -1,7 +1,7 @@
 NAME          = enduro
 VERSION       = 0.1.0
 RPM_TOPDIR    = "/rpmbuild"
-BRANCH	     ?= dev/add-sfa-preprocessing
+BRANCH	     ?= dev/sfa
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
 ENDURO_SRC = "/src/enduro-sfa"
