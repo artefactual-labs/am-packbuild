@@ -52,7 +52,10 @@ cd dashboard; npm install-clean; npm run build
 install -Dpm 0755 %{name} %{buildroot}%{_bindir}/%{name}
 install -Dpm 0755 %{name}-a3m-worker %{buildroot}%{_bindir}/%{name}-a3m-worker
 install -Dpm 0755 %{name}-am-worker %{buildroot}%{_bindir}/%{name}-am-worker
-install -Dpm 0755 enduro.toml %{buildroot}%{_sysconfdir}/%{name}/enduro.toml
+install -Dpm 0755 enduro.toml %{buildroot}%{_sysconfdir}/enduro.toml
+install -Dpm 0755 enduro.toml %{buildroot}%{_sysconfdir}/enduro-am-worker.toml
+install -Dpm 0755 enduro.toml %{buildroot}%{_sysconfdir}/enduro-a3m-worker.toml
+echo 'ENDURO_DEBUGLISTEN="127.0.0.1:9002"' > %{buildroot}%{_sysconfdir}/sysconfig/enduro-am-worker
 install -Dpm 644 %{name}.service %{buildroot}%{_unitdir}/%{name}.service
 install -Dpm 644 %{name}.service %{buildroot}%{_unitdir}/%{name}-a3m-worker.service
 install -Dpm 644 %{name}.service %{buildroot}%{_unitdir}/%{name}-am-worker.service
@@ -76,20 +79,21 @@ cp -a hack/sampledata/xsd/* %{buildroot}/var/lib/enduro/
 %dir %{_sysconfdir}/%{name}
 %{_bindir}/%{name}
 %{_unitdir}/%{name}.service
-%config(noreplace) %{_sysconfdir}/%{name}/enduro.toml
+%config(noreplace) %{_sysconfdir}/enduro.toml
 
 
 %files a3m-worker
 %dir %{_sysconfdir}/%{name}
 %{_bindir}/%{name}-a3m-worker
 %{_unitdir}/%{name}-a3m-worker.service
-%config(noreplace) %{_sysconfdir}/%{name}/enduro.toml
+%config(noreplace) %{_sysconfdir}/enduro-a3m-worker.toml
 
 %files am-worker
 %dir %{_sysconfdir}/%{name}
 %{_bindir}/%{name}-am-worker
 %{_unitdir}/%{name}-am-worker.service
-%config(noreplace) %{_sysconfdir}/%{name}/enduro.toml
+%config(noreplace) %{_sysconfdir}/enduro-am-worker.toml
+%config(noreplace) %{_sysconfdir}/sysconfig/enduro-am-worker
 /var/lib/enduro/
 
 
