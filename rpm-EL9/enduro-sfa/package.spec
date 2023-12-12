@@ -55,6 +55,7 @@ install -Dpm 0755 %{name}-am-worker %{buildroot}%{_bindir}/%{name}-am-worker
 install -Dpm 0755 enduro.toml %{buildroot}%{_sysconfdir}/enduro.toml
 install -Dpm 0755 enduro.toml %{buildroot}%{_sysconfdir}/enduro-am-worker.toml
 install -Dpm 0755 enduro.toml %{buildroot}%{_sysconfdir}/enduro-a3m-worker.toml
+mkdir -p %{buildroot}%{_sysconfdir}/sysconfig/
 echo 'ENDURO_DEBUGLISTEN="127.0.0.1:9002"' > %{buildroot}%{_sysconfdir}/sysconfig/enduro-am-worker
 install -Dpm 644 %{name}.service %{buildroot}%{_unitdir}/%{name}.service
 install -Dpm 644 %{name}.service %{buildroot}%{_unitdir}/%{name}-a3m-worker.service
@@ -76,20 +77,20 @@ cp -a hack/sampledata/xsd/* %{buildroot}/var/lib/enduro/
 %systemd_preun %{name}.service
 
 %files server
-%dir %{_sysconfdir}/%{name}
+%dir %{_sysconfdir}
 %{_bindir}/%{name}
 %{_unitdir}/%{name}.service
 %config(noreplace) %{_sysconfdir}/enduro.toml
 
 
 %files a3m-worker
-%dir %{_sysconfdir}/%{name}
+%dir %{_sysconfdir}
 %{_bindir}/%{name}-a3m-worker
 %{_unitdir}/%{name}-a3m-worker.service
 %config(noreplace) %{_sysconfdir}/enduro-a3m-worker.toml
 
 %files am-worker
-%dir %{_sysconfdir}/%{name}
+%dir %{_sysconfdir}/sysconfig/
 %{_bindir}/%{name}-am-worker
 %{_unitdir}/%{name}-am-worker.service
 %config(noreplace) %{_sysconfdir}/enduro-am-worker.toml
