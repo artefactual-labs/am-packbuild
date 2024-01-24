@@ -10,4 +10,3 @@ ExecStart=/usr/share/archivematica/virtualenvs/archivematica/bin/python /usr/lib
 
 [Install]
 WantedBy=multi-user.target
-

@@ -18,4 +18,3 @@ RUN mkdir -p /debbuild/ && cd /debbuild && \
 	cd $PACKAGE
 
 ADD debian /debbuild/$PACKAGE/debian
-

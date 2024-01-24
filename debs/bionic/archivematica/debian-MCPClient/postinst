@@ -22,4 +22,3 @@ ucf --debconf-ok /etc/default/archivematica-mcp-client /etc/default/archivematic
 find /usr/lib/archivematica/MCPClient/ -name '*.pyc' -delete
 
 #DEBHELPER#
-

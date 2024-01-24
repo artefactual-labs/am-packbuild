@@ -29,4 +29,3 @@ wget https://forensics.cert.org/repository/centos/cert/8/x86_64/libvhdi-20221124
 wget https://forensics.cert.org/repository/centos/cert/8/x86_64/libvmdk-20221124-1.el8.x86_64.rpm
 wget https://forensics.cert.org/repository/centos/cert/8/x86_64/sleuthkit-4.12.1-100.el8.x86_64.rpm
 wget https://forensics.cert.org/repository/centos/cert/8/x86_64/sleuthkit-libs-4.12.1-100.el8.x86_64.rpm
-

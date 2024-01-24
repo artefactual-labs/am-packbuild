@@ -89,4 +89,3 @@ fi
 * Tue Oct 30 2018 - sysadmin@artefactual.com
 - Update systemd init script to use nailgun-server-latest-SNAPSHOT.jar
   symlink
-

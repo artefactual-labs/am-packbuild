@@ -8,4 +8,3 @@
 +FITS_HOME="/usr/share/fits"
  
  export FITS_HOME
-

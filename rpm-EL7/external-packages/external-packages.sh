@@ -26,5 +26,3 @@ wget http://www.cert.org/forensics/repository/centos/cert/7/x86_64/libvmdk-20181
 wget http://www.cert.org/forensics/repository/centos/cert/7/x86_64/python-prettytable-0.7.2-4.el7.noarch.rpm
 wget http://www.cert.org/forensics/repository/centos/cert/7/x86_64/x265-libs-1.9-1.el7.nux.x86_64.rpm
 wget http://www.cert.org/forensics/repository/centos/cert/7/x86_64/xvidcore-1.3.2-5.el7.nux.x86_64.rpm
-
-

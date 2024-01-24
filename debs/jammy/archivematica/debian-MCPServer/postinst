@@ -35,4 +35,3 @@ ucf --debconf-ok /etc/default/archivematica-mcp-server /etc/default/archivematic
 find /usr/lib/archivematica/MCPServer/ -name '*.pyc' -delete
 
 #DEBHELPER#
-

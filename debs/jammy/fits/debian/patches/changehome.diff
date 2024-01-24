@@ -10,4 +10,3 @@ Index: fits/fits-env.sh
 +FITS_HOME="/usr/share/fits"
  
  export FITS_HOME
-

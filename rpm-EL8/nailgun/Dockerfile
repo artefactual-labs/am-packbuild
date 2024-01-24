@@ -16,4 +16,3 @@ RUN mkdir /opt/gradle && \
     unzip -oq ./gradle-${GRADLE_VERSION}-all.zip -d /opt/gradle && \
     ln -sfnv gradle-${GRADLE_VERSION} /opt/gradle/latest && \
     rm ./gradle-${GRADLE_VERSION}-all.zip
-

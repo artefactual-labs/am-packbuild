@@ -24,5 +24,3 @@ override_dh_installsystemd:
 
 override_dh_systemd_enable:
 	dh_systemd_enable --name=temporal-ui
-
-

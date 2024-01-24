@@ -17,4 +17,3 @@ dch -v 1:${VERSION}${RELEASE}~18.04 checkout: $(echo $BRANCH)
 dch -r --distribution bionic --urgency high ignored		
 dpkg-buildpackage -us -uc
 cd $SOURCE
-

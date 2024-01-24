@@ -1,11 +1,11 @@
+# Instructions
+
 This Vagrant environment is based on the official Ubuntu 22.04 Vagrant box
 `ubuntu/jammy64`.
 
-### Instructions
-
 Provision the Vagrant box using our official repository:
 
-    $ vagrant up
+    vagrant up
 
 Alternatively, provision the box using the local repository (`../debs/jammy`),
 which needs to be previously built:

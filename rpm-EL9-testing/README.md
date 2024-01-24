@@ -1,11 +1,11 @@
+# Instructions
+
 This Vagrant environment is based on the official Rocky Linux 9 Vagrant box
 `rockylinux/9`.
 
-### Instructions
-
 Provision the Vagrant box using our official repository:
 
-    $ vagrant up
+    vagrant up
 
 Alternatively, provision the box using the local repository (`../rpm-EL9`), which
 needs to be previously built:

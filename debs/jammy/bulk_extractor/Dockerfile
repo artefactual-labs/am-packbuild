@@ -17,4 +17,3 @@ RUN mkdir -p /debbuild/ && cd /debbuild && \
         sh bootstrap.sh
 
 ADD debian /debbuild/$PACKAGE/debian
-

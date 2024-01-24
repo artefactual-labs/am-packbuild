@@ -17,4 +17,3 @@ dch -v 1:${VERSION}${RELEASE}~22.04 checkout: $(echo $BRANCH)
 dch -r --distribution jammy --urgency high ignored		
 dpkg-buildpackage -us -uc
 cd $SOURCE
-
