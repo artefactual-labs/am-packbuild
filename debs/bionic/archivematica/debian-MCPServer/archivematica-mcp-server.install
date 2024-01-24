@@ -1,3 +1,0 @@
-lib/* /usr/lib/archivematica/MCPServer/
-install/serverConfig.conf /etc/archivematica/
-install/serverConfig.logging.json /etc/archivematica/

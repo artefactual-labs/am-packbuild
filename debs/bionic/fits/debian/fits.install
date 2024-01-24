@@ -1,8 +1,0 @@
-lib/* /usr/share/fits/lib/
-lib-fits/* /usr/share/fits/lib/
-version.properties /usr/share/fits/
-log4j.properties /usr/share/fits/
-tools/droid/* /usr/share/fits/tools/droid/
-tools/ffident/* /usr/share/fits/tools/ffident/
-xml/* /usr/share/fits/xml/
-fits*.sh /usr/bin/

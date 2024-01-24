@@ -8,11 +8,9 @@ Rocky Linux 9 packages:
 
 This also builds a local repository that you can use later from `rpms/EL9-testing`.
 
-We don't have a single target yet for Debian packages but you can build them
-individually, for example:
+Ubuntu 22.04 Jammy packages:
 
-    make -C debs/bionic/archivematica
-    make -C debs/bionic/archivematica-storage-service
+    make -C debs/jammy
 
 ## Using parameters
 
@@ -23,7 +21,7 @@ may be a bit different between packages, but the most common are `BRANCH`,
 So in order to build a specific branch or version, this command can be used from
 the folder of the package we want to build:
 
-    make BRANCH=qa/1.x VERSION=1.7.0 RELEASE=rc5
+    make BRANCH=qa/1.x VERSION=1.15.0 RELEASE=rc5
 
 Keep in mind that the makefiles are a bit recursive, they will invoke Docker,
 mount the current folder, and run the deb-build target.
