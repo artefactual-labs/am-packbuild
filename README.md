@@ -2,11 +2,11 @@
 
 You need Docker installed and running.
 
-CentOS 7 packages:
+Rocky Linux 9 packages:
 
-    make -C rpm-EL7
+    make -C rpm-EL9
 
-This also builds a local repository that you can use later from `rpm-EL7-testing`.
+This also builds a local repository that you can use later from `rpm-EL9-testing`.
 
 We don't have a single target yet for Debian packages but you can build them
 individually, for example:
@@ -40,14 +40,14 @@ needed to build the packages is:
 
 This repo generates Archivematica packages, but also packages that need to be
 installed in order for Archivematica to run. They are placed in the
-ubuntu-extras or centos-extras repos.
+ubuntu-externals, rocky8-extras or rocky9-extras repos.
 
 In order to add a package to a repo, once it's built and uploaded to a temporary
 folder at <https://packages.archivematica.org>, the steps are:
 
-For CentOS/RedHat packages:
+For Rocky Linux/RedHat packages:
 
-- Copy the rpm into centos-extras repo
+- Copy the rpm into rocky8-extras or rocky9-extras repo
 - Run `createrepo`
 - Run `gpg --detach-sign --armor repodata/repomd.xml` to sign the
 repository contents
@@ -68,7 +68,8 @@ managing Ubuntu repositories using reprepro can be found
 
 ## Test package
 
-CentOS 7 packages: see the [./rpm-EL7-testing](rpm-EL7-testing) directory for more
-details.
+Rocky Linux 9 packages: see the [rpm-EL9-testing](rpm-EL9-testing) directory
+for more details.
 
-Ubuntu packages: this is work in progress (see #127).
+Ubuntu 22.04 Jammy packages: see the [deb-testing](deb-testing) directory
+for more details.
