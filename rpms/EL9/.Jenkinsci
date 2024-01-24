@@ -20,7 +20,7 @@ stages {
       }
     git branch: '${PACKBUILD_BRANCH}', url: 'https://github.com/artefactual-labs/am-packbuild'
     sh '''
-        cd rpm-EL9/$PACKAGE/
+        cd rpms/EL9/$PACKAGE/
         rm -rf *.rpm || true
       '''
     }
@@ -28,7 +28,7 @@ stages {
   stage('Build package'){
     steps {
     sh '''
-      cd rpm-EL9/${PACKAGE}/
+      cd rpms/EL9/${PACKAGE}/
       # For rc versions, the version string uses ~
       CURRENT_VERSION=$(echo ${VERSION} | sed -e 's/-/~/g')
       CURRENT_RELEASE=$(echo ${RELEASE} | sed -e 's/-//g')
@@ -40,8 +40,8 @@ stages {
     steps {
     sh '''
       mkdir -p /srv/repos/am-packbuild/${REPOSITORY}/el9
-      cp rpm-EL9/${PACKAGE}/*.rpm /srv/repos/am-packbuild/${REPOSITORY}/el9/
-      cd rpm-EL9/${PACKAGE}/
+      cp rpms/EL9/${PACKAGE}/*.rpm /srv/repos/am-packbuild/${REPOSITORY}/el9/
+      cd rpms/EL9/${PACKAGE}/
       make cleanup
       cd /srv/repos/am-packbuild/${REPOSITORY}/el9/
       createrepo .

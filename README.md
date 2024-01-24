@@ -4,9 +4,9 @@ You need Docker installed and running.
 
 Rocky Linux 9 packages:
 
-    make -C rpm-EL9
+    make -C rpms/EL9
 
-This also builds a local repository that you can use later from `rpm-EL9-testing`.
+This also builds a local repository that you can use later from `rpms/EL9-testing`.
 
 We don't have a single target yet for Debian packages but you can build them
 individually, for example:
@@ -68,8 +68,8 @@ managing Ubuntu repositories using reprepro can be found
 
 ## Test package
 
-Rocky Linux 9 packages: see the [rpm-EL9-testing](rpm-EL9-testing) directory
+Rocky Linux 9 packages: see the [rpms/EL9-testing](rpms/EL9-testing) directory
 for more details.
 
-Ubuntu 22.04 Jammy packages: see the [deb-testing](deb-testing) directory
-for more details.
+Ubuntu 22.04 Jammy packages: see the [debs/jammy-testing](debs/jammy-testing)
+directory for more details.

@@ -7,11 +7,11 @@ Provision the Vagrant box using our official repository:
 
     vagrant up
 
-Alternatively, provision the box using the local repository (`../rpm-EL9`), which
-needs to be previously built:
+Alternatively, provision the box using the local repository (`../EL9`),
+which needs to be previously built:
 
     # Build the packages and the local repo. Then create the box.
-    $ make -C ../rpm-EL9 
+    $ make -C ../EL9
     $ LOCAL_REPOSITORY="yes" vagrant up
 
 Once is up you should be able to access to the web interfaces:

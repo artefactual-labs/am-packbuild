@@ -7,11 +7,11 @@ Provision the Vagrant box using our official repository:
 
     vagrant up
 
-Alternatively, provision the box using the local repository (`../debs/jammy`),
+Alternatively, provision the box using the local repository (`../jammy`),
 which needs to be previously built:
 
     # Build the packages and the local repo. Then create the box.
-    $ make -C ../debs/jammy
+    $ make -C ../jammy
     $ LOCAL_REPOSITORY="yes" vagrant up
 
 Once is up you should be able to access to the web interfaces:
