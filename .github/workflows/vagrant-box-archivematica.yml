@@ -8,7 +8,7 @@ on:
       description:
         description: Description
         required: true
-jobs: 
+jobs:
   vagrant-box-archivematica:
     name: Build and upload
     runs-on: macos-latest

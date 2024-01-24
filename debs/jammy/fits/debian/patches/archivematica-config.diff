@@ -22,12 +22,12 @@ Index: fits/xml/fits.xml
 +        <tool class="edu.harvard.hul.ois.fits.tools.ffident.FFIdent" exclude-exts="dng,wps,vsd,ppt,rtf" classpath-dirs="lib/ffident" />
 +        <tool class="edu.harvard.hul.ois.fits.tools.tika.TikaTool" classpath-dirs="lib/tika"/>
  	</tools>
- 	
+
  	<output>
  		<dataConsolidator class="edu.harvard.hul.ois.fits.consolidation.OISConsolidator"/>
 -		<display-tool-output>false</display-tool-output>
 +		<display-tool-output>true</display-tool-output>
- 		<report-conflicts>true</report-conflicts>	
+ 		<report-conflicts>true</report-conflicts>
 -		<validate-tool-output>false</validate-tool-output>
 +		<validate-tool-output>true</validate-tool-output>
  		<internal-output-schema>xml/fits_output.xsd</internal-output-schema>

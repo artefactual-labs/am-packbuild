@@ -2,12 +2,12 @@
 +++ nailgun-client/ng.c	2018-10-29 22:01:09.827125688 +0100
 @@ -81,7 +81,7 @@
  #define NAILGUN_CLIENT_NAME_EXE "ng.exe"
- 
+
  #define NAILGUN_PORT_DEFAULT "2113"
 -#define NAILGUN_CLIENT_NAME "ng"
 +#define NAILGUN_CLIENT_NAME "ng-nailgun"
  #define CHUNK_HEADER_LEN (5)
- 
+
  #define NAILGUN_SOCKET_FAILED (231)
 @@ -622,9 +622,9 @@
   */

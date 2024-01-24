@@ -4,7 +4,7 @@ FROM rockylinux:9
 ENV GRADLE_VERSION 2.12
 
 # Environment variables needed during runtime
-ENV GRADLE_HOME /opt/gradle/latest 
+ENV GRADLE_HOME /opt/gradle/latest
 ENV JAVA_HOME /usr/lib/jvm/java-1.8.0-openjdk
 ENV PATH /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$GRADLE_HOME/bin
 

@@ -38,7 +38,7 @@ deb-build: deb-clean
 	cd /debbuild/$(NAME) && dpkg-buildpackage -k$(GPG_ID)
 	@echo "==> Copying built  files."
 	mkdir -p $(DOCKER_VOLUME)/build/
-	cp  $(DEB_TOPDIR)/*.*  $(DOCKER_VOLUME)/build/ 
+	cp  $(DEB_TOPDIR)/*.*  $(DOCKER_VOLUME)/build/
 
 deb-clean:
 	@echo "==> Cleaning up previous builds."

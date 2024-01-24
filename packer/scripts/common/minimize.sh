@@ -3,10 +3,10 @@ case "$PACKER_BUILDER_TYPE" in
   qemu) exit 0 ;;
 esac
 
-# Stop eleasticsearch in case it is up to avoid to set the indices in read-only mode 
+# Stop eleasticsearch in case it is up to avoid to set the indices in read-only mode
 # Because the whiteout tasks are going to use the complete disk
 if (systemctl -q is-active elasticsearch.service); then
-    service elasticsearch stop 
+    service elasticsearch stop
 fi
 
 # Whiteout root

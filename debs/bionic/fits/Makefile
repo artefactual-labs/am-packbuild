@@ -31,7 +31,7 @@ deb-build: deb-clean
 	if [ -f "$(DOCKER_VOLUME)/GPG-KEY" ]; then gpg --import $(DOCKER_VOLUME)/GPG-KEY; fi
 	if [ x"$$GPG_KEY" != x ]; then echo "$$GPG_KEY" | gpg --import - ; fi
 	@echo "==> Apply patches."
-	cd /debbuild/$(NAME) && QUILT_PATCHES=debian/patches/ quilt push -a 
+	cd /debbuild/$(NAME) && QUILT_PATCHES=debian/patches/ quilt push -a
 	@echo "==> Install dependencies."
 	cd /debbuild/$(NAME) && yes | mk-build-deps --install debian/control
 	@echo "==> Update changelog."
@@ -40,7 +40,7 @@ deb-build: deb-clean
 	cd /debbuild/$(NAME) && dpkg-buildpackage -k$(GPG_ID)
 	@echo "==> Copying built  files."
 	mkdir -p $(DOCKER_VOLUME)/build/
-	cp  $(DEB_TOPDIR)/*.*  $(DOCKER_VOLUME)/build/ 
+	cp  $(DEB_TOPDIR)/*.*  $(DOCKER_VOLUME)/build/
 
 deb-clean:
 	@echo "==> Cleaning up previous RPMs builds."

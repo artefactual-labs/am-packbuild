@@ -16,7 +16,7 @@ override_dh_auto_install:
 	mv -v temporal-ui.conf.yml temporal.yml # Rename temporal-ui.conf.yml
 	mv -v ui-server temporal-ui             # Rename temporal-ui binary
 	dh_install temporal-ui /usr/bin/  # Copy the binary in /usr/bin
-	dh_install temporal.yml /etc/temporal-ui/config/ 
+	dh_install temporal.yml /etc/temporal-ui/config/
 #	dh_install temporal-ui.service /etc/systemd/system/
 
 override_dh_installsystemd:

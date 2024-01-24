@@ -13,7 +13,7 @@ COMMIT=$(git rev-parse HEAD)
 cp -rf ${BASE}/debian-storage-service debian
 yes | mk-build-deps -i debian/control
 dch -v 1:${VERSION}${RELEASE}~18.04 commit: $(echo $COMMIT)
-dch -v 1:${VERSION}${RELEASE}~18.04 checkout: $(echo $BRANCH) 
-dch -r --distribution bionic --urgency high ignored		
+dch -v 1:${VERSION}${RELEASE}~18.04 checkout: $(echo $BRANCH)
+dch -r --distribution bionic --urgency high ignored
 dpkg-buildpackage -us -uc
 cd $SOURCE

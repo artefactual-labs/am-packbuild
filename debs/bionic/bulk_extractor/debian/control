@@ -3,7 +3,7 @@ Section: utils
 Priority: extra
 Maintainer: Artefactual Systems Inc. <sysadmin@artefactual.com>
 Standards-Version: 3.9.3
-Build-Depends: 
+Build-Depends:
     debhelper (>= 9),
     dh-autoreconf,
     build-essential,
@@ -20,5 +20,4 @@ Build-Depends:
 Package: bulk-extractor
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: Bulk Extractor (bulk_extractor) is a feature extraction tool written in C++ for extracting features from media images. Extracted features are stored in feature files that can be easily inspected, parsed, or processed with automated tools. 
-  
+Description: Bulk Extractor (bulk_extractor) is a feature extraction tool written in C++ for extracting features from media images. Extracted features are stored in feature files that can be easily inspected, parsed, or processed with automated tools.

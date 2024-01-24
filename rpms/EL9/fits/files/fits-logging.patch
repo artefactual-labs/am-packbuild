@@ -1,10 +1,10 @@
 --- fits.sh-orig	2018-10-23 20:12:30.142012129 +0200
 +++ fits.sh	2018-10-23 20:16:50.971424713 +0200
 @@ -16,6 +16,6 @@
- 
+
  . "$(dirname $FITS_SCRIPT)/fits-env.sh"
- 
+
 -cmd="java -classpath \"$APPCLASSPATH\" edu.harvard.hul.ois.fits.Fits $args"
 +cmd="java -Dlog4j.configuration=file:\"$FITS_HOME\"/log4j.properties -classpath \"$APPCLASSPATH\" edu.harvard.hul.ois.fits.Fits $args"
- 
+
  eval "exec $cmd"

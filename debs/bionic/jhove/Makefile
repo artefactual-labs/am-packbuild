@@ -47,7 +47,7 @@ deb-build: deb-clean
 	dpkg-deb --build /debbuild/$(NAME)_$(VERSION)-$(RELEASE)
 	@echo "==> Copying built  files."
 	mkdir -p $(DOCKER_VOLUME)/build/
-	cp  $(DEB_TOPDIR)/*.deb  $(DOCKER_VOLUME)/build/ 
+	cp  $(DEB_TOPDIR)/*.deb  $(DOCKER_VOLUME)/build/
 
 deb-clean:
 	@echo "==> Cleaning up previous RPMs builds."

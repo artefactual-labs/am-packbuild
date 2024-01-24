@@ -5,7 +5,7 @@
 
 # RPM fusion repo
 
-wget https://download1.rpmfusion.org/free/el/updates/8/x86_64/f/ffmpeg-4.2.9-1.el8.x86_64.rpm 
+wget https://download1.rpmfusion.org/free/el/updates/8/x86_64/f/ffmpeg-4.2.9-1.el8.x86_64.rpm
 wget https://download1.rpmfusion.org/free/el/updates/8/x86_64/f/ffmpeg-libs-4.2.9-1.el8.x86_64.rpm
 wget https://download1.rpmfusion.org/free/el/updates/8/x86_64/o/opencore-amr-0.1.5-7.el8.x86_64.rpm
 wget https://download1.rpmfusion.org/free/el/updates/8/x86_64/x/xvidcore-1.3.7-1.el8.x86_64.rpm
