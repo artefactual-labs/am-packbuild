@@ -10,5 +10,4 @@ if vc > 0:
 elif vc == 0:
     print('version a == version b')
 elif vc < 0:
-    print('version a < version b')   
-
+    print('version a < version b')

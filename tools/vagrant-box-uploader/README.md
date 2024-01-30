@@ -34,6 +34,5 @@ Full example:
         2.7.0.2 \
         'AtoM qa/2.x on Ubuntu 20.04.<br/><br/>Add PHP PCOV extension.'
 
-
 [authentication tokens]: https://www.vagrantup.com/vagrant-cloud/users/authentication#authentication-tokens
 [box versioning]: https://www.vagrantup.com/docs/boxes/versioning

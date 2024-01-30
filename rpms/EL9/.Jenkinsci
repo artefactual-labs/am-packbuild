@@ -1,0 +1,53 @@
+pipeline {
+  agent { label "master" }
+  parameters {
+  string(defaultValue: 'archivematica', description: '', name: 'PACKAGE')
+  string(defaultValue: 'qa/1.x', description: '', name: 'BRANCH')
+  string(defaultValue: '0F4A4D31', description: 'For production packages, use production key', name: 'GPG_ID')
+  string(defaultValue: '1.15.0', description: '', name: 'VERSION')
+  string(defaultValue: 'beta1', description: '', name: 'RELEASE')
+  string(defaultValue: '', description: '', name: 'GIT_REPO')
+  string(defaultValue: 'qa/1.x', description: '', name: 'PACKBUILD_BRANCH')
+  string(defaultValue: 'jenkinsci', description: '', name: 'REPOSITORY')
+  }
+
+stages {
+  stage('Get code') {
+    steps {
+     script {
+     currentBuild.displayName = "#${BUILD_NUMBER} ${PACKAGE}"
+     currentBuild.description = "Branch: ${BRANCH} <br> Version: ${VERSION} <br> Release: ${RELEASE} <br> Repository: ${REPOSITORY}"
+      }
+    git branch: '${PACKBUILD_BRANCH}', url: 'https://github.com/artefactual-labs/am-packbuild'
+    sh '''
+        cd rpms/EL9/$PACKAGE/
+        rm -rf *.rpm || true
+      '''
+    }
+  }
+  stage('Build package'){
+    steps {
+    sh '''
+      cd rpms/EL9/${PACKAGE}/
+      # For rc versions, the version string uses ~
+      CURRENT_VERSION=$(echo ${VERSION} | sed -e 's/-/~/g')
+      CURRENT_RELEASE=$(echo ${RELEASE} | sed -e 's/-//g')
+      make PACKAGE=$PACKAGE BRANCH=${BRANCH} VERSION=${CURRENT_VERSION} RELEASE=${CURRENT_RELEASE}
+    '''
+    }
+  }
+  stage('Update repository'){
+    steps {
+    sh '''
+      mkdir -p /srv/repos/am-packbuild/${REPOSITORY}/el9
+      cp rpms/EL9/${PACKAGE}/*.rpm /srv/repos/am-packbuild/${REPOSITORY}/el9/
+      cd rpms/EL9/${PACKAGE}/
+      make cleanup
+      cd /srv/repos/am-packbuild/${REPOSITORY}/el9/
+      createrepo .
+    '''
+    }
+  }
+
+}
+}

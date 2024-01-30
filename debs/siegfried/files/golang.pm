@@ -2,7 +2,7 @@ package Debian::Debhelper::Buildsystem::golang;
 
 use strict;
 use base 'Debian::Debhelper::Buildsystem';
-use Debian::Debhelper::Dh_Lib; 
+use Debian::Debhelper::Dh_Lib;
 use Dpkg::Control::Info;
 use File::Copy; # in core since 5.002
 use File::Path qw(make_path); # in core since 5.001

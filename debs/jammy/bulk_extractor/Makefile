@@ -40,10 +40,10 @@ deb-build: deb-clean
 	@echo "==> Run bootstrap.sh."
 	cd /debbuild/$(NAME) && sh bootstrap.sh
 	@echo "==> Build package."
-	cd /debbuild/$(NAME) && dpkg-buildpackage 
+	cd /debbuild/$(NAME) && dpkg-buildpackage
 	@echo "==> Copying built  files."
 	mkdir -p $(DOCKER_VOLUME)/build/
-	cp  $(DEB_TOPDIR)/*.*  $(DOCKER_VOLUME)/build/ 
+	cp  $(DEB_TOPDIR)/*.*  $(DOCKER_VOLUME)/build/
 
 deb-clean:
 	@echo "==> Cleaning up previous RPMs builds."

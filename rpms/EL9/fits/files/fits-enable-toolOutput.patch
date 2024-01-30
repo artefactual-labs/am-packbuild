@@ -1,0 +1,11 @@
+--- xml/fits.xml	2017-05-19 10:09:16.841578439 +0000
++++ xml/fits.xml.orig	2017-05-19 10:09:04.573563642 +0000
+@@ -20,7 +20,7 @@
+
+ 	<output>
+ 		<dataConsolidator class="edu.harvard.hul.ois.fits.consolidation.OISConsolidator"/>
+-		<display-tool-output>false</display-tool-output>
++		<display-tool-output>true</display-tool-output>
+ 		<report-conflicts>true</report-conflicts>
+ 		<validate-tool-output>false</validate-tool-output>
+ 		<internal-output-schema>xml/fits_output.xsd</internal-output-schema>

@@ -1,8 +1,0 @@
-#!/usr/bin/make -f
-%:
-	dh $@ -with autoreconf
-
-# make check is broken in the 1.5.5 release; re-enable in next release
-# https://github.com/simsong/bulk_extractor/commit/1518072d5dbbf9fbb6f3841833241fdeaa2507b6
-override_dh_auto_test:
-

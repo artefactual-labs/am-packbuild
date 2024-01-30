@@ -3,10 +3,10 @@ Index: fits/fits.sh
 --- fits.orig/fits.sh
 +++ fits/fits.sh
 @@ -16,6 +16,6 @@ done
- 
+
  . "$(dirname $FITS_SCRIPT)/fits-env.sh"
- 
+
 -cmd="java -classpath \"$APPCLASSPATH\" edu.harvard.hul.ois.fits.Fits $args"
 +cmd="java -Dlog4j.configuration=file:\"$FITS_HOME\"/log4j.properties -classpath \"$APPCLASSPATH\" edu.harvard.hul.ois.fits.Fits $args"
- 
+
  eval "exec $cmd"

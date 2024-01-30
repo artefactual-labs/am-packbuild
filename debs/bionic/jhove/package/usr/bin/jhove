@@ -1,2 +1,0 @@
-#!/bin/bash
-java -cp "/usr/share/java/jhove-ext-modules.jar:/usr/share/java/jhove.jar:/usr/share/java/jhove-core.jar:/usr/share/java/pdf-hul.jar:/usr/share/java/jpeg-hul.jar:/usr/share/java/wave-hul.jar:/usr/share/java/ascii-hul.jar:/usr/share/java/jpeg2000-hul.jar:/usr/share/java/utf8-hul.jar:/usr/share/java/aiff-hul.jar:/usr/share/java/xml-hul.jar:/usr/share/java/html-hul.jar:/usr/share/java/tiff-hul.jar:/usr/share/java/gif-hul.jar" edu.harvard.hul.ois.jhove.Jhove -c /etc/jhove/jhove.conf "$@"

@@ -1,3 +1,0 @@
-#!/bin/bash
-
-find /usr/lib/archivematica/archivematicaCommon/ -name '*.pyc' -delete

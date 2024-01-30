@@ -19,4 +19,3 @@ Description: JSTOR/Harvard Object Validation Environment
  arbitrary byte streams, ASCII and UTF-8 encoded text, GIF, JPEG2000,
  and JPEG, and TIFF images, AIFF and WAVE audio, PDF, HTML, and XML;
  and text and XML output handlers.
-

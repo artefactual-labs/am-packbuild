@@ -1,0 +1,19 @@
+--- fits-ngserver.sh    2019-11-12 12:51:05.619986578 +0100
++++ fits-ngserver.sh.orig       2019-11-12 12:48:19.212516519 +0100
+@@ -6,6 +6,8 @@
+ # The one required parameter is the path to nailgun's jar; it can also be
+ # specified via the NAILGUN_JAR environment variable.
+
++test -r /etc/sysconfig/fits && . /etc/sysconfig/fits
++
+ . "$(dirname $BASH_SOURCE)/fits-env.sh"
+
+ if [[ ! $NAILGUN_JAR ]] && [[ ! $1 ]]; then
+@@ -17,7 +19,7 @@
+        NAILGUN_JAR=$1
+ fi
+
+-cmd="java -classpath \"$APPCLASSPATH:$NAILGUN_JAR\" com.martiansoftware.nailgun.NGServer"
++cmd="java -Xms${MAX_JAVA_HEAP_SIZE} -Xmx${MAX_JAVA_HEAP_SIZE} -XX:MaxMetaspaceSize=\"${MAX_JAVA_HEAP_SIZE}\" -Dlog4j.configuration=file:\"$FITS_HOME\"/log4j.properties -classpath \"$APPCLASSPATH:$NAILGUN_JAR\" com.martiansoftware.nailgun.NGServer"
+
+ echo "You may now run FITS by typing: ng edu.harvard.hul.ois.fits.Fits [options]" >&2
