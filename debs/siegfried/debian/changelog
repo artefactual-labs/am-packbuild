@@ -1,3 +1,9 @@
+siegfried (1.11.0-1) xenial; urgency=medium
+
+  * Use Go 1.21.6
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Tue, 30 Jan 2024 18:55:00 +0000
+
 siegfried (1.9.6-1) xenial; urgency=medium
 
   * Build version v1.9.6-1, with custom archivematica configuration
