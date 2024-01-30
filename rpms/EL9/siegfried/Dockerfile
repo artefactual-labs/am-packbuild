@@ -1,7 +1,7 @@
 FROM rockylinux:9
 
 # Environmnet variables needed during build
-ENV GOVERSION 1.19
+ENV GOVERSION 1.21.6
 ENV GOOS linux
 ENV GOARCH amd64
 
