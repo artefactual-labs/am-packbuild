@@ -50,5 +50,13 @@ rpm-clean:
 	@echo "==> Cleaning up previous RPMs builds."
 	@rm -rf $(RPM_TOPDIR)
 
+cleanup:
+	@echo "==> Remove artifacts created as root."
+	@docker run -i  \
+		--rm \
+		--volume "$(shell pwd):$(DOCKER_VOLUME)" \
+		$(DOCKER_IMAGE) \
+		bash -c "rm -rf /src/*.rpm"
+
 rpm-test:
 	docker run --rm --volume="$(shell pwd):$(DOCKER_VOLUME)" rockylinux:9 bash -c "rpm -i $(DOCKER_VOLUME)/$(NAME)-$(VERSION)*.rpm && sf -version"
