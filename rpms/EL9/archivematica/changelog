@@ -1,4 +1,7 @@
 %changelog
+* Mon Feb 19 2024 Artefactual <sysadmin@artefactual.com> - 1.15.1-1
+- Packbuild: 53d71cb2d410052dc2124295efab1bc1df5dda19
+- Archivematica: 2c03a79e710d655c3740ddbc4bc62eebd4e4b4fe
 * Wed Oct 18 2023 Artefactual <sysadmin@artefactual.com> - 1.15.0-1
 - Packbuild: 70ee4c645d63f79dcf71447bc89ced04a0fdb1cd
 - Archivematica: 6484b60dafcf10fb7c66b0d359c43f28231bccb5
