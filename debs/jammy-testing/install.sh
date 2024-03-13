@@ -31,15 +31,15 @@ echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
 export DEBIAN_FRONTEND=noninteractive
 
-sudo wget -O - https://packages.archivematica.org/1.15.x/key.asc | sudo apt-key add -
-sudo sh -c 'echo "deb [arch=amd64] http://packages.archivematica.org/1.15.x/ubuntu-externals jammy main" >> /etc/apt/sources.list'
+sudo wget -O - https://packages.archivematica.org/1.16.x/key.asc | sudo apt-key add -
+sudo sh -c 'echo "deb [arch=amd64] http://packages.archivematica.org/1.16.x/ubuntu-externals jammy main" >> /etc/apt/sources.list'
 
 if [ "${local_repository}" == "true" ] ; then
     sudo -u root bash -c 'cat << EOF > /etc/apt/sources.list.d/archivematica.list
 deb file:/am-packbuild/debs/jammy/_deb_repository ./
 EOF'
 else
-    sudo sh -c 'echo "deb [arch=amd64] http://packages.archivematica.org/1.15.x/ubuntu jammy main" >> /etc/apt/sources.list'
+    sudo sh -c 'echo "deb [arch=amd64] http://packages.archivematica.org/1.16.x/ubuntu jammy main" >> /etc/apt/sources.list'
 fi
 
 sudo apt-get -o Acquire::AllowInsecureRepositories=true update
