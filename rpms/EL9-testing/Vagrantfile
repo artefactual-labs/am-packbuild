@@ -4,16 +4,22 @@
 Vagrant.configure(2) do |config|
   config.vm.box = "rockylinux/9"
   config.vm.network "private_network", ip: "192.168.33.2"
-  config.vm.synced_folder ".", "/vagrant"
-  config.vm.synced_folder "../../", "/am-packbuild"
   config.vm.provider "virtualbox" do |vb|
     vb.memory = "4096"
     vb.cpus = "2"
   end
-  config.vm.provision "shell",
-    inline: "/am-packbuild/rpms/EL9-testing/install.sh",
-    env: {
-      "LOCAL_REPOSITORY" => ENV.fetch('LOCAL_REPOSITORY', 'no'),
-      "SEARCH_ENABLED" => ENV.fetch('SEARCH_ENABLED', 'no'),
-    }
+  if ENV.key?("PROVISION")
+    config.vm.synced_folder ".", "/vagrant"
+    config.vm.synced_folder "../../", "/am-packbuild"
+    config.vm.provision "shell",
+      inline: "/am-packbuild/rpms/EL9-testing/install.sh",
+      env: {
+        "LOCAL_REPOSITORY" => ENV.fetch('LOCAL_REPOSITORY', 'no'),
+        "SEARCH_ENABLED" => ENV.fetch('SEARCH_ENABLED', 'no'),
+      }
+  else
+    config.vbguest.auto_update = false
+    config.vm.synced_folder ".", "/vagrant", disabled: true
+    config.vm.synced_folder "../../", "/am-packbuild", disabled: true
+  end
 end
