@@ -30,16 +30,24 @@ while read -r line; do echo "$line=${!line}"; done < <(compgen -v | grep -v '[^[
 echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
 export DEBIAN_FRONTEND=noninteractive
+sudo debconf-set-selections <<< "postfix postfix/mailname string your.hostname.com"
+sudo debconf-set-selections <<< "postfix postfix/main_mailer_type string 'Internet Site'"
+sudo debconf-set-selections <<< "archivematica-storage-service archivematica-storage-service/dbconfig-install boolean true"
+sudo debconf-set-selections <<< "archivematica-storage-service archivematica-storage-service/mysql/app-pass password demo"
+sudo debconf-set-selections <<< "archivematica-storage-service archivematica-storage-service/app-password-confirm password demo"
+sudo debconf-set-selections <<< "archivematica-mcp-server archivematica-mcp-server/dbconfig-install boolean true"
+sudo debconf-set-selections <<< "archivematica-mcp-server archivematica-mcp-server/mysql/app-pass password demo"
+sudo debconf-set-selections <<< "archivematica-mcp-server archivematica-mcp-server/app-password-confirm password demo"
 
-sudo wget -O - https://packages.archivematica.org/1.16.x/key.asc | sudo apt-key add -
-sudo sh -c 'echo "deb [arch=amd64] http://packages.archivematica.org/1.16.x/ubuntu-externals jammy main" >> /etc/apt/sources.list'
+curl -fsSL https://packages.archivematica.org/1.16.x/key.asc | sudo gpg --dearmor -o /etc/apt/keyrings/archivematica-1.16.x.gpg
+sudo sh -c 'echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/archivematica-1.16.x.gpg] http://packages.archivematica.org/1.16.x/ubuntu-externals jammy main" > /etc/apt/sources.list.d/archivematica-externals.list'
 
 if [ "${local_repository}" == "true" ] ; then
     sudo -u root bash -c 'cat << EOF > /etc/apt/sources.list.d/archivematica.list
 deb file:/am-packbuild/debs/jammy/_deb_repository ./
 EOF'
 else
-    sudo sh -c 'echo "deb [arch=amd64] http://packages.archivematica.org/1.16.x/ubuntu jammy main" >> /etc/apt/sources.list'
+    sudo sh -c 'echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/archivematica-1.16.x.gpg] http://packages.archivematica.org/1.16.x/ubuntu jammy main" > /etc/apt/sources.list.d/archivematica.list'
 fi
 
 sudo apt-get -o Acquire::AllowInsecureRepositories=true update
@@ -56,20 +64,10 @@ if [ "${search_enabled}" == "true" ] ; then
     sudo systemctl enable elasticsearch
 fi
 
-sudo -H -u root mysql -hlocalhost -uroot -e "DROP DATABASE IF EXISTS SS; CREATE DATABASE SS CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
-sudo -H -u root mysql -hlocalhost -uroot -e "CREATE USER 'archivematica'@'localhost' IDENTIFIED BY 'demo';"
-sudo -H -u root mysql -hlocalhost -uroot -e "GRANT ALL ON SS.* TO 'archivematica'@'localhost';"
-
 sudo apt-get install -y --allow-unauthenticated archivematica-storage-service
 
 sudo rm -f /etc/nginx/sites-enabled/default
 sudo ln -sf /etc/nginx/sites-available/storage /etc/nginx/sites-enabled/storage
-
-sudo -H -u root mysql -hlocalhost -uroot -e "DROP DATABASE IF EXISTS MCP; CREATE DATABASE MCP CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
-sudo -H -u root mysql -hlocalhost -uroot -e "GRANT ALL ON MCP.* TO 'archivematica'@'localhost';"
-
-echo archivematica-mcp-server archivematica-mcp-server/dbconfig-install boolean false | sudo debconf-set-selections
-echo postfix postfix/main_mailer_type select No configuration | sudo debconf-set-selections
 
 sudo apt-get install -y --allow-unauthenticated archivematica-mcp-server
 sudo apt-get install -y --allow-unauthenticated archivematica-dashboard
