@@ -53,12 +53,12 @@ enabled=1
 EOF'
 fi
 
-sudo -u root bash -c 'cat << EOF >> /etc/yum.repos.d/archivematica.repo
+sudo -u root bash -c 'cat << EOF >> /etc/yum.repos.d/archivematica-extras.repo
 [archivematica-extras]
 name=archivematica-extras
 baseurl=https://packages.archivematica.org/1.16.x/rocky9-extras
 gpgcheck=1
-gpgkey=https://packages.archivematica.org/1.16.x/key.asc
+gpgkey=https://packages.archivematica.org/GPG-KEY-archivematica-sha512
 enabled=1
 EOF'
 
@@ -111,7 +111,7 @@ fi
 # Archivematica Storage Service
 #
 
-sudo -H -u root mysql -hlocalhost -uroot -e "DROP DATABASE IF EXISTS SS; CREATE DATABASE SS CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+sudo -H -u root mysql -hlocalhost -uroot -e "DROP DATABASE IF EXISTS SS; CREATE DATABASE SS CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
 sudo -H -u root mysql -hlocalhost -uroot -e "CREATE USER 'archivematica'@'localhost' IDENTIFIED BY 'demo';"
 sudo -H -u root mysql -hlocalhost -uroot -e "GRANT ALL ON SS.* TO 'archivematica'@'localhost';"
 
@@ -138,7 +138,7 @@ sudo -u root systemctl start rngd
 sudo -u root yum clean all
 sudo -u root yum install -y archivematica-common archivematica-mcp-server archivematica-dashboard
 
-sudo -H -u root mysql -hlocalhost -uroot -e "DROP DATABASE IF EXISTS MCP; CREATE DATABASE MCP CHARACTER SET utf8 COLLATE utf8_unicode_ci;"
+sudo -H -u root mysql -hlocalhost -uroot -e "DROP DATABASE IF EXISTS MCP; CREATE DATABASE MCP CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
 sudo -H -u root mysql -hlocalhost -uroot -e "GRANT ALL ON MCP.* TO 'archivematica'@'localhost';"
 
 sudo -u archivematica bash -c " \
@@ -188,3 +188,36 @@ if [ ${rc1} -eq 0 ] && [ ${rc2} -eq 0 ]; then
     sudo firewall-cmd --zone=public --add-port=8001/tcp --permanent
     sudo systemctl restart firewalld || true
 fi
+
+sudo -u archivematica bash -c " \
+    set -a -e -x
+    source /etc/default/archivematica-storage-service || \
+        source /etc/sysconfig/archivematica-storage-service \
+            || (echo 'Environment file not found'; exit 1)
+    cd /usr/lib/archivematica/storage-service
+      /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py create_user \
+          --username=admin \
+          --password=archivematica \
+          --email="example@example.com" \
+          --api-key="apikey" \
+          --superuser
+";
+
+sudo -u archivematica bash -c " \
+    set -a -e -x
+    source /etc/default/archivematica-dashboard || \
+        source /etc/sysconfig/archivematica-dashboard \
+            || (echo 'Environment file not found'; exit 1)
+    cd /usr/share/archivematica/dashboard
+      /usr/share/archivematica/virtualenvs/archivematica/bin/python manage.py install \
+          --username="admin" \
+          --password="archivematica" \
+          --email="example@example.com" \
+          --org-name="test" \
+          --org-id="test" \
+          --api-key="apikey" \
+          --ss-url="http://localhost:8001" \
+          --ss-user="admin" \
+          --ss-api-key="apikey" \
+          --site-url="http://localhost:81"
+";
