@@ -30,7 +30,10 @@ Depends:
     rng-tools,
     gnupg1,
     gettext,
-    libmysqlclient-dev
+    libmysqlclient-dev,
+    dbconfig-common,
+    dbconfig-mysql,
+    mysql-server
 Description: Django webapp for managing storage in an Archivematica
     installation.
 Homepage: http://archivematica.org
