@@ -33,11 +33,11 @@ export DEBIAN_FRONTEND=noninteractive
 sudo debconf-set-selections <<< "postfix postfix/mailname string your.hostname.com"
 sudo debconf-set-selections <<< "postfix postfix/main_mailer_type string 'Internet Site'"
 sudo debconf-set-selections <<< "archivematica-storage-service archivematica-storage-service/dbconfig-install boolean true"
-sudo debconf-set-selections <<< "archivematica-storage-service archivematica-storage-service/mysql/app-pass password demo"
-sudo debconf-set-selections <<< "archivematica-storage-service archivematica-storage-service/app-password-confirm password demo"
+sudo debconf-set-selections <<< "archivematica-storage-service archivematica-storage-service/mysql/app-pass password demo-ss"
+sudo debconf-set-selections <<< "archivematica-storage-service archivematica-storage-service/app-password-confirm password demo-ss"
 sudo debconf-set-selections <<< "archivematica-mcp-server archivematica-mcp-server/dbconfig-install boolean true"
-sudo debconf-set-selections <<< "archivematica-mcp-server archivematica-mcp-server/mysql/app-pass password demo"
-sudo debconf-set-selections <<< "archivematica-mcp-server archivematica-mcp-server/app-password-confirm password demo"
+sudo debconf-set-selections <<< "archivematica-mcp-server archivematica-mcp-server/mysql/app-pass password demo-am"
+sudo debconf-set-selections <<< "archivematica-mcp-server archivematica-mcp-server/app-password-confirm password demo-am"
 
 curl -fsSL https://packages.archivematica.org/1.16.x/key.asc | sudo gpg --dearmor -o /etc/apt/keyrings/archivematica-1.16.x.gpg
 sudo sh -c 'echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/archivematica-1.16.x.gpg] http://packages.archivematica.org/1.16.x/ubuntu-externals jammy main" > /etc/apt/sources.list.d/archivematica-externals.list'
@@ -52,11 +52,12 @@ fi
 
 sudo apt-get -o Acquire::AllowInsecureRepositories=true update
 sudo apt-get -y upgrade
-sudo apt-get install -y htop ntp apt-transport-https unzip openjdk-8-jre-headless mysql-server python3-mysqldb
+
+sudo apt-get install -y openjdk-8-jre-headless mysql-server
 
 if [ "${search_enabled}" == "true" ] ; then
-    wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
-    echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x.list
+    curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /etc/apt/keyrings/elasticsearch-6.x.gpg
+    echo "deb [signed-by=/etc/apt/keyrings/elasticsearch-6.x.gpg] https://artifacts.elastic.co/packages/6.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x.list
     sudo apt-get -o Acquire::AllowInsecureRepositories=true update
     sudo apt-get install -y elasticsearch
     sudo systemctl daemon-reload
@@ -92,3 +93,36 @@ sudo service archivematica-dashboard restart
 sudo service nginx restart
 sudo systemctl enable fits-nailgun
 sudo service fits-nailgun start
+
+sudo -u archivematica bash -c " \
+    set -a -e -x
+    source /etc/default/archivematica-storage-service || \
+        source /etc/sysconfig/archivematica-storage-service \
+            || (echo 'Environment file not found'; exit 1)
+    cd /usr/lib/archivematica/storage-service
+      /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py create_user \
+          --username=admin \
+          --password=archivematica \
+          --email="example@example.com" \
+          --api-key="apikey" \
+          --superuser
+";
+
+sudo -u archivematica bash -c " \
+    set -a -e -x
+    source /etc/default/archivematica-dashboard || \
+        source /etc/sysconfig/archivematica-dashboard \
+            || (echo 'Environment file not found'; exit 1)
+    cd /usr/share/archivematica/dashboard
+      /usr/share/archivematica/virtualenvs/archivematica/bin/python manage.py install \
+          --username="admin" \
+          --password="archivematica" \
+          --email="example@example.com" \
+          --org-name="test" \
+          --org-id="test" \
+          --api-key="apikey" \
+          --ss-url="http://localhost:8000" \
+          --ss-user="admin" \
+          --ss-api-key="apikey" \
+          --site-url="http://localhost"
+";
