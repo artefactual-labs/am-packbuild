@@ -188,3 +188,36 @@ if [ ${rc1} -eq 0 ] && [ ${rc2} -eq 0 ]; then
     sudo firewall-cmd --zone=public --add-port=8001/tcp --permanent
     sudo systemctl restart firewalld || true
 fi
+
+sudo -u archivematica bash -c " \
+    set -a -e -x
+    source /etc/default/archivematica-storage-service || \
+        source /etc/sysconfig/archivematica-storage-service \
+            || (echo 'Environment file not found'; exit 1)
+    cd /usr/lib/archivematica/storage-service
+      /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py create_user \
+          --username=admin \
+          --password=archivematica \
+          --email="example@example.com" \
+          --api-key="apikey" \
+          --superuser
+";
+
+sudo -u archivematica bash -c " \
+    set -a -e -x
+    source /etc/default/archivematica-dashboard || \
+        source /etc/sysconfig/archivematica-dashboard \
+            || (echo 'Environment file not found'; exit 1)
+    cd /usr/share/archivematica/dashboard
+      /usr/share/archivematica/virtualenvs/archivematica/bin/python manage.py install \
+          --username="admin" \
+          --password="archivematica" \
+          --email="example@example.com" \
+          --org-name="test" \
+          --org-id="test" \
+          --api-key="apikey" \
+          --ss-url="http://localhost:8001" \
+          --ss-user="admin" \
+          --ss-api-key="apikey" \
+          --site-url="http://localhost:81"
+";
