@@ -113,9 +113,26 @@ jobs:
       env:
         PROVISION: yes
         LOCAL_REPOSITORY: yes
-    - name: Test
+    - name: Test AM API - Get processing configurations
       run: |
-        echo "Call AM and SS APIs"
+        test $( \
+            curl \
+                --silent \
+                --header 'Authorization: ApiKey admin:apikey' \
+                --header 'Content-Type: application/json' \
+                'http://192.168.33.2/api/processing-configuration/' \
+            | jq -r '.processing_configurations == ["automated", "default"]' \
+        ) == true
+    - name: Test SS API - Get pipeline count
+      run: |
+        test $( \
+            curl \
+                --silent \
+                --header 'Authorization: ApiKey admin:apikey' \
+                --header 'Content-Type: application/json' \
+                'http://192.168.33.2:8000/api/v2/pipeline/' \
+            | jq -r '.meta.total_count == 1' \
+        ) == true
   build-am-rpm:
     name: Build Archivematica RPM packages
     runs-on: ubuntu-latest
@@ -227,6 +244,23 @@ jobs:
       env:
         PROVISION: yes
         LOCAL_REPOSITORY: yes
-    - name: Test
+    - name: Test AM API - Get processing configurations
       run: |
-        echo "Call AM and SS APIs"
+        test $( \
+            curl \
+                --silent \
+                --header 'Authorization: ApiKey admin:apikey' \
+                --header 'Content-Type: application/json' \
+                'http://192.168.33.2:81/api/processing-configuration/' \
+            | jq -r '.processing_configurations == ["automated", "default"]' \
+        ) == true
+    - name: Test SS API - Get pipeline count
+      run: |
+        test $( \
+            curl \
+                --silent \
+                --header 'Authorization: ApiKey admin:apikey' \
+                --header 'Content-Type: application/json' \
+                'http://192.168.33.2:8001/api/v2/pipeline/' \
+            | jq -r '.meta.total_count == 1' \
+        ) == true
