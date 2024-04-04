@@ -1,6 +1,6 @@
 PACKAGE ?= archivematica
 BRANCH ?= qa/1.x
-VERSION ?= 1.15.0
+VERSION ?= 1.16.0
 RELEASE ?= 1
 RPM_TOPDIR = "/rpmbuild"
 DOCKER_VOLUME = "/src"
