@@ -1,5 +1,17 @@
 # Packer templates
 
+## Requirements
+
+* Install [packer](https://developer.hashicorp.com/packer/install)
+
+* Install [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
+
+* Install packer's [VirtualBox plugin](https://developer.hashicorp.com/packer/integrations/hashicorp/virtualbox).
+
+* Install packer's [Ansible plugin](https://developer.hashicorp.com/packer/integrations/hashicorp/ansible)
+
+* Install packer's [Vagrant plugin](https://developer.hashicorp.com/packer/integrations/hashicorp/vagrant)
+
 ## How to build them
 
 * Change directory

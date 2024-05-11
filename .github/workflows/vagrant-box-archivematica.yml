@@ -8,15 +8,38 @@ on:
       description:
         description: Description
         required: true
+  push:
+    branches:
+      - "dev/packer-updates"
 jobs:
   vagrant-box-archivematica:
     name: Build and upload
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     env:
       PACKER_CACHE_DIR: ${{ github.workspace }}/.packer_cache
     steps:
     - name: Check out code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
+    - name: "Install packer"
+      run: |
+        wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+        sudo apt update && sudo apt install packer
+    - name: "Install VirtualBox"
+      run: |
+        wget -O- https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo gpg --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg --dearmor
+        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/oracle-virtualbox-2016.gpg] https://download.virtualbox.org/virtualbox/debian jammy contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
+        sudo apt update && sudo apt install virtualbox-7.0
+    - name: "Downgrade VirtualBox"
+      run: |
+        sudo apt-get purge virtualbox-7.0
+        wget -O /tmp/virtualbox-7.0_7.0.14-161095~Ubuntu~jammy_amd64.deb -L https://download.virtualbox.org/virtualbox/7.0.14/virtualbox-7.0_7.0.14-161095~Ubuntu~jammy_amd64.deb
+        sudo dpkg -i /tmp/virtualbox-7.0_7.0.14-161095~Ubuntu~jammy_amd64.deb
+    - name: Install packer plugins
+      run: |
+        packer plugins install github.com/hashicorp/virtualbox
+        packer plugins install github.com/hashicorp/ansible
+        packer plugins install github.com/hashicorp/vagrant
     - name: Build
       run: |
         cd ${{ github.workspace }}/packer/templates/vagrant-base-ubuntu-18.04-amd64
@@ -25,13 +48,3 @@ jobs:
         packer build -on-error=abort template.json
         mv ${{ github.workspace }}/packer/builds/virtualbox/vagrant-am.box \
           ${{ github.workspace }}/archivematica-vagrant-${{ github.event.inputs.version }}.box
-    - name: Upload
-      run: |
-        cd ${{ github.workspace }}/tools/vagrant-box-uploader
-        bundle install
-        ruby upload.rb \
-          archivematica \
-          '${{ github.workspace }}/archivematica-vagrant-${{ github.event.inputs.version }}.box' \
-          '${{ secrets.VAGRANT_CLOUD }}' \
-          '${{ github.event.inputs.version }}' \
-          '${{ github.event.inputs.description }}'
