@@ -12,16 +12,10 @@ BuildRequires: systemd-rpm-macros
 
 Provides: %{name} = %{version}
 %description
-Enduro 
+Preprocessing child workflow
 
 %global debug_package %{nil}
 
-
-%package preprocessing-worker
-Summary: preprocessing am worker
-
-%description preprocessing-worker
-Preprocessing worker
 
 %build
 hack/build_dist.sh -o preprocessing-worker ./cmd/worker/
@@ -30,6 +24,7 @@ hack/build_dist.sh -o preprocessing-worker ./cmd/worker/
 %install 
 install -Dpm 0755 %{name} %{buildroot}%{_bindir}/%{name}
 install -Dpm 644 %{name}.service %{buildroot}%{_unitdir}/%{name}.service
+install -Dpm 644 %{name}.toml %{buildroot}%{_sysconfdir}/%{name}.toml
 
 
 
@@ -43,17 +38,17 @@ install -Dpm 644 %{name}.service %{buildroot}%{_unitdir}/%{name}.service
 %systemd_preun %{name}.service
 
 
-%files preprocessing-worker
-#%dir %{_sysconfdir}/sysconfig/
+%files
+%dir %{_sysconfdir}
 %{_bindir}/%{name}
 %{_unitdir}/%{name}.service
-#%config(noreplace) %{_sysconfdir}/enduro-am-worker.toml
-#%config(noreplace) %{_sysconfdir}/sysconfig/enduro-am-worker
+#%config(noreplace) %{_etcdir}/%{name}.toml
+%config(noreplace) %{_sysconfdir}/%{name}.toml
 #/var/lib/enduro/
 
 
 
-%changelog server
+%changelog
 * Wed May 19 2021 John Doe - 1.0-1
 - First release
  
