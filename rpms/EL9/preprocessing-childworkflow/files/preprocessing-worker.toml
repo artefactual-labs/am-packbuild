@@ -1,0 +1,12 @@
+debug = false
+verbosity = 0
+sharedPath = "/var/lib/enduro/preprocessing"
+
+[temporal]
+address = "127.0.0.1:7233"
+namespace = "default"
+taskQueue = "preprocessing"
+workflowName = "preprocessing"
+
+[worker]
+maxConcurrentSessions = 1
