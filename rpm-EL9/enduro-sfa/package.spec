@@ -42,7 +42,7 @@ Summary: Enduro dashboard
 Enduro dashboard website
 
 %build
-hack/build_dist.sh -o enduro ./
+hack/build_dist.sh -o enduro ./cmd/enduro/
 hack/build_dist.sh -o enduro-a3m-worker ./cmd/enduro-a3m-worker/
 hack/build_dist.sh -o enduro-am-worker ./cmd/enduro-am-worker/
 cd dashboard; npm install-clean; npm run build
@@ -63,7 +63,6 @@ install -Dpm 644 %{name}.service %{buildroot}%{_unitdir}/%{name}-am-worker.servi
 mkdir -p %{buildroot}/usr/lib/enduro-dashboard
 cp -a dashboard/dist/* %{buildroot}/usr/lib/enduro-dashboard/
 mkdir -p %{buildroot}/var/lib/enduro
-cp -a hack/sampledata/xsd/* %{buildroot}/var/lib/enduro/
 
 
 
