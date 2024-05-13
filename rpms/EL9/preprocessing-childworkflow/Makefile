@@ -58,5 +58,5 @@ cleanup:
 		--rm \
 		--volume "$(shell pwd):$(DOCKER_VOLUME)" \
 		$(DOCKER_IMAGE) \
-		bash -c "rm -rf /src/*.rpm /src/"
+		bash -c "rm -rf /src/*.rpm /src/preprocessing-worker"
 
