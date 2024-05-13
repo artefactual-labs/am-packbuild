@@ -28,7 +28,7 @@ build:
 rpm-build: rpm-clean
 	@echo "==> Downloading enduro code."
 	mkdir -p $(ENDURO_SRC)
-	git clone --branch $(BRANCH) --depth 1 https://github.com/artefactual-sdps/enduro-sfa.git $(ENDURO_SRC)
+	git clone --branch $(BRANCH) --depth 1 https://github.com/artefactual-sdps/enduro.git $(ENDURO_SRC)
 
 	@echo "==> Preparing environment for rpmbuild."
 	mkdir -p $(RPM_TOPDIR)/{BUILD,RPMS,SRPMS}
