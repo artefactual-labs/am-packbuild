@@ -25,7 +25,8 @@ hack/build_dist.sh -o preprocessing-worker ./cmd/worker/
 install -Dpm 0755 %{name} %{buildroot}%{_bindir}/%{name}
 install -Dpm 644 %{name}.service %{buildroot}%{_unitdir}/%{name}.service
 install -Dpm 644 %{name}.toml %{buildroot}%{_sysconfdir}/%{name}.toml
-
+mkdir -p %{buildroot}/var/lib/enduro/
+cp -a hack/sampledata/xsd/* %{buildroot}/var/lib/enduro/
 
 
 %check
@@ -44,7 +45,7 @@ install -Dpm 644 %{name}.toml %{buildroot}%{_sysconfdir}/%{name}.toml
 %{_unitdir}/%{name}.service
 #%config(noreplace) %{_etcdir}/%{name}.toml
 %config(noreplace) %{_sysconfdir}/%{name}.toml
-#/var/lib/enduro/
+/var/lib/enduro/
 
 
 
