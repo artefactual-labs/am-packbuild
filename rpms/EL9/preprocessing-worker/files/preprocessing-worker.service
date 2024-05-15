@@ -9,7 +9,7 @@ WorkingDirectory=/var/lib/enduro
 User=enduro
 Group=enduro
 #EnvironmentFile=-/etc/sysconfig/enduro-am-worker
-ExecStart=/usr/bin/preprocessing-worker --config /etc/preprocessing-sfa.toml
+ExecStart=/usr/bin/preprocessing-worker --config /etc/preprocessing-worker.toml
 
 # Let systemd restart this service always
 #Restart=always
