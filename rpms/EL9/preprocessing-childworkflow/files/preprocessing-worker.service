@@ -1,6 +1,6 @@
 [Unit]
 Description=SFA preprocessing worker
-AssertFileIsExecutable=/usr/bin/preprocessing-sfa-worker
+AssertFileIsExecutable=/usr/bin/preprocessing-worker
 
 
 [Service]
@@ -9,7 +9,7 @@ WorkingDirectory=/var/lib/enduro
 User=enduro
 Group=enduro
 #EnvironmentFile=-/etc/sysconfig/enduro-am-worker
-ExecStart=/usr/bin/preprocessing-sfa-worker --config /etc/preprocessing-sfa.toml
+ExecStart=/usr/bin/preprocessing-worker --config /etc/preprocessing-sfa.toml
 
 # Let systemd restart this service always
 #Restart=always
