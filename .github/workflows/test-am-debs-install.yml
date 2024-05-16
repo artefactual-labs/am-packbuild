@@ -1,91 +1,13 @@
-name: Archivematica DEB Packages Test
+name: Archivematica DEB Packages Install Test
 on:
-  pull_request:
-    paths:
-      - "debs/jammy/archivematica/**"
-      - "debs/jammy/archivematica-storage-service/**"
-      - "debs/jammy-testing/**"
-  push:
-    branches:
-      - "stable/**"
-      - "qa/**"
-    paths:
-      - "debs/jammy/archivematica/**"
-      - "debs/jammy/archivematica-storage-service/**"
-      - "debs/jammy-testing/**"
+  workflow_dispatch:
 jobs:
-  build-am-deb:
-    name: Build Archivematica Debian packages
-    runs-on: ubuntu-latest
-    steps:
-    - name: Check out code
-      uses: actions/checkout@v4
-    - name: Build
-      run: |
-        make -C ${{ github.workspace }}/debs/jammy/archivematica
-    - name: Save artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: archivematica-deb
-        path: |
-          ${{ github.workspace }}/debs/jammy/archivematica/repo
-  build-ss-deb:
-    name: Build Storage Service Debian package
-    runs-on: ubuntu-latest
-    steps:
-    - name: Check out code
-      uses: actions/checkout@v4
-    - name: Build
-      run: |
-        make -C ${{ github.workspace }}/debs/jammy/archivematica-storage-service
-    - name: Save artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: archivematica-storage-service-deb
-        path: |
-          ${{ github.workspace }}/debs/jammy/archivematica-storage-service/repo
-  create-deb-repo:
-    name: Create Debian repository
-    runs-on: ubuntu-latest
-    needs:
-    - build-am-deb
-    - build-ss-deb
-    steps:
-    - name: Check out code
-      uses: actions/checkout@v4
-    - name: Restore Archivematica packages
-      uses: actions/download-artifact@v4
-      with:
-        name: archivematica-deb
-        path: |
-          ${{ github.workspace }}/debs/jammy/archivematica/repo
-    - name: Restore Storage Service package
-      uses: actions/download-artifact@v4
-      with:
-        name: archivematica-storage-service-deb
-        path: |
-          ${{ github.workspace }}/debs/jammy/archivematica-storage-service/repo
-    - name: Create repository
-      run: |
-        make -C ${{ github.workspace }}/debs/jammy createrepo
-    - name: Save package repository
-      uses: actions/upload-artifact@v4
-      with:
-        name: repository-deb
-        path: |
-          ${{ github.workspace }}/debs/jammy/_deb_repository
-  test-deb:
+  test-deb-install:
     name: Test Debian packages
-    needs: create-deb-repo
     runs-on: ubuntu-latest
     steps:
     - name: Check out code
       uses: actions/checkout@v4
-    - name: Restore package repository
-      uses: actions/download-artifact@v4
-      with:
-        name: repository-deb
-        path: ${{ github.workspace }}/debs/jammy/_deb_repository
     - name: Install Vagrant
       run: |
         wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
@@ -127,7 +49,10 @@ jobs:
       working-directory: ${{ github.workspace }}/debs/jammy-testing
       env:
         PROVISION: yes
-        LOCAL_REPOSITORY: yes
+    - name: Show AM package versions
+      working-directory: ${{ github.workspace }}/debs/jammy-testing
+      run: |
+        vagrant ssh -c 'apt list --installed archivematica*'
     - name: Test AM API - Get processing configurations
       run: |
         test $( \

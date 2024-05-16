@@ -1,0 +1,77 @@
+name: Archivematica RPM Packages Install Test
+on:
+  workflow_dispatch:
+jobs:
+  test-rpm-install:
+    name: Test RPM packages
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+    - name: Install Vagrant
+      run: |
+        wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+        sudo apt update && sudo apt install vagrant
+    - name: Install VirtualBox
+      run: |
+        wget -O- https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo gpg --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg --dearmor
+        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/oracle-virtualbox-2016.gpg] https://download.virtualbox.org/virtualbox/debian jammy contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
+        sudo apt update && sudo apt install virtualbox-7.0
+    - name: "Downgrade VirtualBox"
+      run: |
+        sudo apt-get purge virtualbox-7.0
+        wget -O /tmp/virtualbox-7.0_7.0.14-161095~Ubuntu~jammy_amd64.deb -L https://download.virtualbox.org/virtualbox/7.0.14/virtualbox-7.0_7.0.14-161095~Ubuntu~jammy_amd64.deb
+        sudo dpkg -i /tmp/virtualbox-7.0_7.0.14-161095~Ubuntu~jammy_amd64.deb
+    - name: Install the vagrant-vbguest plugin
+      run: |
+        vagrant plugin install vagrant-vbguest
+    - name: Update vbox networks
+      run: |
+        sudo mkdir -p /etc/vbox/
+        echo "* 192.168.33.0/24" | sudo tee -a /etc/vbox/networks.conf
+    - name: Start
+      run: |
+        vagrant up --no-provision
+      working-directory: ${{ github.workspace }}/rpms/EL9-testing
+    - name: Install Guest Additions build dependencies
+      run: |
+        vagrant ssh -c 'sudo yum update -y && sudo yum upgrade -y'
+        vagrant ssh -c 'sudo yum install -y epel-release yum-utils'
+        vagrant ssh -c 'sudo yum-config-manager --enable crb'
+        vagrant ssh -c 'sudo yum install -y kernel-devel'
+      working-directory: ${{ github.workspace }}/rpms/EL9-testing
+    - name: Stop
+      run: |
+        vagrant halt
+      working-directory: ${{ github.workspace }}/rpms/EL9-testing
+    - name: Start and provision
+      run: |
+        vagrant up
+      working-directory: ${{ github.workspace }}/rpms/EL9-testing
+      env:
+        PROVISION: yes
+    - name: Show AM package versions
+      working-directory: ${{ github.workspace }}/rpms/EL9-testing
+      run: |
+        vagrant ssh -c 'yum list --installed archivematica*'
+    - name: Test AM API - Get processing configurations
+      run: |
+        test $( \
+            curl \
+                --silent \
+                --header 'Authorization: ApiKey admin:apikey' \
+                --header 'Content-Type: application/json' \
+                'http://192.168.33.2:81/api/processing-configuration/' \
+            | jq -r '.processing_configurations == ["automated", "default"]' \
+        ) == true
+    - name: Test SS API - Get pipeline count
+      run: |
+        test $( \
+            curl \
+                --silent \
+                --header 'Authorization: ApiKey admin:apikey' \
+                --header 'Content-Type: application/json' \
+                'http://192.168.33.2:8001/api/v2/pipeline/' \
+            | jq -r '.meta.total_count == 1' \
+        ) == true

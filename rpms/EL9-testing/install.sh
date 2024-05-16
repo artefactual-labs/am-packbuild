@@ -48,7 +48,7 @@ else
 name=archivematica
 baseurl=https://packages.archivematica.org/1.16.x/rocky9
 gpgcheck=1
-gpgkey=https://packages.archivematica.org/1.16.x/key.asc
+gpgkey=https://packages.archivematica.org/GPG-KEY-archivematica-sha512
 enabled=1
 EOF'
 fi
