@@ -24,6 +24,8 @@ function get_env_boolean() {
 
 search_enabled=$(get_env_boolean "SEARCH_ENABLED" "true")
 local_repository=$(get_env_boolean "LOCAL_REPOSITORY" "false")
+repository_version="${REPOSITORY_VERSION:-1.16.x}"
+upgrade=$(get_env_boolean "UPGRADE" "false")
 
 echo "~~~~~~~~ DEBUG ~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 while read -r line; do echo "$line=${!line}"; done < <(compgen -v | grep -v '[^[:lower:]_]' | grep -v '^_$')
@@ -43,28 +45,29 @@ enabled=1
 gpgcheck=0
 EOF'
 else
-    sudo -u root bash -c 'cat << EOF > /etc/yum.repos.d/archivematica.repo
-[archivematica]
-name=archivematica
-baseurl=https://packages.archivematica.org/1.16.x/rocky9
+    sudo -u root bash -c "cat << EOF > /etc/yum.repos.d/archivematica-${repository_version}.repo
+[archivematica-${repository_version}]
+name=archivematica-${repository_version}
+baseurl=https://packages.archivematica.org/${repository_version}/rocky9
 gpgcheck=1
 gpgkey=https://packages.archivematica.org/GPG-KEY-archivematica-sha512
 enabled=1
-EOF'
+EOF"
 fi
 
-sudo -u root bash -c 'cat << EOF >> /etc/yum.repos.d/archivematica-extras.repo
-[archivematica-extras]
-name=archivematica-extras
-baseurl=https://packages.archivematica.org/1.16.x/rocky9-extras
+sudo -u root bash -c "cat << EOF >> /etc/yum.repos.d/archivematica-extras.repo
+[archivematica-extras-${repository_version}]
+name=archivematica-extras-${repository_version}
+baseurl=https://packages.archivematica.org/${repository_version}/rocky9-extras
 gpgcheck=1
 gpgkey=https://packages.archivematica.org/GPG-KEY-archivematica-sha512
 enabled=1
-EOF'
+EOF"
 
 sudo -u root yum update -y
 sudo -u root yum install -y epel-release policycoreutils-python-utils
 
+if [ "${upgrade}" != "true" ] ; then
 
 #
 # SELinux tweaks
@@ -115,6 +118,8 @@ sudo -H -u root mysql -hlocalhost -uroot -e "DROP DATABASE IF EXISTS SS; CREATE 
 sudo -H -u root mysql -hlocalhost -uroot -e "CREATE USER 'archivematica'@'localhost' IDENTIFIED BY 'demo';"
 sudo -H -u root mysql -hlocalhost -uroot -e "GRANT ALL ON SS.* TO 'archivematica'@'localhost';"
 
+fi
+
 sudo -u root yum install -y archivematica-storage-service
 sudo -u archivematica bash -c " \
   set -a -e -x
@@ -138,8 +143,13 @@ sudo -u root systemctl start rngd
 sudo -u root yum clean all
 sudo -u root yum install -y archivematica-common archivematica-mcp-server archivematica-dashboard
 
+
+if [ "${upgrade}" != "true" ] ; then
+
 sudo -H -u root mysql -hlocalhost -uroot -e "DROP DATABASE IF EXISTS MCP; CREATE DATABASE MCP CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
 sudo -H -u root mysql -hlocalhost -uroot -e "GRANT ALL ON MCP.* TO 'archivematica'@'localhost';"
+
+fi
 
 sudo -u archivematica bash -c " \
   set -a -e -x
@@ -148,8 +158,12 @@ sudo -u archivematica bash -c " \
   /usr/share/archivematica/virtualenvs/archivematica/bin/python manage.py migrate --noinput
 ";
 
+if [ "${upgrade}" != "true" ] ; then
+
 sudo -u root bash -c "echo 'ARCHIVEMATICA_DASHBOARD_DASHBOARD_SEARCH_ENABLED=${search_enabled}' >> /etc/sysconfig/archivematica-dashboard"
 sudo -u root bash -c "echo 'ARCHIVEMATICA_MCPSERVER_MCPSERVER_SEARCH_ENABLED=${search_enabled}' >> /etc/sysconfig/archivematica-mcp-server"
+
+fi
 
 sudo -u root systemctl enable archivematica-mcp-server
 sudo -u root systemctl start archivematica-mcp-server
@@ -163,9 +177,14 @@ sudo -u root systemctl reload nginx
 #
 
 sudo -u root yum install -y archivematica-mcp-client
+
+if [ "${upgrade}" != "true" ] ; then
+
 sudo -u root sed -i 's/^#TCPSocket/TCPSocket/g' /etc/clamd.d/scan.conf
 sudo -u root sed -i 's/^Example//g' /etc/clamd.d/scan.conf
 sudo -u root bash -c "echo 'ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_SEARCH_ENABLED=${search_enabled}' >> /etc/sysconfig/archivematica-mcp-client"
+
+fi
 
 sudo -u root systemctl enable archivematica-mcp-client
 sudo -u root systemctl start archivematica-mcp-client
@@ -174,6 +193,8 @@ sudo -u root systemctl start fits-nailgun
 sudo -u root systemctl enable clamd@scan
 sudo -u root systemctl start clamd@scan
 
+
+if [ "${upgrade}" != "true" ] ; then
 
 #
 # Set up the firewall
@@ -221,3 +242,5 @@ sudo -u archivematica bash -c " \
           --ss-api-key="apikey" \
           --site-url="http://localhost:81"
 ";
+
+fi
