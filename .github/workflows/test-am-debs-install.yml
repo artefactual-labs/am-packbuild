@@ -1,6 +1,9 @@
 name: Archivematica DEB Packages Install Test
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - "dev/ci-workflows"
 jobs:
   test-deb-install:
     name: Test Debian packages

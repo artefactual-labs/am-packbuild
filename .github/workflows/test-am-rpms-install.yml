@@ -1,6 +1,9 @@
 name: Archivematica RPM Packages Install Test
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - "dev/ci-workflows"
 jobs:
   test-rpm-install:
     name: Test RPM packages
