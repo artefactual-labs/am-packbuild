@@ -1,23 +1,29 @@
-Name: %{name}
+%define _builddir ./
+%define build_timestamp %(date +"%Y%m%d%H%M")
+
+Name: enduro
 Version: %{version}
-Release: 1%{?dist}
+Release: %{release}
 Summary: Enduro is a tool to aid automation of Archivematica
 URL: https://github.com/artefactual-labs/enduro
 Group: Application/SystemTools
 License: Apache License, Version 2.0
-Source0: %{name}-%{version}.tar.gz
+
+BuildRequires: systemd-rpm-macros
+BuildRequires: which
 
 %description
 A tool to aid automation of Archivematica and surrounding workflows
 
-%prep
-%setup -q
+%build
+make build
+
 
 %install
 rm -rf $RPM_BUILD_ROOT
 install -m 0755 -d $RPM_BUILD_ROOT/usr/bin/
 install -m 0755 -d $RPM_BUILD_ROOT/etc/systemd/system/
-install -m 0755 enduro $RPM_BUILD_ROOT/usr/bin/enduro
+install -m 0755 build/enduro $RPM_BUILD_ROOT/usr/bin/enduro
 install -m 0644 enduro.toml $RPM_BUILD_ROOT/etc/enduro.toml
 install -m 0644 enduro.service $RPM_BUILD_ROOT/etc/systemd/system/enduro.service
 
