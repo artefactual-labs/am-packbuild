@@ -54,6 +54,9 @@ sudo apt-get -o Acquire::AllowInsecureRepositories=true update
 sudo apt-get -y upgrade
 
 sudo apt-get install -y openjdk-8-jre-headless mysql-server
+sudo systemctl daemon-reload
+sudo service mysql restart
+sudo systemctl enable mysql
 
 if [ "${search_enabled}" == "true" ] ; then
     curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /etc/apt/keyrings/elasticsearch-6.x.gpg
