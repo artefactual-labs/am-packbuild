@@ -63,7 +63,8 @@ enabled=1
 EOF'
 
 sudo -u root yum update -y
-sudo -u root yum install -y epel-release policycoreutils-python-utils
+sudo -u root yum install -y epel-release policycoreutils-python-utils yum-utils
+sudo -u root yum-config-manager --enable crb
 
 
 #
@@ -83,7 +84,7 @@ fi
 # Install MariaDB and Gearman
 #
 
-sudo -u root yum install -y --enablerepo=crb mariadb-server gearmand
+sudo -u root yum install -y java-1.8.0-openjdk-headless mariadb-server gearmand
 sudo -u root systemctl enable mariadb
 sudo -u root systemctl start mariadb
 sudo -u root systemctl enable gearmand
@@ -102,7 +103,7 @@ enabled=1
 autorefresh=1
 type=rpm-md
 EOF'
-    sudo -u root yum install -y java-1.8.0-openjdk-headless elasticsearch
+    sudo -u root yum install -y elasticsearch
     sudo -u root systemctl enable elasticsearch
     sudo -u root systemctl start elasticsearch
 fi
