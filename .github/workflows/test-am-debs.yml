@@ -1,5 +1,6 @@
 name: Archivematica DEB Packages Test
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - "debs/jammy/archivematica/**"

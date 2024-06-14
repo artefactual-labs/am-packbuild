@@ -1,5 +1,6 @@
 name: Archivematica RPM Packages Test
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - "rpms/EL9/archivematica/**"
