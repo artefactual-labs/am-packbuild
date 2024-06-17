@@ -1,5 +1,6 @@
 name: Archivematica RPM Packages Test
 on:
+  workflow_dispatch:
   pull_request:
     paths:
       - "rpms/EL9/archivematica/**"
@@ -86,50 +87,46 @@ jobs:
       with:
         name: repository-rpm
         path: ${{ github.workspace }}/rpms/EL9/_yum_repository
-    - name: Install Vagrant
+    - name: "Upgrade crun (supports Ubuntu's systemd in the Dockerfile)"
       run: |
-        wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-        echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-        sudo apt update && sudo apt install vagrant
-    - name: Install VirtualBox
+        wget https://github.com/containers/crun/releases/download/1.15/crun-1.15-linux-amd64
+        sudo install crun-1.15-linux-amd64 /usr/bin/crun
+        rm crun-1.15-linux-amd64
+    - name: "Install Python"
+      uses: "actions/setup-python@v5"
+      with:
+        python-version: "3.10"
+        cache: "pip"
+        cache-dependency-path: |
+          rpms/EL9-testing/requirements.txt
+    - name: "Cache the virtual environment"
+      id: "venv-cache"
+      uses: "actions/cache@v4"
+      with:
+        path: |
+          rpms/EL9-testing/.venv/
+        key: "os-${{ runner.os }}-python_version-${{ env.python_version }}-hash-${{ hashFiles('rpms/EL9-testing/requirements.txt') }}"
+    - name: "Set up the virtual environment"
+      if: "steps.venv-cache.outputs.cache-hit == false"
+      working-directory: "${{ github.workspace }}/rpms/EL9-testing"
       run: |
-        wget -O- https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo gpg --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg --dearmor
-        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/oracle-virtualbox-2016.gpg] https://download.virtualbox.org/virtualbox/debian jammy contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
-        sudo apt update && sudo apt install virtualbox-7.0
-    - name: "Downgrade VirtualBox"
-      run: |
-        sudo apt-get purge virtualbox-7.0
-        wget -O /tmp/virtualbox-7.0_7.0.14-161095~Ubuntu~jammy_amd64.deb -L https://download.virtualbox.org/virtualbox/7.0.14/virtualbox-7.0_7.0.14-161095~Ubuntu~jammy_amd64.deb
-        sudo dpkg -i /tmp/virtualbox-7.0_7.0.14-161095~Ubuntu~jammy_amd64.deb
-    - name: Install the vagrant-vbguest plugin
-      run: |
-        vagrant plugin install vagrant-vbguest
-    - name: Update vbox networks
-      run: |
-        sudo mkdir -p /etc/vbox/
-        echo "* 192.168.33.0/24" | sudo tee -a /etc/vbox/networks.conf
-    - name: Start
-      run: |
-        vagrant up --no-provision
-      working-directory: ${{ github.workspace }}/rpms/EL9-testing
-    - name: Install Guest Additions build dependencies
-      run: |
-        vagrant ssh -c 'sudo yum update -y && sudo yum upgrade -y'
-        vagrant ssh -c 'sudo yum install -y epel-release yum-utils'
-        vagrant ssh -c 'sudo yum-config-manager --enable crb'
-        vagrant ssh -c 'sudo yum install -y kernel-devel'
-      working-directory: ${{ github.workspace }}/rpms/EL9-testing
-    - name: Stop
-      run: |
-        vagrant halt
-      working-directory: ${{ github.workspace }}/rpms/EL9-testing
-    - name: Start and provision
-      run: |
-        vagrant up
-      working-directory: ${{ github.workspace }}/rpms/EL9-testing
+        python3 -m venv .venv
+        .venv/bin/python -m pip install -r requirements.txt
+    - name: "Add virtual environment to PATH"
+      working-directory: "${{ github.workspace }}/rpms/EL9-testing"
+      run:
+        echo "$PWD/.venv/bin" >> $GITHUB_PATH
+    - name: "Start the Compose environment"
+      working-directory: "${{ github.workspace }}/rpms/EL9-testing"
       env:
-        PROVISION: yes
-        LOCAL_REPOSITORY: yes
+        DOCKER_IMAGE_NAME: "rockylinux"
+        DOCKER_IMAGE_TAG: "9"
+      run: |
+        podman-compose up --detach
+    - name: Install packages
+      working-directory: ${{ github.workspace }}/rpms/EL9-testing
+      run: |
+        podman-compose exec --env LOCAL_REPOSITORY="yes" --user ubuntu archivematica /am-packbuild/rpms/EL9-testing/install.sh
     - name: Test AM API - Get processing configurations
       run: |
         test $( \
@@ -137,7 +134,7 @@ jobs:
                 --silent \
                 --header 'Authorization: ApiKey admin:apikey' \
                 --header 'Content-Type: application/json' \
-                'http://192.168.33.2:81/api/processing-configuration/' \
+                'http://localhost:8000/api/processing-configuration/' \
             | jq -r '.processing_configurations == ["automated", "default"]' \
         ) == true
     - name: Test SS API - Get pipeline count
@@ -147,6 +144,6 @@ jobs:
                 --silent \
                 --header 'Authorization: ApiKey admin:apikey' \
                 --header 'Content-Type: application/json' \
-                'http://192.168.33.2:8001/api/v2/pipeline/' \
+                'http://localhost:8001/api/v2/pipeline/' \
             | jq -r '.meta.total_count == 1' \
         ) == true
