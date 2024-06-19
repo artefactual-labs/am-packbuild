@@ -5,9 +5,9 @@ on:
     paths:
       - "debs/jammy/archivematica/**"
       - "debs/jammy/archivematica-storage-service/**"
-      - "tests/archivematica/jammy/**"
-      - "tests/archivematica/requirements.txt"
-      - "tests/archivematica/Dockerfile"
+      - "tests/archivematica/**"
+      - "!tests/archivematica/README.md"
+      - "!tests/archivematica/EL9/**"
   push:
     branches:
       - "stable/**"
@@ -15,9 +15,9 @@ on:
     paths:
       - "debs/jammy/archivematica/**"
       - "debs/jammy/archivematica-storage-service/**"
-      - "tests/archivematica/jammy/**"
-      - "tests/archivematica/requirements.txt"
-      - "tests/archivematica/Dockerfile"
+      - "tests/archivematica/**"
+      - "!tests/archivematica/README.md"
+      - "!tests/archivematica/EL9/**"
 jobs:
   build-am-deb:
     name: Build Archivematica Debian packages
@@ -108,27 +108,27 @@ jobs:
       uses: "actions/cache@v4"
       with:
         path: |
-          tests/archivematica/jammy/.venv/
+          tests/archivematica/.venv/
         key: "os-${{ runner.os }}-python_version-${{ env.python_version }}-hash-${{ hashFiles('tests/archivematica/requirements.txt') }}"
     - name: "Set up the virtual environment"
       if: "steps.venv-cache.outputs.cache-hit == false"
-      working-directory: "${{ github.workspace }}/tests/archivematica/jammy"
+      working-directory: "${{ github.workspace }}/tests/archivematica"
       run: |
         python3 -m venv .venv
-        .venv/bin/python -m pip install -r ../requirements.txt
+        .venv/bin/python -m pip install -r requirements.txt
     - name: "Add virtual environment to PATH"
-      working-directory: "${{ github.workspace }}/tests/archivematica/jammy"
+      working-directory: "${{ github.workspace }}/tests/archivematica"
       run:
         echo "$PWD/.venv/bin" >> $GITHUB_PATH
     - name: "Start the Compose environment"
-      working-directory: "${{ github.workspace }}/tests/archivematica/jammy"
+      working-directory: "${{ github.workspace }}/tests/archivematica"
       env:
         DOCKER_IMAGE_NAME: "ubuntu"
         DOCKER_IMAGE_TAG: "22.04"
       run: |
         podman-compose up --detach
     - name: Install packages
-      working-directory: ${{ github.workspace }}/tests/archivematica/jammy
+      working-directory: ${{ github.workspace }}/tests/archivematica
       run: |
         podman-compose exec --env LOCAL_REPOSITORY="yes" --user ubuntu archivematica /am-packbuild/tests/archivematica/jammy/install.sh
     - name: Test AM API - Get processing configurations
