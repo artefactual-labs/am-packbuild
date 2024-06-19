@@ -37,20 +37,22 @@ podman-compose up --detach
 Test packages from the published Archivematica repository:
 
 ```shell
-podman-compose exec --user ubuntu archivematica /am-packbuild/rpms/EL9-testing/install.sh
+podman-compose exec --user ubuntu archivematica /am-packbuild/tests/archivematica/EL9/install.sh
 ```
 
-Alternatively, test using the local repository (`../EL9`), which needs to be
-previously built:
+Alternatively, test using the local repository (`../../../rpms/EL9`), which
+needs to be previously built:
 
 ```shell
-make -C ../EL9
+make -C ../../../rpms/EL9/archivematica
+make -C ../../../rpms/EL9/archivematica-storage-service
+make -C ../../../rpms/EL9 createrepo
 ```
 
 Test using the local repository:
 
 ```shell
-podman-compose exec --env LOCAL_REPOSITORY="yes" --user ubuntu archivematica /am-packbuild/rpms/EL9-testing/install.sh
+podman-compose exec --env LOCAL_REPOSITORY="yes" --user ubuntu archivematica /am-packbuild/tests/archivematica/EL9/install.sh
 ```
 
 Once installation finishes you should be able to access to the web interfaces:

@@ -37,20 +37,22 @@ podman-compose up --detach
 Test packages from the published Archivematica repository:
 
 ```shell
-podman-compose exec --user ubuntu archivematica /am-packbuild/debs/jammy-testing/install.sh
+podman-compose exec --user ubuntu archivematica /am-packbuild/tests/archivematica/jammy/install.sh
 ```
 
-Alternatively, test using the local repository (`../jammy`), which needs to be
-previously built:
+Alternatively, test using the local repository (`../../../debs/jammy`), which
+needs to be previously built:
 
 ```shell
-make -C ../jammy
+make -C ../../../debs/jammy/archivematica
+make -C ../../../debs/jammy/archivematica-storage-service
+make -C ../../../debs/jammy createrepo
 ```
 
 Test using the local repository:
 
 ```shell
-podman-compose exec --env LOCAL_REPOSITORY="yes" --user ubuntu archivematica /am-packbuild/debs/jammy-testing/install.sh
+podman-compose exec --env LOCAL_REPOSITORY="yes" --user ubuntu archivematica /am-packbuild/tests/archivematica/jammy/install.sh
 ```
 
 Once installation finishes you should be able to access to the web interfaces:

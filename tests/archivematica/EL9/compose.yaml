@@ -19,4 +19,4 @@ services:
       - "8001:8001"
     volumes:
       - ".:/src"
-      - "../../:/am-packbuild"
+      - "../../../:/am-packbuild"
