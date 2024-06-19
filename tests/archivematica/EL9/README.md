@@ -21,7 +21,7 @@ source .venv/bin/activate
 Install the Python requirements:
 
 ```shell
-python3 -m pip install -r requirements.txt
+python3 -m pip install -r ../requirements.txt
 ```
 
 ## Starting the Compose environment

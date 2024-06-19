@@ -1,6 +1,30 @@
 ARG TARGET=server
-ARG DOCKER_IMAGE_NAME=rockylinux
-ARG DOCKER_IMAGE_TAG=9
+ARG DOCKER_IMAGE_NAME=ubuntu
+ARG DOCKER_IMAGE_TAG=22.04
+
+FROM ubuntu:22.04 AS install_ubuntu_22.04
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN set -ex \
+	&& apt-get update \
+	&& apt-get install -y \
+        curl \
+        dialog \
+        gnupg \
+        locales \
+        openssh-server \
+        rsync \
+        sudo \
+    && apt-get clean
+
+RUN locale-gen en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV LC_ALL en_US.UTF-8
+ENV TZ=UTC
+
+RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone
 
 FROM rockylinux:9 AS install_rockylinux_9
 
