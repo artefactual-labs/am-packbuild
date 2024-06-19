@@ -72,8 +72,8 @@ sudo -u root yum-config-manager --enable crb
 #
 
 if [ $(getenforce) != "Disabled" ]; then
-    sudo semanage port -m -t http_port_t -p tcp 81
-    sudo semanage port -a -t http_port_t -p tcp 8001
+    sudo semanage port -m -t http_port_t -p tcp 80
+    sudo semanage port -a -t http_port_t -p tcp 8000
     sudo setsebool -P httpd_can_network_connect_db=1
     sudo setsebool -P httpd_can_network_connect=1
     sudo setsebool -P httpd_setrlimit 1
@@ -156,8 +156,12 @@ sudo -u root systemctl enable archivematica-mcp-server
 sudo -u root systemctl start archivematica-mcp-server
 sudo -u root systemctl enable archivematica-dashboard
 sudo -u root systemctl start archivematica-dashboard
-sudo -u root systemctl reload nginx
 
+# Update nginx site configurations to match standard Archivematica ports
+sudo -u root sed -i -e 's/80;/90;/g' /etc/nginx/nginx.conf
+sudo -u root sed -i -e 's/listen 8001/listen 8000/g' /etc/nginx/conf.d/archivematica-storage-service.conf
+sudo -u root sed -i -e 's/listen 81/listen 80/g' /etc/nginx/conf.d/archivematica-dashboard.conf
+sudo -u root systemctl reload nginx
 
 #
 # MCPClient
@@ -185,8 +189,8 @@ sudo -u root systemctl start clamd@scan
 systemctl -q is-enabled firewalld || rc1=$?
 systemctl -q is-active firewalld || rc2=$?
 if [ ${rc1} -eq 0 ] && [ ${rc2} -eq 0 ]; then
-    sudo firewall-cmd --zone=public --add-port=81/tcp --permanent
-    sudo firewall-cmd --zone=public --add-port=8001/tcp --permanent
+    sudo firewall-cmd --zone=public --add-port=80/tcp --permanent
+    sudo firewall-cmd --zone=public --add-port=8000/tcp --permanent
     sudo systemctl restart firewalld || true
 fi
 
@@ -217,8 +221,8 @@ sudo -u archivematica bash -c " \
           --org-name="test" \
           --org-id="test" \
           --api-key="apikey" \
-          --ss-url="http://localhost:8001" \
+          --ss-url="http://localhost:8000" \
           --ss-user="admin" \
           --ss-api-key="apikey" \
-          --site-url="http://localhost:81"
+          --site-url="http://localhost"
 ";
