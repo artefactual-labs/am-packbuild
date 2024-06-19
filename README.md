@@ -66,8 +66,4 @@ managing Ubuntu repositories using reprepro can be found
 
 ## Test package
 
-Rocky Linux 9 packages: see the [rpms/EL9-testing](rpms/EL9-testing) directory
-for more details.
-
-Ubuntu 22.04 Jammy packages: see the [debs/jammy-testing](debs/jammy-testing)
-directory for more details.
+See the [tests/archivematica](tests/archivematica) directory for more details.
