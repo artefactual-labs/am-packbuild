@@ -10,3 +10,11 @@ repos:
   rev: v0.39.0
   hooks:
   - id: markdownlint
+- repo: https://github.com/thlorenz/doctoc
+  rev: v2.2.0
+  hooks:
+  - id: doctoc
+    files: |
+      (?x)^(
+        tests/archivematica/README\.md
+      )

@@ -1,5 +1,5 @@
 ---
-name: archivematica-jammy-testing
+name: archivematica-package-testing
 
 services:
 
@@ -9,6 +9,10 @@ services:
         DOCKER_IMAGE_NAME: "${DOCKER_IMAGE_NAME:-ubuntu}"
         DOCKER_IMAGE_TAG: "${DOCKER_IMAGE_TAG:-22.04}"
         TARGET: server
+    # The nginx configuration files included in the EL9 RPM specs reference
+    # this hostname in their proxy_pass.
+    extra_hosts:
+      - "localhost4:127.0.0.1"
     ports:
       - "2222:22"
       - "8000:80"

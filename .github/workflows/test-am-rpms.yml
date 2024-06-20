@@ -1,11 +1,19 @@
 name: Archivematica RPM Packages Test
 on:
   workflow_dispatch:
+    inputs:
+      build_packages:
+        description: "Build local packages"
+        required: true
+        default: true
+        type: "boolean"
   pull_request:
     paths:
       - "rpms/EL9/archivematica/**"
       - "rpms/EL9/archivematica-storage-service/**"
-      - "rpms/EL9-testing/**"
+      - "tests/archivematica/**"
+      - "!tests/archivematica/README.md"
+      - "!tests/archivematica/jammy/**"
   push:
     branches:
       - "stable/**"
@@ -13,11 +21,14 @@ on:
     paths:
       - "rpms/EL9/archivematica/**"
       - "rpms/EL9/archivematica-storage-service/**"
-      - "rpms/EL9-testing/**"
+      - "tests/archivematica/**"
+      - "!tests/archivematica/README.md"
+      - "!tests/archivematica/jammy/**"
 jobs:
-  build-am-rpm:
-    name: Build Archivematica RPM packages
+  build-am-packages:
+    name: Build Archivematica packages
     runs-on: ubuntu-latest
+    if: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
     steps:
     - name: Check out code
       uses: actions/checkout@v4
@@ -27,12 +38,13 @@ jobs:
     - name: Save artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: archivematica-rpm
+        name: archivematica-packages
         path: |
           ${{ github.workspace }}/rpms/EL9/archivematica/*.rpm
-  build-ss-rpm:
-    name: Build Storage Service RPM package
+  build-ss-packages:
+    name: Build Storage Service packages
     runs-on: ubuntu-latest
+    if: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
     steps:
     - name: Check out code
       uses: actions/checkout@v4
@@ -42,28 +54,29 @@ jobs:
     - name: Save artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: archivematica-storage-service-rpm
+        name: archivematica-storage-service-packages
         path: |
           ${{ github.workspace }}/rpms/EL9/archivematica-storage-service/*.rpm
-  create-rpm-repo:
-    name: Create RPM repository
+  create-package-repo:
+    name: Create package repository
     runs-on: ubuntu-latest
+    if: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
     needs:
-    - build-am-rpm
-    - build-ss-rpm
+    - build-am-packages
+    - build-ss-packages
     steps:
     - name: Check out code
       uses: actions/checkout@v4
     - name: Restore Archivematica packages
       uses: actions/download-artifact@v4
       with:
-        name: archivematica-rpm
+        name: archivematica-packages
         path: |
           ${{ github.workspace }}/rpms/EL9/archivematica/
-    - name: Restore Storage Service package
+    - name: Restore Storage Service packages
       uses: actions/download-artifact@v4
       with:
-        name: archivematica-storage-service-rpm
+        name: archivematica-storage-service-packages
         path: |
           ${{ github.workspace }}/rpms/EL9/archivematica-storage-service
     - name: Create repository
@@ -72,20 +85,28 @@ jobs:
     - name: Save package repository
       uses: actions/upload-artifact@v4
       with:
-        name: repository-rpm
+        name: package-repository
         path: |
           ${{ github.workspace }}/rpms/EL9/_yum_repository
-  test-rpm:
-    name: Test RPM packages
-    needs: create-rpm-repo
+  test:
+    name: Test packages
+    needs: create-package-repo
     runs-on: ubuntu-latest
+    if: "${{ always() }}"
+    env:
+      build_packages: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
     steps:
+    - name: Check if the repository creation job failed
+      if: "${{ needs.create-package-repo.result != 'skipped' && ! env.build_packages }}"
+      run: |
+        exit 1
     - name: Check out code
       uses: actions/checkout@v4
     - name: Restore package repository
+      if: needs.create-package-repo.result == 'success'
       uses: actions/download-artifact@v4
       with:
-        name: repository-rpm
+        name: package-repository
         path: ${{ github.workspace }}/rpms/EL9/_yum_repository
     - name: "Upgrade crun (supports Ubuntu's systemd in the Dockerfile)"
       run: |
@@ -98,35 +119,35 @@ jobs:
         python-version: "3.10"
         cache: "pip"
         cache-dependency-path: |
-          rpms/EL9-testing/requirements.txt
+          tests/archivematica/requirements.txt
     - name: "Cache the virtual environment"
       id: "venv-cache"
       uses: "actions/cache@v4"
       with:
         path: |
-          rpms/EL9-testing/.venv/
-        key: "os-${{ runner.os }}-python_version-${{ env.python_version }}-hash-${{ hashFiles('rpms/EL9-testing/requirements.txt') }}"
+          tests/archivematica/.venv/
+        key: "os-${{ runner.os }}-python_version-${{ env.python_version }}-hash-${{ hashFiles('tests/archivematica/requirements.txt') }}"
     - name: "Set up the virtual environment"
       if: "steps.venv-cache.outputs.cache-hit == false"
-      working-directory: "${{ github.workspace }}/rpms/EL9-testing"
+      working-directory: "${{ github.workspace }}/tests/archivematica"
       run: |
         python3 -m venv .venv
         .venv/bin/python -m pip install -r requirements.txt
     - name: "Add virtual environment to PATH"
-      working-directory: "${{ github.workspace }}/rpms/EL9-testing"
+      working-directory: "${{ github.workspace }}/tests/archivematica"
       run:
         echo "$PWD/.venv/bin" >> $GITHUB_PATH
     - name: "Start the Compose environment"
-      working-directory: "${{ github.workspace }}/rpms/EL9-testing"
+      working-directory: "${{ github.workspace }}/tests/archivematica"
       env:
         DOCKER_IMAGE_NAME: "rockylinux"
         DOCKER_IMAGE_TAG: "9"
       run: |
         podman-compose up --detach
     - name: Install packages
-      working-directory: ${{ github.workspace }}/rpms/EL9-testing
+      working-directory: ${{ github.workspace }}/tests/archivematica
       run: |
-        podman-compose exec --env LOCAL_REPOSITORY="yes" --user ubuntu archivematica /am-packbuild/rpms/EL9-testing/install.sh
+        podman-compose exec --env LOCAL_REPOSITORY="${{ env.build_packages }}" --user ubuntu archivematica /am-packbuild/tests/archivematica/EL9/install.sh
     - name: Test AM API - Get processing configurations
       run: |
         test $( \
