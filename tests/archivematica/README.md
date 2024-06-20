@@ -1,5 +1,22 @@
 # Instructions
 
+## Table of contents
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+- [Software requirements](#software-requirements)
+- [Set up a Python virtual environment](#set-up-a-python-virtual-environment)
+- [Set up EL9 packages](#set-up-el9-packages)
+  - [Install EL9 packages from archivematica.org](#install-el9-packages-from-archivematicaorg)
+  - [Install EL9 packages from a local repository](#install-el9-packages-from-a-local-repository)
+- [Set up Ubuntu 22.04 Jammy packages](#set-up-ubuntu-2204-jammy-packages)
+  - [Install jammy packages from archivematica.org](#install-jammy-packages-from-archivematicaorg)
+  - [Install jammy packages from a local repository](#install-jammy-packages-from-a-local-repository)
+- [Test the Archivematica installation](#test-the-archivematica-installation)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Software requirements
 
 - Podman
