@@ -24,11 +24,13 @@ on:
       - "tests/archivematica/**"
       - "!tests/archivematica/README.md"
       - "!tests/archivematica/jammy/**"
+  schedule:
+    - cron: "0 2 * * *"
 jobs:
   build-am-packages:
     name: Build Archivematica packages
     runs-on: ubuntu-latest
-    if: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
+    if: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
     steps:
     - name: Check out code
       uses: actions/checkout@v4
@@ -44,7 +46,7 @@ jobs:
   build-ss-packages:
     name: Build Storage Service packages
     runs-on: ubuntu-latest
-    if: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
+    if: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
     steps:
     - name: Check out code
       uses: actions/checkout@v4
@@ -60,7 +62,7 @@ jobs:
   create-package-repo:
     name: Create package repository
     runs-on: ubuntu-latest
-    if: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
+    if: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
     needs:
     - build-am-packages
     - build-ss-packages
@@ -94,7 +96,7 @@ jobs:
     runs-on: ubuntu-latest
     if: "${{ always() }}"
     env:
-      build_packages: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
+      build_packages: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
     steps:
     - name: Check if the repository creation job failed
       if: "${{ needs.create-package-repo.result != 'skipped' && ! env.build_packages }}"
