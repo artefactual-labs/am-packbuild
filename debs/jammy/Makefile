@@ -6,7 +6,6 @@ build:
 	make -C ./archivematica-storage-service
 	make -C ./archivematica
 	make -C ./bulk_extractor
-	make -C ./fits
 	make -C ./jhove
 	make -C ./temporal-ui
 
