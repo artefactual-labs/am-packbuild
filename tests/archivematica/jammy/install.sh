@@ -94,8 +94,6 @@ sudo service archivematica-mcp-client restart
 sudo service archivematica-storage-service start
 sudo service archivematica-dashboard restart
 sudo service nginx restart
-sudo systemctl enable fits-nailgun
-sudo service fits-nailgun start
 
 sudo -u archivematica bash -c " \
     set -a -e -x

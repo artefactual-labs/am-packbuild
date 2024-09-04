@@ -174,8 +174,6 @@ sudo -u root bash -c "echo 'ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_SEARCH_ENABLED=${s
 
 sudo -u root systemctl enable archivematica-mcp-client
 sudo -u root systemctl start archivematica-mcp-client
-sudo -u root systemctl enable fits-nailgun
-sudo -u root systemctl start fits-nailgun
 sudo -u root systemctl enable clamd@scan
 sudo -u root systemctl start clamd@scan
 

@@ -6,8 +6,6 @@ build:
 	make -C ./archivematica
 	make -C ./archivematica-storage-service
 	make -C ./siegfried
-	make -C ./nailgun
-	make -C ./fits
 	make -C ./jhove
 	make -C ./cadence
 	make -C ./cadence-web

@@ -64,7 +64,6 @@ Requires: md5deep
 Requires: uuid
 # Packages from Archivematica repo
 Requires: siegfried
-Requires: fits
 Requires: atool
 Requires: jhove
 # Packages from https://forensics.cert.org/
