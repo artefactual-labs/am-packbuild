@@ -127,3 +127,40 @@ sudo -u archivematica bash -c " \
           --ss-api-key="apikey" \
           --site-url="http://localhost"
 ";
+
+sudo -u archivematica bash -c " \
+    set -a -e -x
+    source /etc/default/archivematica-dashboard || \
+        source /etc/sysconfig/archivematica-dashboard \
+            || (echo 'Environment file not found'; exit 1)
+    cd /usr/share/archivematica/dashboard
+      /usr/share/archivematica/virtualenvs/archivematica/bin/python manage.py collectstatic --noinput --clear
+";
+
+sudo -u archivematica bash -c " \
+    set -a -e -x
+    source /etc/default/archivematica-dashboard || \
+        source /etc/sysconfig/archivematica-dashboard \
+            || (echo 'Environment file not found'; exit 1)
+    cd /usr/share/archivematica/dashboard
+      /usr/share/archivematica/virtualenvs/archivematica/bin/python manage.py compilemessages
+";
+
+
+sudo -u archivematica bash -c " \
+    set -a -e -x
+    source /etc/default/archivematica-storage-service || \
+        source /etc/sysconfig/archivematica-storage-service \
+            || (echo 'Environment file not found'; exit 1)
+    cd /usr/lib/archivematica/storage-service
+      /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py collectstatic --noinput --clear
+";
+
+sudo -u archivematica bash -c " \
+    set -a -e -x
+    source /etc/default/archivematica-storage-service || \
+        source /etc/sysconfig/archivematica-storage-service \
+            || (echo 'Environment file not found'; exit 1)
+    cd /usr/lib/archivematica/storage-service
+      /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py compilemessages
+";
