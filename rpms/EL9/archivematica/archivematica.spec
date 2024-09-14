@@ -281,4 +281,6 @@ bash -c " \
   /usr/share/archivematica/virtualenvs/archivematica/bin/python manage.py compilemessages
 ";
 chown -R archivematica:archivematica /var/log/archivematica/dashboard
+chown -R archivematica:archivematica /usr/share/archivematica/dashboard/static
+chown -R archivematica:archivematica /usr/share/archivematica/dashboard/locale
 systemctl daemon-reload
