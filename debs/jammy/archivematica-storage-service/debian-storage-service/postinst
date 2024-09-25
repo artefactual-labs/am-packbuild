@@ -63,6 +63,8 @@ chown -R archivematica:archivematica /var/archivematica/.storage-service
 chown -R archivematica:archivematica ${SS_ENV_DIR}
 mkdir -p /var/log/archivematica/storage-service
 chown -R archivematica:archivematica /var/log/archivematica/storage-service
+chown -R archivematica:archivematica /usr/lib/archivematica/storage-service/assets
+chown -R archivematica:archivematica /usr/lib/archivematica/storage-service/locale
 
 rm -f /tmp/storage_service.log
 

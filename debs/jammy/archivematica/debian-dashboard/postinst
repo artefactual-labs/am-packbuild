@@ -56,4 +56,8 @@ dashboard::manage collectstatic --noinput --clear
 # Compile messages
 dashboard::manage compilemessages
 
+# Set permissions.
+chown -R archivematica:archivematica /usr/share/archivematica/dashboard/static
+chown -R archivematica:archivematica /usr/share/archivematica/dashboard/locale
+
 #DEBHELPER#

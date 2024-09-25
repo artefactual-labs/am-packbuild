@@ -123,3 +123,5 @@ bash -c " \
   /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py collectstatic --noinput --clear
   /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py compilemessages
 ";
+chown -R archivematica:archivematica /usr/lib/archivematica/storage-service/assets
+chown -R archivematica:archivematica /usr/lib/archivematica/storage-service/locale
