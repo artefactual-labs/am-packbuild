@@ -24,6 +24,8 @@ function get_env_boolean() {
 
 search_enabled=$(get_env_boolean "SEARCH_ENABLED" "true")
 local_repository=$(get_env_boolean "LOCAL_REPOSITORY" "false")
+am_version=${AM_VERSION:-1.17}
+am_packages_url="https://packages.archivematica.org/${am_version}.x"
 
 echo "~~~~~~~~ DEBUG ~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 while read -r line; do echo "$line=${!line}"; done < <(compgen -v | grep -v '[^[:lower:]_]' | grep -v '^_$')
@@ -35,32 +37,32 @@ echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 #
 
 if [ "${local_repository}" == "true" ] ; then
-    sudo -u root bash -c 'cat << EOF > /etc/yum.repos.d/archivematica.repo
+    sudo -u root bash -c "cat << EOF > /etc/yum.repos.d/archivematica.repo
 [archivematica]
 name=archivematica
 baseurl=file:///am-packbuild/rpms/EL9/_yum_repository/
 enabled=1
 gpgcheck=0
-EOF'
+EOF"
 else
-    sudo -u root bash -c 'cat << EOF > /etc/yum.repos.d/archivematica.repo
+    sudo -u root bash -c "cat << EOF > /etc/yum.repos.d/archivematica.repo
 [archivematica]
 name=archivematica
-baseurl=https://packages.archivematica.org/1.17.x/rocky9
+baseurl=${am_packages_url}/rocky9
 gpgcheck=1
 gpgkey=https://packages.archivematica.org/GPG-KEY-archivematica-sha512
 enabled=1
-EOF'
+EOF"
 fi
 
-sudo -u root bash -c 'cat << EOF >> /etc/yum.repos.d/archivematica-extras.repo
+sudo -u root bash -c "cat << EOF >> /etc/yum.repos.d/archivematica-extras.repo
 [archivematica-extras]
 name=archivematica-extras
-baseurl=https://packages.archivematica.org/1.17.x/rocky9-extras
+baseurl=${am_packages_url}/rocky9-extras
 gpgcheck=1
 gpgkey=https://packages.archivematica.org/GPG-KEY-archivematica-sha512
 enabled=1
-EOF'
+EOF"
 
 sudo -u root yum update -y
 sudo -u root yum install -y epel-release policycoreutils-python-utils yum-utils
