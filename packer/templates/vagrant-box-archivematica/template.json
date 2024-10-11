@@ -21,7 +21,7 @@
     {
       "execute_command": "echo 'vagrant'|{{.Vars}} sudo -S -E bash '{{.Path}}'",
       "scripts": [
-        "../../scripts/ubuntu/ansible-bionic.sh"
+        "../../scripts/ubuntu/ansible-focal.sh"
       ],
       "type": "shell"
     },
