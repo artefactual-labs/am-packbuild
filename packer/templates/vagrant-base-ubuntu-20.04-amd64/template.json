@@ -36,7 +36,7 @@
       "iso_checksum": "{{user `iso_checksum`}}",
       "iso_urls": [
         "iso/ubuntu-20.04.1-legacy-server-amd64.iso",
-        "http://cdimage.ubuntu.com/ubuntu-legacy-server/releases/20.04.1/release/ubuntu-20.04.1-legacy-server-amd64.iso"
+        "http://cdimage.ubuntu.com/ubuntu-legacy-server/releases/20.04/release/ubuntu-20.04.1-legacy-server-amd64.iso"
        ],
       "output_directory": "../../builds/virtualbox/vagrant-base-ubuntu-20.04-amd64",
       "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now",
