@@ -1,5 +1,5 @@
 NAME          = preprocessing-worker
-VERSION       = 0.1.0
+VERSION      ?= 0.1.0
 RPM_TOPDIR    = "/rpmbuild"
 BRANCH	     ?= main
 DOCKER_VOLUME = "/src"
@@ -23,6 +23,7 @@ build:
 	@echo "==> Building RPM inside Docker container."
 	@docker run \
 	       -e BRANCH="$(BRANCH)" \
+	       -e VERSION="$(VERSION)" \
 		--rm --volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) make -C $(DOCKER_VOLUME) rpm-build
 
 rpm-build: rpm-clean
