@@ -8,9 +8,6 @@ on:
       description:
         description: Description
         required: true
-  push:
-    branches:
-      - "dev/test-am-vagrant-workflow"
 jobs:
   build-base-image:
     name: Build base image
@@ -84,15 +81,12 @@ jobs:
         cd ${{ github.workspace }}/packer/templates/vagrant-box-archivematica
         packer build -on-error=abort template.json
         mv ${{ github.workspace }}/packer/builds/virtualbox/vagrant-am.box \
-          ${{ github.workspace }}/archivematica-vagrant-v1.17.0.box
+          ${{ github.workspace }}/archivematica-vagrant-${{ github.event.inputs.version }}.box
     - name: Provision a test VM with the new image
       run: |
-        vagrant init --minimal --no-tty archivematica-vagrant-v1.17.0 file://${{ github.workspace }}/archivematica-vagrant-v1.17.0.box
+        vagrant init --minimal --no-tty archivematica-vagrant-${{ github.event.inputs.version }} file://${{ github.workspace }}/archivematica-vagrant-${{ github.event.inputs.version }}.box
         cat Vagrantfile
         vagrant up --debug-timestamp --provider virtualbox
-    - name: Print Python versions installed
-      run: |
-        vagrant ssh -c "ls -altr /usr/bin/python*"
     - name: Test AM is running in the test VM
       run: |
         sleep 180
@@ -112,13 +106,13 @@ jobs:
                 'http://10.10.10.20:8000/api/v2/pipeline/' \
             | jq -r '.meta.total_count == 1' \
         ) == true
-    # - name: Upload
-    #   run: |
-    #     cd ${{ github.workspace }}/tools/vagrant-box-uploader
-    #     bundle install
-    #     ruby upload.rb \
-    #       archivematica \
-    #       '${{ github.workspace }}/archivematica-vagrant-${{ github.event.inputs.version }}.box' \
-    #       '${{ secrets.VAGRANT_CLOUD }}' \
-    #       '${{ github.event.inputs.version }}' \
-    #       '${{ github.event.inputs.description }}'
+    - name: Upload
+      run: |
+        cd ${{ github.workspace }}/tools/vagrant-box-uploader
+        bundle install
+        ruby upload.rb \
+          archivematica \
+          '${{ github.workspace }}/archivematica-vagrant-${{ github.event.inputs.version }}.box' \
+          '${{ secrets.VAGRANT_CLOUD }}' \
+          '${{ github.event.inputs.version }}' \
+          '${{ github.event.inputs.description }}'
