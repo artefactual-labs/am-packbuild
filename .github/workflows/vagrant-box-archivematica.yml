@@ -35,15 +35,11 @@ jobs:
       run: |
         echo "USER=$USER" >> $GITHUB_ENV
         echo "LOGNAME=$USER" >> $GITHUB_ENV
-    - name: Install packer plugins
-      run: |
-        packer plugins install github.com/hashicorp/virtualbox
-        packer plugins install github.com/hashicorp/ansible
-        packer plugins install github.com/hashicorp/vagrant
     - name: Build
       run: |
         cd "${{ github.workspace }}/packer/templates/vagrant-base-ubuntu-${{ matrix.ubuntu-version }}-amd64"
-        packer build -on-error=abort template.json
+        packer init template.json.pkr.hcl
+        packer build -on-error=abort template.json.pkr.hcl
     - name: Upload base image
       uses: actions/upload-artifact@v4
       with:
