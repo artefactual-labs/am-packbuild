@@ -7,11 +7,6 @@ packer {
   }
 }
 
-variable "box_basename" {
-  type    = string
-  default = "ubuntu-20.04"
-}
-
 variable "cpus" {
   type    = string
   default = "2"
@@ -20,11 +15,6 @@ variable "cpus" {
 variable "disk_size" {
   type    = string
   default = "20960"
-}
-
-variable "git_revision" {
-  type    = string
-  default = "__unknown_git_revision__"
 }
 
 variable "headless" {
@@ -47,34 +37,9 @@ variable "iso_checksum" {
   default = "f11bda2f2caed8f420802b59f382c25160b114ccc665dbac9c5046e7fceaced2"
 }
 
-variable "iso_name" {
-  type    = string
-  default = "ubuntu-20.04.1-legacy-server-amd64.iso"
-}
-
 variable "memory" {
   type    = string
   default = "4096"
-}
-
-variable "metadata" {
-  type    = string
-  default = "floppy/dummy_metadata.json"
-}
-
-variable "mirror" {
-  type    = string
-  default = "http://cdimage.ubuntu.com/ubuntu-legacy-server/releases"
-}
-
-variable "mirror_directory" {
-  type    = string
-  default = "20.04.1/release/"
-}
-
-variable "name" {
-  type    = string
-  default = "ubuntu-20.04"
 }
 
 variable "no_proxy" {
@@ -82,23 +47,9 @@ variable "no_proxy" {
   default = "${env("no_proxy")}"
 }
 
-variable "preseed_path" {
-  type    = string
-  default = "../../http/ubuntu-20.04/preseed.cfg"
-}
-
 variable "template" {
   type    = string
   default = "vagrant-base-ubuntu-20.04-amd64"
-}
-
-variable "version" {
-  type    = string
-  default = "2.1.TIMESTAMP"
-}
-
-locals {
-  build_timestamp = "${timestamp()}"
 }
 
 source "virtualbox-iso" "ubuntu" {
@@ -144,7 +95,7 @@ source "virtualbox-iso" "ubuntu" {
   ssh_password            = "vagrant"
   ssh_port                = 22
   ssh_username            = "vagrant"
-  ssh_wait_timeout        = "10000s"
+  ssh_timeout             = "10000s"
   vboxmanage              = [
     ["modifyvm", "{{ .Name }}", "--memory", "${var.memory}"],
     ["modifyvm", "{{ .Name }}", "--cpus", "${var.cpus}"]
