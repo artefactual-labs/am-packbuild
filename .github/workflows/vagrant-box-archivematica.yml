@@ -81,15 +81,11 @@ jobs:
       run: |
         sudo mkdir -p /etc/vbox/
         echo "* 10.10.10.20/24" | sudo tee -a /etc/vbox/networks.conf
-    - name: Install packer plugins
-      run: |
-        packer plugins install github.com/hashicorp/virtualbox
-        packer plugins install github.com/hashicorp/ansible
-        packer plugins install github.com/hashicorp/vagrant
     - name: Build
       run: |
         cd ${{ github.workspace }}/packer/templates/vagrant-box-archivematica
-        packer build -on-error=abort template.json
+        packer init template.json.pkr.hcl
+        packer build -on-error=abort template.json.pkr.hcl
         mv ${{ github.workspace }}/packer/builds/virtualbox/vagrant-am.box \
           ${{ github.workspace }}/archivematica-vagrant-${{ github.event.inputs.version }}.box
     - name: Provision a test VM with the new image
