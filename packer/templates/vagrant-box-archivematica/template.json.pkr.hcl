@@ -15,11 +15,6 @@ packer {
   }
 }
 
-variable "mirror" {
-  type    = string
-  default = "http://releases.ubuntu.com"
-}
-
 source "virtualbox-ovf" "ubuntu" {
   headless         = "true"
   shutdown_command = "echo 'vagrant' | sudo -S shutdown -P now"
