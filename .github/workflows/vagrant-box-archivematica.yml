@@ -10,10 +10,17 @@ on:
         required: true
 jobs:
   build-base-image:
-    name: Build base image
+    name: "Build base image Ubuntu ${{ matrix.ubuntu-version }}"
     runs-on: ubuntu-24.04
     env:
       PACKER_CACHE_DIR: ${{ github.workspace }}/.packer_cache
+      PACKER_LOG: TRACE
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu-version: [
+          "20.04",
+        ]
     steps:
     - name: Check out code
       uses: actions/checkout@v4
@@ -35,27 +42,34 @@ jobs:
         packer plugins install github.com/hashicorp/vagrant
     - name: Build
       run: |
-        cd ${{ github.workspace }}/packer/templates/vagrant-base-ubuntu-20.04-amd64
+        cd "${{ github.workspace }}/packer/templates/vagrant-base-ubuntu-${{ matrix.ubuntu-version }}-amd64"
         packer build -on-error=abort template.json
     - name: Upload base image
       uses: actions/upload-artifact@v4
       with:
-        name: base-image
-        path: "${{ github.workspace }}/packer/builds/virtualbox/vagrant-base-ubuntu-20.04-amd64"
+        name: "base-image-${{ matrix.ubuntu-version }}"
+        path: "${{ github.workspace }}/packer/builds/virtualbox/vagrant-base-ubuntu-${{ matrix.ubuntu-version }}-amd64"
   vagrant-box-archivematica:
-    name: Build and upload box image
+    name: "Build and upload box image Ubuntu ${{ matrix.ubuntu-version }}"
     runs-on: ubuntu-24.04
     needs: ["build-base-image"]
     env:
       PACKER_CACHE_DIR: ${{ github.workspace }}/.packer_cache
+      PACKER_LOG: TRACE
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu-version: [
+          "20.04",
+        ]
     steps:
     - name: Check out code
       uses: actions/checkout@v4
     - name: Restore base image
       uses: actions/download-artifact@v4
       with:
-        name: base-image
-        path: "${{ github.workspace }}/packer/builds/virtualbox/vagrant-base-ubuntu-20.04-amd64"
+        name: "base-image-${{ matrix.ubuntu-version }}"
+        path: "${{ github.workspace }}/packer/builds/virtualbox/vagrant-base-ubuntu-${{ matrix.ubuntu-version }}-amd64"
     - name: "Install packer, vagrant and VirtualBox"
       run: |
         wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
