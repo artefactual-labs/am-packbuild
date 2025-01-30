@@ -84,7 +84,7 @@ nginx_sites:
 
 # elasticsearch role
 
-elasticsearch_version: "5.6.0"
+elasticsearch_version: "6.8.23"
 elasticsearch_apt_java_package: "openjdk-8-jre-headless"
 elasticsearch_java_home: "/usr/lib/jvm/java-1.8.0-openjdk-amd64"
 elasticsearch_heap_size: "1g"
