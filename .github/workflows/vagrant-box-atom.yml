@@ -9,22 +9,112 @@ on:
         description: Description
         required: true
 jobs:
-  vagrant-box-atom:
-    name: Build and upload
-    runs-on: macos-10.15
+  build-base-image:
+    name: "Build base image Ubuntu ${{ matrix.ubuntu-version }}"
+    runs-on: ubuntu-24.04
     env:
       PACKER_CACHE_DIR: ${{ github.workspace }}/.packer_cache
+      PACKER_LOG: TRACE
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu-version: [
+          "20.04",
+        ]
     steps:
     - name: Check out code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
+    - name: "Install packer and VirtualBox"
+      run: |
+        wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+        wget -O- https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo gpg --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg --dearmor
+        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/oracle-virtualbox-2016.gpg] https://download.virtualbox.org/virtualbox/debian $(lsb_release -cs) contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
+        sudo apt update && sudo apt install packer virtualbox-7.1
+    - name: Set the user environment as VirtualBox expects it
+      run: |
+        echo "USER=$USER" >> $GITHUB_ENV
+        echo "LOGNAME=$USER" >> $GITHUB_ENV
     - name: Build
       run: |
-        cd ${{ github.workspace }}/packer/templates/vagrant-base-ubuntu-20.04-amd64
-        packer build -on-error=abort template.json
+        cd "${{ github.workspace }}/packer/templates/vagrant-base-ubuntu-${{ matrix.ubuntu-version }}-amd64"
+        packer init template.json.pkr.hcl
+        packer build -on-error=abort template.json.pkr.hcl
+    - name: Upload base image
+      uses: actions/upload-artifact@v4
+      with:
+        name: "base-image-${{ matrix.ubuntu-version }}"
+        path: "${{ github.workspace }}/packer/builds/virtualbox/vagrant-base-ubuntu-${{ matrix.ubuntu-version }}-amd64"
+  vagrant-box-atom:
+    name: "Build and upload box image Ubuntu ${{ matrix.ubuntu-version }}"
+    runs-on: ubuntu-24.04
+    needs: ["build-base-image"]
+    env:
+      PACKER_CACHE_DIR: ${{ github.workspace }}/.packer_cache
+      PACKER_LOG: TRACE
+    strategy:
+      fail-fast: false
+      matrix:
+        ubuntu-version: [
+          "20.04",
+        ]
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+    - name: Restore base image
+      uses: actions/download-artifact@v4
+      with:
+        name: "base-image-${{ matrix.ubuntu-version }}"
+        path: "${{ github.workspace }}/packer/builds/virtualbox/vagrant-base-ubuntu-${{ matrix.ubuntu-version }}-amd64"
+    - name: "Install packer, vagrant and VirtualBox"
+      run: |
+        wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+        echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+        wget -O- https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo gpg --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg --dearmor
+        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/oracle-virtualbox-2016.gpg] https://download.virtualbox.org/virtualbox/debian $(lsb_release -cs) contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
+        sudo apt update && sudo apt install packer vagrant virtualbox-7.1
+    - name: Set the user environment as VirtualBox expects it
+      run: |
+        echo "USER=$USER" >> $GITHUB_ENV
+        echo "LOGNAME=$USER" >> $GITHUB_ENV
+    - name: Update vbox networks
+      run: |
+        sudo mkdir -p /etc/vbox/
+        echo "* 10.10.10.10/24" | sudo tee -a /etc/vbox/networks.conf
+    - name: Build
+      run: |
         cd ${{ github.workspace }}/packer/templates/vagrant-box-atom
+        packer plugins install github.com/hashicorp/virtualbox
+        packer plugins install github.com/hashicorp/ansible
+        packer plugins install github.com/hashicorp/vagrant
         packer build -on-error=abort template.json
         mv ${{ github.workspace }}/packer/builds/virtualbox/vagrant-atom.box \
           ${{ github.workspace }}/atom-vagrant-${{ github.event.inputs.version }}.box
+    - name: Provision a test VM with the new image
+      run: |
+        vagrant init --minimal --no-tty atom-vagrant-${{ github.event.inputs.version }} file://${{ github.workspace }}/atom-vagrant-${{ github.event.inputs.version }}.box
+        cat Vagrantfile
+        vagrant up --debug-timestamp --provider virtualbox
+    - name: Set up API access
+      run: |
+        vagrant ssh -c 'php -d memory_limit=-1 /usr/share/nginx/atom/symfony tools:atom-plugins add arRestApiPlugin'
+        export DEMO_USER_ID=$(vagrant ssh -c "sudo mysql atom --batch --skip-column-names --execute \"select id from atom.user where email='demo@example.com'\"")
+        export SQLQUERY="insert into atom.property (name, object_id, source_culture, serial_number) values ('RestApiKey', $DEMO_USER_ID, 'en', 0)"
+        vagrant ssh -c "sudo mysql atom --execute \"$SQLQUERY\""
+        export SQLSUBQUERY="(select id from atom.property where object_id=$DEMO_USER_ID and name='RestApiKey')"
+        export SQLQUERY="insert into atom.property_i18n (value, id, culture) values ('0000000000000000', $SQLSUBQUERY, 'en')"
+        vagrant ssh -c "sudo mysql atom --execute \"$SQLQUERY\""
+        vagrant ssh -c 'sudo service atom-worker restart'
+    - name: Test AtoM is running in the test VM
+      run: |
+        test $( \
+            curl \
+                --silent \
+                --header 'REST-API-Key: 0000000000000000' \
+                --header 'Content-Type: application/json' \
+                'http://10.10.10.10/api/taxonomies/34' \
+            | jq -e '[.[] | .name] == ["Collection", "File", "Fonds", "Item", "Part", "Record group", "Series", "Subfonds", "Subseries"]' \
+        ) == true
     - name: Upload
       run: |
         cd ${{ github.workspace }}/tools/vagrant-box-uploader
