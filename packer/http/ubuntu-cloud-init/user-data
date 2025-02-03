@@ -1,0 +1,35 @@
+#cloud-config
+autoinstall:
+  version: 1
+  timezone: UTC
+  locale: en_US.UTF-8
+  console-setup:
+    ask_detect: false
+  identity:
+    hostname: ubuntu
+    username: vagrant
+    password: '$6$SdHO1cZDy98ywcIg$k/x29J989QigaPu.KB/Am6LQXOcs3PFbyW6.FuOSgtr736DJOy3P3ulyWDEOJMdFrj9Y9WwYjKr5E1vh12vEf1'
+
+  users:
+  - name: vagrant
+    uid: 900
+    groups: [vagrant,sudo]
+    encrypt_home: false
+    sudo: ALL=(ALL) NOPASSWD:ALL
+
+  storage:
+    layout:
+      name: direct
+
+  network:
+    network:
+      version: 2
+      ethernets:
+        enp0s3:
+          dhcp4: true
+
+  ssh:
+    install-server: true
+    allow-pw: true
+
+  interactive-sections: []
