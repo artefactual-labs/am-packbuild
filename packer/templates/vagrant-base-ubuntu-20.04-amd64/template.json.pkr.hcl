@@ -34,7 +34,7 @@ variable "https_proxy" {
 
 variable "iso_checksum" {
   type    = string
-  default = "b8f31413336b9393ad5d8ef0282717b2ab19f007df2e9ed5196c13d8f9153c8b"
+  default = "file:https://releases.ubuntu.com/20.04/SHA256SUMS"
 }
 
 variable "memory" {
