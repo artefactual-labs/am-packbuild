@@ -1,25 +1,68 @@
 # Packer templates
 
-## How to build them
+## Requirements
 
-* Change directory
+- [VirtualBox](https://www.virtualbox.org/wiki/Downloads) 7.1 or higher
+- [Packer](https://developer.hashicorp.com/packer/install) 1.12 or higher
+- [Vagrant](https://developer.hashicorp.com/vagrant/install) 2.4.3 or higher
 
-```bash
-cd vagrant-base-ubuntu-14.04-amd64
+## How to build the Ubuntu base template
+
+- Clone this repository
+
+```shell
+git clone https://github.com/artefactual-labs/am-packbuild
 ```
 
-* Run packer
+- Change to the Ubuntu 20.04 template directory
 
-```bash
-PACKER_CACHE_DIR="$HOME/.packer_cache" packer build template.json
+```shell
+cd packer/templates/vagrant-base-ubuntu-20.04-amd64
 ```
 
-## Vagrant boxes
+- Run packer
 
-Boxes like ```vagrant-box-atom``` start being built from a OVF file that must
-be generated previously building the ```vagrant-base-ubuntu-14.04-amd64```
-template.
+To enable detailed logging, set the `PACKER_LOG` environment variable to `1`.
 
-Vagrant boxes:
+```shell
+packer init template.json.pkr.hcl
+packer build template.json.pkr.hcl
+```
 
-* vagrant-box-atom: AtoM box for developers and demos
+## Archivematica Vagrant box
+
+- Build the `vagrant-base-ubuntu-20.04-amd64` base template as explained above.
+
+- Change to the Archivematica box directory:
+
+```shell
+cd packer/templates/vagrant-box-archivematica
+```
+
+- Run packer
+
+To enable detailed logging, set the `PACKER_LOG` environment variable to `1`.
+
+```shell
+packer init template.json.pkr.hcl
+packer build template.json.pkr.hcl
+```
+
+## AtoM Vagrant box
+
+- Build the `vagrant-base-ubuntu-20.04-amd64` base template as explained above.
+
+- Change to the AtoM box directory:
+
+```shell
+cd packer/templates/vagrant-box-archivematica
+```
+
+- Run packer
+
+To enable detailed logging, set the `PACKER_LOG` environment variable to `1`.
+
+```shell
+packer init template.json.pkr.hcl
+packer build template.json.pkr.hcl
+```
