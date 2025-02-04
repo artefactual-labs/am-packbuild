@@ -24,9 +24,12 @@ cd packer/templates/vagrant-base-ubuntu-amd64
 
 To enable detailed logging, set the `PACKER_LOG` environment variable to `1`.
 
+There are variables files for different Ubuntu versions. Specify the version
+you need as a base using the `-var-file` option in the build command.
+
 ```shell
 packer init template.json.pkr.hcl
-packer build template.json.pkr.hcl
+packer build -var-file=ubuntu-20.04.pkvars.hcl template.json.pkr.hcl
 ```
 
 ## Archivematica Vagrant box

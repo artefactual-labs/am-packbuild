@@ -39,7 +39,7 @@ jobs:
       run: |
         cd "${{ github.workspace }}/packer/templates/vagrant-base-ubuntu-amd64"
         packer init template.json.pkr.hcl
-        packer build -on-error=abort template.json.pkr.hcl
+        packer build -on-error=abort -var-file=ubuntu-${{ matrix.ubuntu-version }}.pkvars.hcl template.json.pkr.hcl
     - name: Upload base image
       uses: actions/upload-artifact@v4
       with:
