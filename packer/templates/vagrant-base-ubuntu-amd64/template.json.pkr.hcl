@@ -49,7 +49,7 @@ variable "no_proxy" {
 
 variable "vm_name" {
   type    = string
-  default = "vagrant-base-ubuntu-20.04-amd64"
+  default = "vagrant-base-ubuntu-amd64"
 }
 
 variable "iso_url" {
@@ -82,7 +82,7 @@ variable "http_directory" {
 
 variable "output_directory" {
   type    = string
-  default = "../../builds/virtualbox/vagrant-base-ubuntu-20.04-amd64"
+  default = "../../builds/virtualbox/vagrant-base-ubuntu-amd64"
 }
 
 variable "boot_wait" {

@@ -37,14 +37,14 @@ jobs:
         echo "LOGNAME=$USER" >> $GITHUB_ENV
     - name: Build
       run: |
-        cd "${{ github.workspace }}/packer/templates/vagrant-base-ubuntu-${{ matrix.ubuntu-version }}-amd64"
+        cd "${{ github.workspace }}/packer/templates/vagrant-base-ubuntu-amd64"
         packer init template.json.pkr.hcl
         packer build -on-error=abort template.json.pkr.hcl
     - name: Upload base image
       uses: actions/upload-artifact@v4
       with:
         name: "base-image-${{ matrix.ubuntu-version }}"
-        path: "${{ github.workspace }}/packer/builds/virtualbox/vagrant-base-ubuntu-${{ matrix.ubuntu-version }}-amd64"
+        path: "${{ github.workspace }}/packer/builds/virtualbox/vagrant-base-ubuntu-amd64"
   vagrant-box-archivematica:
     name: "Build and upload box image Ubuntu ${{ matrix.ubuntu-version }}"
     runs-on: ubuntu-24.04
@@ -65,7 +65,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: "base-image-${{ matrix.ubuntu-version }}"
-        path: "${{ github.workspace }}/packer/builds/virtualbox/vagrant-base-ubuntu-${{ matrix.ubuntu-version }}-amd64"
+        path: "${{ github.workspace }}/packer/builds/virtualbox/vagrant-base-ubuntu-amd64"
     - name: "Install packer, vagrant and VirtualBox"
       run: |
         wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
