@@ -52,6 +52,11 @@ variable "template" {
   default = "vagrant-base-ubuntu-20.04-amd64"
 }
 
+variable "iso_url" {
+  type    = string
+  default = "https://www.releases.ubuntu.com/20.04/ubuntu-20.04.6-live-server-amd64.iso"
+}
+
 source "virtualbox-iso" "ubuntu" {
   boot_command            = [
     # Display language menu.
@@ -74,10 +79,7 @@ source "virtualbox-iso" "ubuntu" {
   headless                = "${var.headless}"
   http_directory          = "../../http/ubuntu-cloud-init"
   iso_checksum            = "${var.iso_checksum}"
-  iso_urls                = [
-    "iso/ubuntu-20.04.6-live-server-amd64.iso",
-    "https://www.releases.ubuntu.com/20.04/ubuntu-20.04.6-live-server-amd64.iso"
-  ]
+  iso_url                 = "${var.iso_url}"
   output_directory        = "../../builds/virtualbox/vagrant-base-ubuntu-20.04-amd64"
   shutdown_command        = "echo 'vagrant' | sudo -S shutdown -P now"
   ssh_password            = "vagrant"
