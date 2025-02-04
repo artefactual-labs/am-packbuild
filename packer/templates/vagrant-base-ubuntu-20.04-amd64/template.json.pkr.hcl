@@ -80,6 +80,11 @@ variable "http_directory" {
   default = "../../http/ubuntu-cloud-init"
 }
 
+variable "output_directory" {
+  type    = string
+  default = "../../builds/virtualbox/vagrant-base-ubuntu-20.04-amd64"
+}
+
 source "virtualbox-iso" "ubuntu" {
   boot_command            = "${var.boot_command}"
   boot_wait               = "5s"
@@ -90,7 +95,7 @@ source "virtualbox-iso" "ubuntu" {
   http_directory          = "${var.http_directory}"
   iso_checksum            = "${var.iso_checksum}"
   iso_url                 = "${var.iso_url}"
-  output_directory        = "../../builds/virtualbox/vagrant-base-ubuntu-20.04-amd64"
+  output_directory        = "${var.output_directory}"
   shutdown_command        = "echo 'vagrant' | sudo -S shutdown -P now"
   ssh_password            = "vagrant"
   ssh_port                = 22
