@@ -14,7 +14,7 @@ variable "cpus" {
 
 variable "disk_size" {
   type    = string
-  default = "20960"
+  default = "30720"
 }
 
 variable "headless" {
@@ -34,7 +34,7 @@ variable "https_proxy" {
 
 variable "iso_checksum" {
   type    = string
-  default = "f11bda2f2caed8f420802b59f382c25160b114ccc665dbac9c5046e7fceaced2"
+  default = "b8f31413336b9393ad5d8ef0282717b2ab19f007df2e9ed5196c13d8f9153c8b"
 }
 
 variable "memory" {
@@ -54,41 +54,29 @@ variable "template" {
 
 source "virtualbox-iso" "ubuntu" {
   boot_command            = [
-    "<enter><wait><f6><esc><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
-    "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
-    "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
-    "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
-    "/install/vmlinuz<wait>",
-    " auto<wait>",
-    " console-setup/ask_detect=false<wait>",
-    " console-setup/layoutcode=us<wait>",
-    " console-setup/modelcode=pc105<wait>",
-    " debconf/frontend=noninteractive<wait>",
-    " debian-installer=en_US.UTF-8<wait>",
-    " fb=false<wait>",
-    " initrd=/install/initrd.gz<wait>",
-    " kbd-chooser/method=us<wait>",
-    " keyboard-configuration/layout=USA<wait>",
-    " keyboard-configuration/variant=USA<wait>",
-    " locale=en_US.UTF-8<wait>",
-    " netcfg/get_domain=vm<wait>",
-    " netcfg/get_hostname=vagrant<wait>",
-    " grub-installer/bootdev=/dev/sda<wait>",
-    " noapic<wait>",
-    " preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg<wait>",
-    " -- <wait>",
+    # Display language menu.
+    "<wait><enter><wait>",
+    # Select English.
+    "<enter><wait>",
+    # Select "Other Options".
+    "<f6><wait>",
+    # Close "Expert mode" menu.
+    "<esc><wait>",
+    # Set the source URL for autoinstallation.
+    " autoinstall ds=nocloud-net;seedfrom=http://{{ .HTTPIP }}:{{ .HTTPPort }}/",
+    # Boot.
     "<enter><wait>"
   ]
-  boot_wait               = "10s"
+  boot_wait               = "5s"
   disk_size               = "${var.disk_size}"
   guest_os_type           = "Ubuntu_64"
   hard_drive_interface    = "sata"
   headless                = "${var.headless}"
-  http_directory          = "../../http/ubuntu-20.04"
+  http_directory          = "../../http/ubuntu-cloud-init"
   iso_checksum            = "${var.iso_checksum}"
   iso_urls                = [
-    "iso/ubuntu-20.04.1-legacy-server-amd64.iso",
-    "http://cdimage.ubuntu.com/ubuntu-legacy-server/releases/20.04/release/ubuntu-20.04.1-legacy-server-amd64.iso"
+    "iso/ubuntu-20.04.6-live-server-amd64.iso",
+    "https://www.releases.ubuntu.com/20.04/ubuntu-20.04.6-live-server-amd64.iso"
   ]
   output_directory        = "../../builds/virtualbox/vagrant-base-ubuntu-20.04-amd64"
   shutdown_command        = "echo 'vagrant' | sudo -S shutdown -P now"
