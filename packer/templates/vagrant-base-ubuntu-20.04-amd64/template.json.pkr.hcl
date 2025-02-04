@@ -34,7 +34,7 @@ variable "https_proxy" {
 
 variable "iso_checksum" {
   type    = string
-  default = "b8f31413336b9393ad5d8ef0282717b2ab19f007df2e9ed5196c13d8f9153c8b"
+  default = "file:https://releases.ubuntu.com/20.04/SHA256SUMS"
 }
 
 variable "memory" {
@@ -47,13 +47,19 @@ variable "no_proxy" {
   default = "${env("no_proxy")}"
 }
 
-variable "template" {
+variable "vm_name" {
   type    = string
   default = "vagrant-base-ubuntu-20.04-amd64"
 }
 
-source "virtualbox-iso" "ubuntu" {
-  boot_command            = [
+variable "iso_url" {
+  type    = string
+  default = "https://www.releases.ubuntu.com/20.04/ubuntu-20.04.6-live-server-amd64.iso"
+}
+
+variable "boot_command" {
+  type    = list(string)
+  default = [
     # Display language menu.
     "<wait><enter><wait>",
     # Select English.
@@ -67,18 +73,34 @@ source "virtualbox-iso" "ubuntu" {
     # Boot.
     "<enter><wait>"
   ]
-  boot_wait               = "5s"
+}
+
+variable "http_directory" {
+  type    = string
+  default = "../../http/ubuntu-cloud-init"
+}
+
+variable "output_directory" {
+  type    = string
+  default = "../../builds/virtualbox/vagrant-base-ubuntu-20.04-amd64"
+}
+
+variable "boot_wait" {
+  type    = string
+  default = "5s"
+}
+
+source "virtualbox-iso" "ubuntu" {
+  boot_command            = "${var.boot_command}"
+  boot_wait               = "${var.boot_wait}"
   disk_size               = "${var.disk_size}"
   guest_os_type           = "Ubuntu_64"
   hard_drive_interface    = "sata"
   headless                = "${var.headless}"
-  http_directory          = "../../http/ubuntu-cloud-init"
+  http_directory          = "${var.http_directory}"
   iso_checksum            = "${var.iso_checksum}"
-  iso_urls                = [
-    "iso/ubuntu-20.04.6-live-server-amd64.iso",
-    "https://www.releases.ubuntu.com/20.04/ubuntu-20.04.6-live-server-amd64.iso"
-  ]
-  output_directory        = "../../builds/virtualbox/vagrant-base-ubuntu-20.04-amd64"
+  iso_url                 = "${var.iso_url}"
+  output_directory        = "${var.output_directory}"
   shutdown_command        = "echo 'vagrant' | sudo -S shutdown -P now"
   ssh_password            = "vagrant"
   ssh_port                = 22
@@ -89,7 +111,7 @@ source "virtualbox-iso" "ubuntu" {
     ["modifyvm", "{{ .Name }}", "--cpus", "${var.cpus}"]
   ]
   virtualbox_version_file = ".vbox_version"
-  vm_name                 = "${var.template}"
+  vm_name                 = "${var.vm_name}"
 }
 
 build {
