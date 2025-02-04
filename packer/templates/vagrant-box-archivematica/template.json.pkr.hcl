@@ -32,7 +32,7 @@ build {
   provisioner "shell" {
     execute_command = "echo 'vagrant'|{{ .Vars }} sudo -S -E bash '{{ .Path }}'"
     scripts         = [
-      "../../scripts/ubuntu/ansible-focal.sh"
+      "../../scripts/ubuntu/ansible.sh"
     ]
   }
 
