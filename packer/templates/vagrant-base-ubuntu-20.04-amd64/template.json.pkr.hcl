@@ -57,8 +57,9 @@ variable "iso_url" {
   default = "https://www.releases.ubuntu.com/20.04/ubuntu-20.04.6-live-server-amd64.iso"
 }
 
-source "virtualbox-iso" "ubuntu" {
-  boot_command            = [
+variable "boot_command" {
+  type    = list(string)
+  default = [
     # Display language menu.
     "<wait><enter><wait>",
     # Select English.
@@ -72,6 +73,10 @@ source "virtualbox-iso" "ubuntu" {
     # Boot.
     "<enter><wait>"
   ]
+}
+
+source "virtualbox-iso" "ubuntu" {
+  boot_command            = "${var.boot_command}"
   boot_wait               = "5s"
   disk_size               = "${var.disk_size}"
   guest_os_type           = "Ubuntu_64"
