@@ -47,7 +47,7 @@ variable "no_proxy" {
   default = "${env("no_proxy")}"
 }
 
-variable "template" {
+variable "vm_name" {
   type    = string
   default = "vagrant-base-ubuntu-20.04-amd64"
 }
@@ -96,7 +96,7 @@ source "virtualbox-iso" "ubuntu" {
     ["modifyvm", "{{ .Name }}", "--cpus", "${var.cpus}"]
   ]
   virtualbox_version_file = ".vbox_version"
-  vm_name                 = "${var.template}"
+  vm_name                 = "${var.vm_name}"
 }
 
 build {
