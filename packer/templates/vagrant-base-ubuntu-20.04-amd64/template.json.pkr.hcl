@@ -75,6 +75,11 @@ variable "boot_command" {
   ]
 }
 
+variable "http_directory" {
+  type    = string
+  default = "../../http/ubuntu-cloud-init"
+}
+
 source "virtualbox-iso" "ubuntu" {
   boot_command            = "${var.boot_command}"
   boot_wait               = "5s"
@@ -82,7 +87,7 @@ source "virtualbox-iso" "ubuntu" {
   guest_os_type           = "Ubuntu_64"
   hard_drive_interface    = "sata"
   headless                = "${var.headless}"
-  http_directory          = "../../http/ubuntu-cloud-init"
+  http_directory          = "${var.http_directory}"
   iso_checksum            = "${var.iso_checksum}"
   iso_url                 = "${var.iso_url}"
   output_directory        = "../../builds/virtualbox/vagrant-base-ubuntu-20.04-amd64"
