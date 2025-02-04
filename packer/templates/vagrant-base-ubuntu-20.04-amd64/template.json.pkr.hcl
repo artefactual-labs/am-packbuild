@@ -85,9 +85,14 @@ variable "output_directory" {
   default = "../../builds/virtualbox/vagrant-base-ubuntu-20.04-amd64"
 }
 
+variable "boot_wait" {
+  type    = string
+  default = "5s"
+}
+
 source "virtualbox-iso" "ubuntu" {
   boot_command            = "${var.boot_command}"
-  boot_wait               = "5s"
+  boot_wait               = "${var.boot_wait}"
   disk_size               = "${var.disk_size}"
   guest_os_type           = "Ubuntu_64"
   hard_drive_interface    = "sata"
