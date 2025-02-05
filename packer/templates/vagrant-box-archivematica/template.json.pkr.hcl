@@ -18,7 +18,7 @@ packer {
 source "virtualbox-ovf" "ubuntu" {
   headless         = "true"
   shutdown_command = "echo 'vagrant' | sudo -S shutdown -P now"
-  source_path      = "../../builds/virtualbox/vagrant-base-ubuntu-20.04-amd64/vagrant-base-ubuntu-20.04-amd64.ovf"
+  source_path      = "../../builds/virtualbox/vagrant-base-ubuntu-amd64/vagrant-base-ubuntu-amd64.ovf"
   ssh_password     = "vagrant"
   ssh_username     = "vagrant"
   ssh_wait_timeout = "30s"
@@ -32,7 +32,7 @@ build {
   provisioner "shell" {
     execute_command = "echo 'vagrant'|{{ .Vars }} sudo -S -E bash '{{ .Path }}'"
     scripts         = [
-      "../../scripts/ubuntu/ansible-focal.sh"
+      "../../scripts/ubuntu/ansible.sh"
     ]
   }
 

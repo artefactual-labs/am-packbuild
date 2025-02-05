@@ -2,7 +2,17 @@
 
 apt-get update -y
 apt-get upgrade -y
-apt-get install -y ansible git net-tools
+apt-get install -y python3-dev curl git net-tools acl
 
-echo '[defaults]' > /etc/ansible/ansible.cfg
-echo 'allow_world_readable_tmpfiles = True' >> /etc/ansible/ansible.cfg
+curl -s https://bootstrap.pypa.io/pip/get-pip.py | python3 - --break-system-packages
+pip install --break-system-packages ansible jmespath Jinja2==3.0.3
+
+mkdir -p /etc/ansible
+
+cat << EOF
+[defaults]
+allow_world_readable_tmpfiles = True
+
+[ssh_connection]
+pipelining = True
+EOF

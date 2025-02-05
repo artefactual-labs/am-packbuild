@@ -34,7 +34,6 @@ variable "https_proxy" {
 
 variable "iso_checksum" {
   type    = string
-  default = "file:https://releases.ubuntu.com/20.04/SHA256SUMS"
 }
 
 variable "memory" {
@@ -49,30 +48,15 @@ variable "no_proxy" {
 
 variable "vm_name" {
   type    = string
-  default = "vagrant-base-ubuntu-20.04-amd64"
+  default = "vagrant-base-ubuntu-amd64"
 }
 
 variable "iso_url" {
   type    = string
-  default = "https://www.releases.ubuntu.com/20.04/ubuntu-20.04.6-live-server-amd64.iso"
 }
 
 variable "boot_command" {
   type    = list(string)
-  default = [
-    # Display language menu.
-    "<wait><enter><wait>",
-    # Select English.
-    "<enter><wait>",
-    # Select "Other Options".
-    "<f6><wait>",
-    # Close "Expert mode" menu.
-    "<esc><wait>",
-    # Set the source URL for autoinstallation.
-    " autoinstall ds=nocloud-net;seedfrom=http://{{ .HTTPIP }}:{{ .HTTPPort }}/",
-    # Boot.
-    "<enter><wait>"
-  ]
 }
 
 variable "http_directory" {
@@ -82,7 +66,7 @@ variable "http_directory" {
 
 variable "output_directory" {
   type    = string
-  default = "../../builds/virtualbox/vagrant-base-ubuntu-20.04-amd64"
+  default = "../../builds/virtualbox/vagrant-base-ubuntu-amd64"
 }
 
 variable "boot_wait" {

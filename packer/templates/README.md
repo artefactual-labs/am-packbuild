@@ -14,24 +14,27 @@
 git clone https://github.com/artefactual-labs/am-packbuild
 ```
 
-- Change to the Ubuntu 20.04 template directory
+- Change to the Ubuntu base template directory
 
 ```shell
-cd packer/templates/vagrant-base-ubuntu-20.04-amd64
+cd packer/templates/vagrant-base-ubuntu-amd64
 ```
 
 - Run packer
 
 To enable detailed logging, set the `PACKER_LOG` environment variable to `1`.
 
+There are variables files for different Ubuntu versions. Specify the version
+you need as a base using the `-var-file` option in the build command.
+
 ```shell
 packer init template.json.pkr.hcl
-packer build template.json.pkr.hcl
+packer build -var-file=ubuntu-22.04.pkvars.hcl template.json.pkr.hcl
 ```
 
 ## Archivematica Vagrant box
 
-- Build the `vagrant-base-ubuntu-20.04-amd64` base template as explained above.
+- Build the `vagrant-base-ubuntu-amd64` base template as explained above.
 
 - Change to the Archivematica box directory:
 
@@ -50,7 +53,7 @@ packer build template.json.pkr.hcl
 
 ## AtoM Vagrant box
 
-- Build the `vagrant-base-ubuntu-20.04-amd64` base template as explained above.
+- Build the `vagrant-base-ubuntu-amd64` base template as explained above.
 
 - Change to the AtoM box directory:
 
