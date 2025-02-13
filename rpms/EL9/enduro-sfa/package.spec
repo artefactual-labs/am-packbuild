@@ -9,7 +9,7 @@ License: ASL 2.0
 
 # BuildRequires: golang
 BuildRequires: systemd-rpm-macros
-BuildRequires: npm
+BuildRequires: nodejs
 
 Provides: %{name} = %{version}
 %description
