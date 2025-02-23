@@ -7,7 +7,7 @@ export DH_VIRTUALENV_INSTALL_ROOT=/usr/share/archivematica/virtualenvs
 	dh $@ --with python-virtualenv
 
 override_dh_virtualenv:
-	dh_virtualenv --python=python3 --requirements=requirements.txt --skip-install
+	dh_virtualenv --python=python3 --preinstall "setuptools>=75" --requirements=requirements.txt --skip-install
 
 # Ignore orjson because the *.so file included its Python 3.10 wheel contains
 # an 8-byte build ID which debugedit does not support.
