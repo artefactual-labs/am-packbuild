@@ -58,7 +58,7 @@ mkdir -p \
   %{buildroot}/etc/nginx/conf.d
 
 virtualenv /usr/share/archivematica/virtualenvs/archivematica-storage-service
-/usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/pip install --upgrade pip
+/usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/pip install --upgrade pip setuptools
 /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/pip install -r %{_sourcedir}/%{name}/requirements.txt
 cp -rf /usr/share/archivematica/virtualenvs/archivematica-storage-service/* %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-storage-service/
 
