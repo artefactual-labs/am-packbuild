@@ -29,7 +29,7 @@ you need as a base using the `-var-file` option in the build command.
 
 ```shell
 packer init template.json.pkr.hcl
-packer build -var-file=ubuntu-22.04.pkvars.hcl template.json.pkr.hcl
+packer build -var-file=ubuntu-24.04.pkvars.hcl template.json.pkr.hcl
 ```
 
 ## Archivematica Vagrant box
