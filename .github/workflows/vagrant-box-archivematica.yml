@@ -112,13 +112,3 @@ jobs:
                 'http://10.10.10.20:8000/api/v2/pipeline/' \
             | jq -r '.meta.total_count == 1' \
         ) == true
-    - name: Upload
-      run: |
-        cd ${{ github.workspace }}/tools/vagrant-box-uploader
-        bundle install
-        ruby upload.rb \
-          archivematica \
-          '${{ github.workspace }}/archivematica-vagrant-${{ github.event.inputs.version }}.box' \
-          '${{ secrets.VAGRANT_CLOUD }}' \
-          '${{ github.event.inputs.version }}' \
-          '${{ github.event.inputs.description }}'
