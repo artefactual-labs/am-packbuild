@@ -1,7 +1,7 @@
 FROM ubuntu:xenial
 
 # Environmnet variables needed during build
-ENV GOVERSION 1.21.6
+ENV GOVERSION 1.24.1
 ENV GOOS linux
 ENV GOARCH amd64
 ARG DEBIAN_FRONTEND=noninteractive
