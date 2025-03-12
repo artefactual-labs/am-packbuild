@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         ubuntu-version: [
-          "20.04",
+          "24.04",
         ]
     steps:
     - name: Check out code
@@ -56,7 +56,7 @@ jobs:
       fail-fast: false
       matrix:
         ubuntu-version: [
-          "20.04",
+          "24.04",
         ]
     steps:
     - name: Check out code
