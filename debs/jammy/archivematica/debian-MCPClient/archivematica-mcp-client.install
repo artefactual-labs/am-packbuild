@@ -1,3 +1,10 @@
-lib/* /usr/lib/archivematica/MCPClient/
+archivematicaClient.py /usr/lib/archivematica/MCPClient/
+archivematicaClientModules /usr/lib/archivematica/MCPClient/
+assets /usr/lib/archivematica/MCPClient/
+client /usr/lib/archivematica/MCPClient/
+clientScripts /usr/lib/archivematica/MCPClient/
+README.md /usr/lib/archivematica/MCPClient/
+settings /usr/lib/archivematica/MCPClient/
+
 install/clientConfig.logging.json /etc/archivematica/
 install/clientConfig.conf /etc/archivematica/

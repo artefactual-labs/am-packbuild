@@ -1,4 +1,19 @@
-src/* /usr/share/archivematica/dashboard/
+__init__.py /usr/share/archivematica/dashboard/
+components /usr/share/archivematica/dashboard/
+contrib /usr/share/archivematica/dashboard/
+fpr /usr/share/archivematica/dashboard/
+frontend /usr/share/archivematica/dashboard/
+installer /usr/share/archivematica/dashboard/
+locale /usr/share/archivematica/dashboard/
+main /usr/share/archivematica/dashboard/
+manage.py /usr/share/archivematica/dashboard/
+media /usr/share/archivematica/dashboard/
+middleware /usr/share/archivematica/dashboard/
+settings /usr/share/archivematica/dashboard/
+templates /usr/share/archivematica/dashboard/
+urls.py /usr/share/archivematica/dashboard/
+wsgi.py /usr/share/archivematica/dashboard/
+
 install/dashboard.conf /etc/nginx/sites-available/
 install/dashboard.gunicorn-config.py /etc/archivematica/
 install/dashboard.logging.json /etc/archivematica/
