@@ -1,7 +1,2 @@
-archivematicaMCP.py /usr/lib/archivematica/MCPServer/
-assets /usr/lib/archivematica/MCPServer/
-server /usr/lib/archivematica/MCPServer/
-settings /usr/lib/archivematica/MCPServer/
-
 install/serverConfig.conf /etc/archivematica/
 install/serverConfig.logging.json /etc/archivematica/
