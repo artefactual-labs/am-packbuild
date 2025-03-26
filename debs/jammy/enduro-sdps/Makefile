@@ -33,26 +33,31 @@ deb-build:
 	# Update debian/folder and changelog, and install dependencies
 	@echo "==> Build package."
 	git config --global --add safe.directory /src/src/enduro
-	cd src/$(PACKAGE) && PATH=${PATH} GOPATH=${GOPATH} && ./hack/build_dist.sh -o enduro ./cmd/enduro
-	cd src/$(PACKAGE) && PATH=${PATH} GOPATH=${GOPATH} && ./hack/build_dist.sh -o enduro-am-worker ./cmd/enduro-am-worker
+	cd src/$(NAME) && PATH=${PATH} GOPATH=${GOPATH} && ./hack/build_dist.sh -o enduro ./cmd/enduro
+	cd src/$(NAME) && PATH=${PATH} GOPATH=${GOPATH} && ./hack/build_dist.sh -o enduro-am-worker ./cmd/enduro-am-worker
 	cd src/ && rm -f *.deb 
 	cd src/ && cp /src/.fpm . 
 	cd src/ && PATH=${PATH} fpm --name enduro --version ${VERSION} -p enduro_${VERSION}-${RELEASE}_amd64.deb  enduro=/usr/bin/enduro enduro.toml=/etc/enduro.toml
 	cd src/ && PATH=${PATH} fpm --name enduro-am-worker --version ${VERSION} --description "enduro worker package" -p enduro-am-worker_${VERSION}-${RELEASE}_amd64.deb  enduro-am-worker=/usr/bin/enduro-am-worker
 	@echo "==> Copying DEB files."
 	mkdir -p build
-	cp src/$(PACKAGE)*.deb build/
+	cp src/$(NAME)*.deb build/
+
+cleanup:
+	@echo "==> Cleanup."
+	@docker run --rm \
+		--volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) rm -rf $(DOCKER_VOLUME)/src/$(NAME) $(DOCKER_VOLUME)/src/build/
 
 get-code:
 	@echo "==> Get code."
 	@mkdir -p src/
 	@docker run --rm \
-		--volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) rm -rf $(DOCKER_VOLUME)/src/$(PACKAGE)
+		--volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) rm -rf $(DOCKER_VOLUME)/src/$(NAME)
 	@git clone \
 			--quiet \
 			--branch ${BRANCH} \
 			--recurse-submodules $(GIT_URL) \
-		src/$(PACKAGE)
+		src/$(NAME)
 
 deb-test:
 	@docker run --rm --volume="$(shell pwd):$(DOCKER_VOLUME)" ubuntu:$(DISTRO_CODENAME) echo "Create repo and install package"
