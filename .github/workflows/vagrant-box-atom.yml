@@ -61,6 +61,11 @@ jobs:
     steps:
     - name: Check out code
       uses: actions/checkout@v4
+    - name: Install ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '2.7.7'
+        bundler-cache: false
     - name: Restore base image
       uses: actions/download-artifact@v4
       with:
