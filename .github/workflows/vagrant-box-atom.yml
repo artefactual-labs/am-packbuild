@@ -134,6 +134,7 @@ jobs:
       run: |
         vagrant cloud publish \
             --force \
+            --release \
             --version-description '${{ github.event.inputs.description }}' \
             artefactual/atom \
             '${{ github.event.inputs.version }}' \
