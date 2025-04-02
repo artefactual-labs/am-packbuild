@@ -58,9 +58,26 @@ jobs:
         ubuntu-version: [
           "24.04",
         ]
+    permissions:
+      contents: "read"
+      id-token: "write"
     steps:
     - name: Check out code
       uses: actions/checkout@v4
+    - name: Set up HCP authentication
+      uses: hashicorp/hcp-auth-action@v0
+      with:
+        workload_identity_provider: "${{ secrets.HCP_WORKLOAD_IDENTITY_PROVIDER }}"
+        set_access_token: true
+    - name: Set up the HCP CLI
+      uses: hashicorp/hcp-setup-action@v0
+      with:
+        version: "latest"
+    - name: Set the Vagrant Cloud token
+      run: |
+        VAGRANT_CLOUD_TOKEN="$(hcp auth print-access-token)"
+        echo "::add-mask::$VAGRANT_CLOUD_TOKEN"
+        echo "VAGRANT_CLOUD_TOKEN=$VAGRANT_CLOUD_TOKEN" >> $GITHUB_ENV
     - name: Restore base image
       uses: actions/download-artifact@v4
       with:
@@ -115,11 +132,10 @@ jobs:
         ) == true
     - name: Upload
       run: |
-        cd ${{ github.workspace }}/tools/vagrant-box-uploader
-        bundle install
-        ruby upload.rb \
-          atom \
-          '${{ github.workspace }}/atom-vagrant-${{ github.event.inputs.version }}.box' \
-          '${{ secrets.VAGRANT_CLOUD }}' \
-          '${{ github.event.inputs.version }}' \
-          '${{ github.event.inputs.description }}'
+        vagrant cloud publish \
+            --force \
+            --version-description '${{ github.event.inputs.description }}' \
+            artefactual/atom \
+            '${{ github.event.inputs.version }}' \
+            virtualbox \
+            '${{ github.workspace }}/atom-vagrant-${{ github.event.inputs.version }}.box'
