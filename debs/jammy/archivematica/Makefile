@@ -54,7 +54,7 @@ deb-build: deb-clean git-clone import-gpg-key
 	./build.sh
 	mkdir -p repo/
 	cp src/archivematica_* repo
-	cp -rf src/archivematica/src/archivematica-* repo
+	cp -rf src/archivematica/src/archivematica/archivematica-* repo
 	cd repo && dpkg-scanpackages . | gzip > Packages.gz
 
 .PHONY: git-clone

@@ -20,7 +20,7 @@ dpkg-buildpackage -us -uc
 popd
 
 # Install front-end node modules.
-pushd $SOURCE/src/dashboard/frontend/
+pushd $SOURCE/src/archivematica/dashboard/frontend/
 npm install --unsafe-perm
 popd
 
@@ -52,7 +52,7 @@ update_install_file() {
 
 # Create child packages.
 for i in dashboard MCPClient MCPServer archivematicaCommon; do
-	pushd "${SOURCE}/src/$i"
+	pushd "${SOURCE}/src/archivematica/$i"
 	cp -rf $BASE/debian-$i debian
 	update_install_file "$i"
 	yes | mk-build-deps -i debian/control

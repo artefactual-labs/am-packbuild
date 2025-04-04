@@ -18,7 +18,7 @@ The Storage Service is the mechanism by which Archivematica is able to store pac
 
 %files
 /usr/share/archivematica/virtualenvs/archivematica-storage-service/
-/usr/lib/archivematica/storage-service/
+/usr/lib/archivematica/storage_service/
 /var/archivematica/storage-service/
 /var/archivematica/storage_service/
 /usr/lib/systemd/system/archivematica-storage-service.service
@@ -49,7 +49,7 @@ git clone \
 %install
 mkdir -p \
   %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-storage-service/ \
-  %{buildroot}/usr/lib/archivematica/storage-service/ \
+  %{buildroot}/usr/lib/archivematica/storage_service/ \
   %{buildroot}/var/archivematica/storage-service/ \
   %{buildroot}/var/archivematica/storage_service/ \
   %{buildroot}/usr/lib/systemd/system \
@@ -62,7 +62,7 @@ virtualenv /usr/share/archivematica/virtualenvs/archivematica-storage-service
 /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/pip install -r %{_sourcedir}/%{name}/requirements.txt
 cp -rf /usr/share/archivematica/virtualenvs/archivematica-storage-service/* %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-storage-service/
 
-cp -rf %{_sourcedir}/%{name}/storage_service/* %{buildroot}/usr/lib/archivematica/storage-service/
+cp -rf %{_sourcedir}/%{name}/src/archivematica/storage_service/* %{buildroot}/usr/lib/archivematica/storage_service/
 cp %{_sourcedir}/%{name}/install/storage-service.gunicorn-config.py %{buildroot}/etc/archivematica/storage-service.gunicorn-config.py
 cp %{_sourcedir}/%{name}/install/storageService.logging.json %{buildroot}/etc/archivematica/storageService.logging.json
 cp %{_etcdir}/archivematica-storage-service.service %{buildroot}/usr/lib/systemd/system/archivematica-storage-service.service
@@ -90,7 +90,7 @@ fi
 mkdir -p /var/log/archivematica/storage-service /var/archivematica/storage-service /var/archivematica/storage_service
 touch /var/log/archivematica/storage-service/storage_service.log
 touch /var/log/archivematica/storage-service/storage_service_debug.log
-chown -R archivematica:archivematica /var/archivematica/storage_service /var/log/archivematica/storage-service /usr/lib/archivematica/storage-service /var/lib/archivematica /var/archivematica/storage-service
+chown -R archivematica:archivematica /var/archivematica/storage_service /var/log/archivematica/storage-service /usr/lib/archivematica/storage_service /var/lib/archivematica /var/archivematica/storage-service
 chmod 770 /var/archivematica/storage-service/
 chmod 750 /var/lib/archivematica/
 
@@ -114,14 +114,14 @@ fi
 # because the old virtualenv files need to be removed from the old package.
 # https://github.com/archivematica/Issues/issues/1312
 # https://docs.fedoraproject.org/en-US/packaging-guidelines/Scriptlets/#ordering
-mkdir -p /usr/lib/archivematica/storage-service/assets
+mkdir -p /usr/lib/archivematica/storage_service/assets
 bash -c " \
   set -a -e -x
   source /etc/sysconfig/archivematica-storage-service \
     || (echo 'Environment file not found'; exit 1)
-  cd /usr/lib/archivematica/storage-service
+  cd /usr/lib/archivematica/storage_service
   /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py collectstatic --noinput --clear
   /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py compilemessages
 ";
-chown -R archivematica:archivematica /usr/lib/archivematica/storage-service/assets
-chown -R archivematica:archivematica /usr/lib/archivematica/storage-service/locale
+chown -R archivematica:archivematica /usr/lib/archivematica/storage_service/assets
+chown -R archivematica:archivematica /usr/lib/archivematica/storage_service/locale

@@ -171,31 +171,31 @@ virtualenv /usr/share/archivematica/virtualenvs/archivematica
 cp -rf /usr/share/archivematica/virtualenvs/archivematica/* %{buildroot}/usr/share/archivematica/virtualenvs/archivematica/
 
 # Common
-cp -rf %{_sourcedir}/%{name}/src/archivematicaCommon/* %{buildroot}/usr/lib/archivematica/archivematicaCommon/
+cp -rf %{_sourcedir}/%{name}/src/archivematica/archivematicaCommon/* %{buildroot}/usr/lib/archivematica/archivematicaCommon/
 
 # MCPServer
-cp -rf %{_sourcedir}/%{name}/src/MCPServer/* %{buildroot}/usr/lib/archivematica/MCPServer/
-cp %{_sourcedir}/%{name}/src/MCPServer/install/serverConfig.logging.json %{buildroot}/etc/archivematica/serverConfig.logging.json
-cp %{_sourcedir}/%{name}/src/MCPServer/install/serverConfig.conf %{buildroot}/etc/archivematica/serverConfig.conf
+cp -rf %{_sourcedir}/%{name}/src/archivematica/MCPServer/* %{buildroot}/usr/lib/archivematica/MCPServer/
+cp %{_sourcedir}/%{name}/src/archivematica/MCPServer/install/serverConfig.logging.json %{buildroot}/etc/archivematica/serverConfig.logging.json
+cp %{_sourcedir}/%{name}/src/archivematica/MCPServer/install/serverConfig.conf %{buildroot}/etc/archivematica/serverConfig.conf
 cp %{_etcdir}/archivematica-mcp-server.service %{buildroot}/usr/lib/systemd/system/archivematica-mcp-server.service
 cp %{_etcdir}/archivematica-mcp-server.env %{buildroot}/etc/sysconfig/archivematica-mcp-server
 
 # MCPClient
-cp -rf %{_sourcedir}/%{name}/src/MCPClient/* %{buildroot}/usr/lib/archivematica/MCPClient
-cp %{_sourcedir}/%{name}/src/MCPClient/install/clientConfig.logging.json %{buildroot}/etc/archivematica/clientConfig.logging.json
-cp %{_sourcedir}/%{name}/src/MCPClient/install/clientConfig.conf %{buildroot}/etc/archivematica/clientConfig.conf
+cp -rf %{_sourcedir}/%{name}/src/archivematica/MCPClient/* %{buildroot}/usr/lib/archivematica/MCPClient
+cp %{_sourcedir}/%{name}/src/archivematica/MCPClient/install/clientConfig.logging.json %{buildroot}/etc/archivematica/clientConfig.logging.json
+cp %{_sourcedir}/%{name}/src/archivematica/MCPClient/install/clientConfig.conf %{buildroot}/etc/archivematica/clientConfig.conf
 cp %{_etcdir}/archivematica-mcp-client.service %{buildroot}/usr/lib/systemd/system/archivematica-mcp-client.service
 cp %{_etcdir}/archivematica-mcp-client.env %{buildroot}/etc/sysconfig/archivematica-mcp-client
 
 # Dashboard
-cp %{_sourcedir}/%{name}/src/dashboard/install/dashboard.gunicorn-config.py %{buildroot}/etc/archivematica/dashboard.gunicorn-config.py
-cp %{_sourcedir}/%{name}/src/dashboard/install/dashboard.logging.json %{buildroot}/etc/archivematica/dashboard.logging.json
+cp %{_sourcedir}/%{name}/src/archivematica/dashboard/install/dashboard.gunicorn-config.py %{buildroot}/etc/archivematica/dashboard.gunicorn-config.py
+cp %{_sourcedir}/%{name}/src/archivematica/dashboard/install/dashboard.logging.json %{buildroot}/etc/archivematica/dashboard.logging.json
 cp %{_etcdir}/archivematica-dashboard.service %{buildroot}/usr/lib/systemd/system/archivematica-dashboard.service
 cp %{_etcdir}/archivematica-dashboard.env %{buildroot}/etc/sysconfig/archivematica-dashboard
 cp %{_etcdir}/dashboard.nginx %{buildroot}/etc/nginx/conf.d/archivematica-dashboard.conf
 
-cd %{_sourcedir}/%{name}/src/dashboard/frontend/ && npm install --unsafe-perm
-cp -rf %{_sourcedir}/%{name}/src/dashboard/* %{buildroot}/usr/share/archivematica/dashboard/
+cd %{_sourcedir}/%{name}/src/archivematica/dashboard/frontend/ && npm install --unsafe-perm
+cp -rf %{_sourcedir}/%{name}/src/archivematica/dashboard/* %{buildroot}/usr/share/archivematica/dashboard/
 
 #
 # Clean up build directory
@@ -253,7 +253,7 @@ fi
 #
 %posttrans mcp-client
 # Update PYTHONPATH in configuration file
-sed -i "s/^PYTHONPATH=.*$/PYTHONPATH=\/usr\/lib\/archivematica\/MCPClient:\/usr\/lib\/archivematica\/MCPClient\/clientScripts:\/usr\/lib\/archivematica\/archivematicaCommon\/:\/usr\/share\/archivematica\/dashboard\//g" /etc/sysconfig/archivematica-mcp-client
+sed -i "s/^PYTHONPATH=.*$/PYTHONPATH=\/usr\/lib\/:\/usr\/share\//g" /etc/sysconfig/archivematica-mcp-client
 
 %posttrans dashboard
 # Update old virtual environment paths in configuration files
