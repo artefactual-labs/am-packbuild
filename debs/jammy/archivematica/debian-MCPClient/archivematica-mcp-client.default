@@ -1,10 +1,10 @@
 PATH=/usr/share/archivematica/virtualenvs/archivematica/bin:/usr/local/sbin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin
-PYTHONPATH=/usr/lib/archivematica/MCPClient:/usr/lib/archivematica/MCPClient/clientScripts:/usr/lib/archivematica/archivematicaCommon/:/usr/share/archivematica/dashboard/
+PYTHONPATH=/usr/lib/:/usr/share/
 LANG="en_US.UTF-8"
 LC_ALL="en_US.UTF-8"
 LC_LANG="en_US.UTF-8"
 
-DJANGO_SETTINGS_MODULE=settings.common
+DJANGO_SETTINGS_MODULE=archivematica.MCPClient.settings.common
 
 ARCHIVEMATICA_MCPCLIENT_CLIENT_HOST=localhost
 ARCHIVEMATICA_MCPCLIENT_CLIENT_PORT=3306

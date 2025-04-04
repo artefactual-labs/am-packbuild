@@ -120,7 +120,7 @@ sudo -u root yum install -y archivematica-storage-service
 sudo -u archivematica bash -c " \
   set -a -e -x
   source /etc/sysconfig/archivematica-storage-service
-  cd /usr/lib/archivematica/storage-service
+  cd /usr/lib/archivematica/storage_service
   /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py migrate
 ";
 
@@ -197,7 +197,7 @@ sudo -u archivematica bash -c " \
     source /etc/default/archivematica-storage-service || \
         source /etc/sysconfig/archivematica-storage-service \
             || (echo 'Environment file not found'; exit 1)
-    cd /usr/lib/archivematica/storage-service
+    cd /usr/lib/archivematica/storage_service
       /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py create_user \
           --username=admin \
           --password=archivematica \
@@ -249,7 +249,7 @@ sudo -u archivematica bash -c " \
     source /etc/default/archivematica-storage-service || \
         source /etc/sysconfig/archivematica-storage-service \
             || (echo 'Environment file not found'; exit 1)
-    cd /usr/lib/archivematica/storage-service
+    cd /usr/lib/archivematica/storage_service
       /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py collectstatic --noinput --clear
 ";
 
@@ -258,6 +258,6 @@ sudo -u archivematica bash -c " \
     source /etc/default/archivematica-storage-service || \
         source /etc/sysconfig/archivematica-storage-service \
             || (echo 'Environment file not found'; exit 1)
-    cd /usr/lib/archivematica/storage-service
+    cd /usr/lib/archivematica/storage_service
       /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py compilemessages
 ";

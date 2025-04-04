@@ -47,12 +47,12 @@ set -a
 source /etc/default/archivematica-storage-service
 set +a
 
-find /usr/lib/archivematica/storage-service/ -name '*.pyc' -delete
+find /usr/lib/archivematica/storage_service/ -name '*.pyc' -delete
 
 echo "configuring django database and static files"
-cd /usr/lib/archivematica/storage-service
+cd /usr/lib/archivematica/storage_service
 ${SS_ENV_DIR}/bin/python manage.py migrate
-mkdir -p /usr/lib/archivematica/storage-service/assets
+mkdir -p /usr/lib/archivematica/storage_service/assets
 ${SS_ENV_DIR}/bin/python manage.py collectstatic --noinput --clear
 ${SS_ENV_DIR}/bin/python manage.py compilemessages
 ${SS_ENV_DIR}/bin/python manage.py backfill_api_keys
@@ -63,8 +63,8 @@ chown -R archivematica:archivematica /var/archivematica/.storage-service
 chown -R archivematica:archivematica ${SS_ENV_DIR}
 mkdir -p /var/log/archivematica/storage-service
 chown -R archivematica:archivematica /var/log/archivematica/storage-service
-chown -R archivematica:archivematica /usr/lib/archivematica/storage-service/assets
-chown -R archivematica:archivematica /usr/lib/archivematica/storage-service/locale
+chown -R archivematica:archivematica /usr/lib/archivematica/storage_service/assets
+chown -R archivematica:archivematica /usr/lib/archivematica/storage_service/locale
 
 rm -f /tmp/storage_service.log
 
