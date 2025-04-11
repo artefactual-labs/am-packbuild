@@ -42,6 +42,8 @@ cp -rf lib %{buildroot}/usr/share/jhove/
 cp LICENSE README.md COPYING %{buildroot}/usr/share/doc/jhove/
 
 %changelog
+* Fri Apr 11 2025 - sysadmin@artefactual.com
+- 1.32.1-2 package: Enable external JHOVE modules
 * Thu Mar 13 2025 - sysadmin@artefactual.com
 - 1.32.1-1 package: Bump version to 1.32.1
 * Mon Sep 25 2023 - sysadmin@artefactual.com

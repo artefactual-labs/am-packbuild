@@ -20,7 +20,7 @@ for i in $(find /usr/share/jhove/bin/ -name *.jar ! -name jhove*jar);do
      fi
 done
 
-CONFIG="/usr/share/jhove/conf/jhove.conf"
+CONFIG="/usr/share/jhove/conf/ext-modules/jhove.conf"
 
 # Set class path and invoke Java
 java -Xss1024k -classpath "${jar_list}:${extra_jar_list}" edu.harvard.hul.ois.jhove.viewer.JhoveView -c "${CONFIG}" "${@}"
