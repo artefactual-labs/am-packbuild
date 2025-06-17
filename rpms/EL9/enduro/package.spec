@@ -15,16 +15,12 @@ BuildRequires: which
 %description
 A tool to aid automation of Archivematica and surrounding workflows
 
-%build
-make ui
-make build
-
 
 %install
 rm -rf $RPM_BUILD_ROOT
 install -m 0755 -d $RPM_BUILD_ROOT/usr/bin/
 install -m 0755 -d $RPM_BUILD_ROOT/etc/systemd/system/
-install -m 0755 build/enduro $RPM_BUILD_ROOT/usr/bin/enduro
+install -m 0755 dist/enduro_linux_amd64_v1/enduro $RPM_BUILD_ROOT/usr/bin/enduro
 install -m 0644 enduro.toml $RPM_BUILD_ROOT/etc/enduro.toml
 install -m 0644 enduro.service $RPM_BUILD_ROOT/etc/systemd/system/enduro.service
 
