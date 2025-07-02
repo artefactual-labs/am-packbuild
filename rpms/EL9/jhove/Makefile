@@ -1,5 +1,5 @@
 NAME          = jhove
-VERSION       = 1.32.1
+VERSION       = 1.34.0
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
