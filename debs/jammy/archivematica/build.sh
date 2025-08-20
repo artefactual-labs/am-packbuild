@@ -48,6 +48,12 @@ update_install_file() {
 	# excluding 'install' and 'debian', and append their names along with the
 	# designated target directory to the install file.
 	find . -maxdepth 1 \( -type f -o -type d \) -not -name ".*" -not -path "./install" -not -path "./debian" -exec echo "{} $target_dir" \; >> "debian/$install_file"
+
+	# Add archivematica.search to the common package.
+	if [[ "$i" == "archivematicaCommon" ]]; then
+		target_dir="/usr/lib/archivematica/search/"
+		find ../search -maxdepth 1 \( -type f -o -type d \) -not -name ".*" -not -path "./install" -not -path "./debian" -exec echo "{} $target_dir" \; >> "debian/$install_file"
+	fi
 }
 
 # Create child packages.

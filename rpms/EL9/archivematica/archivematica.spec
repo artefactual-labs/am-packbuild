@@ -97,6 +97,7 @@ Archivematica dashboard with Nginx + gunicorn.
 # Common
 %files common
 /usr/lib/archivematica/archivematicaCommon/
+/usr/lib/archivematica/search/
 /var/archivematica/sharedDirectory/
 
 # MCPServer
@@ -157,6 +158,7 @@ mkdir -p \
   %{buildroot}/usr/lib/archivematica/MCPServer \
   %{buildroot}/usr/lib/archivematica/MCPClient \
   %{buildroot}/usr/lib/archivematica/archivematicaCommon \
+  %{buildroot}/usr/lib/archivematica/search \
   %{buildroot}/usr/share/archivematica/virtualenvs/archivematica \
   %{buildroot}/usr/share/archivematica/dashboard \
   %{buildroot}/var/archivematica/sharedDirectory \
@@ -172,6 +174,7 @@ cp -rf /usr/share/archivematica/virtualenvs/archivematica/* %{buildroot}/usr/sha
 
 # Common
 cp -rf %{_sourcedir}/%{name}/src/archivematica/archivematicaCommon/* %{buildroot}/usr/lib/archivematica/archivematicaCommon/
+cp -rf %{_sourcedir}/%{name}/src/archivematica/search/* %{buildroot}/usr/lib/archivematica/search/
 
 # MCPServer
 cp -rf %{_sourcedir}/%{name}/src/archivematica/MCPServer/* %{buildroot}/usr/lib/archivematica/MCPServer/
