@@ -94,9 +94,9 @@ sudo -u root systemctl start gearmand
 if [ "${search_enabled}" == "true" ] ; then
     sudo -u root rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
     sudo -u root bash -c 'cat << EOF > /etc/yum.repos.d/elasticsearch.repo
-[elasticsearch-6.x]
-name=Elasticsearch repository for 6.x packages
-baseurl=https://artifacts.elastic.co/packages/6.x/yum
+[elasticsearch-8.x]
+name=Elasticsearch repository for 8.x packages
+baseurl=https://artifacts.elastic.co/packages/8.x/yum
 gpgcheck=1
 gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
 enabled=1
@@ -104,6 +104,7 @@ autorefresh=1
 type=rpm-md
 EOF'
     sudo -u root yum install -y elasticsearch
+    sudo -u root sed -i -e 's/xpack.security.enabled: true/xpack.security.enabled: false/g' /etc/elasticsearch/elasticsearch.yml
     sudo -u root systemctl enable elasticsearch
     sudo -u root systemctl start elasticsearch
 fi
