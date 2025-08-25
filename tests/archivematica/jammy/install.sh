@@ -59,10 +59,11 @@ sudo service mysql restart
 sudo systemctl enable mysql
 
 if [ "${search_enabled}" == "true" ] ; then
-    curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /etc/apt/keyrings/elasticsearch-6.x.gpg
-    echo "deb [signed-by=/etc/apt/keyrings/elasticsearch-6.x.gpg] https://artifacts.elastic.co/packages/6.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x.list
+    curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /etc/apt/keyrings/elasticsearch-8.x.gpg
+    echo "deb [signed-by=/etc/apt/keyrings/elasticsearch-8.x.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-8.x.list
     sudo apt-get -o Acquire::AllowInsecureRepositories=true update
     sudo apt-get install -y elasticsearch
+    sudo sed -i -e 's/xpack.security.enabled: true/xpack.security.enabled: false/g' /etc/elasticsearch/elasticsearch.yml
     sudo systemctl daemon-reload
     sudo service elasticsearch restart
     sudo systemctl enable elasticsearch
