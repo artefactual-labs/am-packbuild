@@ -8,6 +8,9 @@ ENV GRADLE_HOME /opt/gradle/latest
 ENV JAVA_HOME /usr/lib/jvm/java-1.8.0-openjdk
 ENV PATH /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$GRADLE_HOME/bin
 
+# JHOVE 1.34.0 build requires Maven 3.6.3+
+RUN yum -y module reset maven && yum -y module enable maven:3.8
+
 RUN yum -y install rpm-build make git java-1.8.0-openjdk-devel wget maven gcc
 
 RUN mkdir /opt/gradle && \

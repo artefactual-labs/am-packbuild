@@ -1,5 +1,5 @@
 NAME          = jhove
-VERSION       = 1.26.1
+VERSION       = 1.34.0
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
@@ -38,6 +38,14 @@ rpm-build: rpm-clean
 rpm-clean:
 	@echo "==> Cleaning up previous RPMs builds."
 	@rm -rf $(RPM_TOPDIR)
+
+cleanup:
+	@echo "==> Remove artifacts created as root."
+	@docker run -i  \
+		--rm \
+		--volume "$(shell pwd):$(DOCKER_VOLUME)" \
+		$(DOCKER_IMAGE) \
+		bash -c "rm -rf /src/*.rpm"
 
 rpm-test:
 	@docker run --rm --volume="$(shell pwd):$(DOCKER_VOLUME)" rockylinux:8 bash -c "yum install -y epel-release && yum localinstall -y --nogpgcheck $(DOCKER_VOLUME)/$(NAME)-$(VERSION)*.rpm"
