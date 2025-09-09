@@ -1,13 +1,15 @@
 FROM rockylinux:8
 
-# Environmnet variables needed during build
-ENV GOVERSION 1.24.1
-ENV GOOS linux
-ENV GOARCH amd64
+ARG GOVERSION=1.24.1
+ARG GOOS=linux
+ARG GOARCH=amd64
 
 # Environment variables needed during runtime
-ENV GOPATH /go
-ENV PATH /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/go/bin:/go/bin
+ENV GOPATH=/go
+ENV PATH="/usr/local/go/bin:${PATH}"
+ENV GOVERSION=${GOVERSION}
+ENV GOOS=${GOOS}
+ENV GOARCH=${GOARCH}
 
 RUN yum -y install rpm-build make git && \
 	curl -sO https://storage.googleapis.com/golang/go${GOVERSION}.${GOOS}-${GOARCH}.tar.gz && \
