@@ -10,6 +10,7 @@ build:
 	make -C ./cadence
 	make -C ./cadence-web
 	make -C ./enduro
+	make -C ./bulk_extractor
 	make -C ./temporal
 	make -C ./temporal-ui
 	make -C ./tctl

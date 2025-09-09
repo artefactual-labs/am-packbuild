@@ -1,0 +1,12 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@ --with autoreconf
+
+override_dh_autoreconf:
+	./bootstrap.sh
+	dh_autoreconf
+
+override_dh_gencontrol:
+	dh_gencontrol
+	perl -0pi -e 's/libre2-10 \(>= [^)]+\)/libre2-10/g' debian/bulk-extractor/DEBIAN/control

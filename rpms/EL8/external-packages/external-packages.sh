@@ -20,7 +20,6 @@ wget https://download1.rpmfusion.org/free/el/updates/8/x86_64/l/libavdevice-4.2.
 
 # CERT Forensics repo
 
-wget https://forensics.cert.org/repository/centos/cert/8/x86_64/bulk_extractor-2.0.3-1.el8.x86_64.rpm
 wget https://forensics.cert.org/repository/centos/cert/8/x86_64/libewf-20160718-20140806.4.el8.x86_64.rpm
 wget https://forensics.cert.org/repository/centos/cert/8/x86_64/libbfio-20221025-1.el8.x86_64.rpm
 wget https://forensics.cert.org/repository/centos/cert/8/x86_64/libpst-0.6.72-4.el8.x86_64.rpm
