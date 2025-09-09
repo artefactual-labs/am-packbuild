@@ -17,7 +17,6 @@ wget https://download1.rpmfusion.org/free/el/updates/9/x86_64/l/libavdevice-5.1.
 
 # CERT Forensics repo
 
-wget https://forensics.cert.org/repository/centos/cert/9/x86_64/bulk_extractor-2.0.3-1.el9.x86_64.rpm
 wget https://forensics.cert.org/repository/centos/cert/9/x86_64/libewf-20160718-20140812.1.el9.x86_64.rpm
 wget https://forensics.cert.org/repository/centos/cert/9/x86_64/libpst-libs-0.6.76-5.el9.x86_64.rpm
 wget https://forensics.cert.org/repository/centos/cert/9/x86_64/libpst-0.6.76-5.el9.x86_64.rpm

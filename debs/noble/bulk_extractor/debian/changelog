@@ -1,3 +1,9 @@
+bulk-extractor (2.1.1-1~24.04) noble; urgency=medium
+
+  * Rebuild for Ubuntu 24.04 (libre2-10)
+
+ -- Jesús García Crespo <jesus@sevein.com>  Wed, 01 Oct 2025 19:51:13 +0200
+
 bulk-extractor (2.1.1-1~22.04) jammy; urgency=medium
 
   * New upstream release

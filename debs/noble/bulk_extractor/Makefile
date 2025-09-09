@@ -1,13 +1,13 @@
 NAME          = bulk_extractor
 VERSION       ?= 2.1.1
-RELEASE	      ?= 1~22.04
+RELEASE	      ?= 1~24.04
 GIT_URL	      = https://github.com/simsong/bulk_extractor
 GIT_BRANCH    = 2.1.1
 DEB_TOPDIR    = "/debbuild"
 DOCKER_VOLUME = "/src"
-DOCKER_IMAGE  = "debbuild-$(NAME)-$(VERSION)"
+DOCKER_IMAGE  = "debbuild-noble-$(NAME)-$(VERSION)"
 GPG_ID        ?= 5236CA08
-DISTRO_CODENAME = jammy
+DISTRO_CODENAME = noble
 
 .PHONY: build-docker-image build deb-build deb-clean deb-test update-changelog
 
@@ -37,6 +37,8 @@ deb-build: deb-clean
 	@echo "===> Install gpg key"
 	if [ -f "$(DOCKER_VOLUME)/GPG-KEY" ]; then gpg --import $(DOCKER_VOLUME)/GPG-KEY; fi
 	if [ x"$$GPG_KEY" != x ]; then echo "$$GPG_KEY" | gpg --import - ; fi
+	@echo "==> Refresh apt cache."
+	apt-get update
 	@echo "==> Install dependencies."
 	cd /debbuild/$(NAME) && yes | mk-build-deps --install debian/control
 	@echo "==> Update changelog."
