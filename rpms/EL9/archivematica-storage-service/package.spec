@@ -60,6 +60,7 @@ mkdir -p \
 virtualenv /usr/share/archivematica/virtualenvs/archivematica-storage-service
 /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/pip install --upgrade pip setuptools
 /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/pip install -r %{_sourcedir}/%{name}/requirements.txt
+/usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/pip install %{_sourcedir}/%{name}
 cp -rf /usr/share/archivematica/virtualenvs/archivematica-storage-service/* %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-storage-service/
 
 cp -rf %{_sourcedir}/%{name}/src/archivematica/storage_service/* %{buildroot}/usr/lib/archivematica/storage_service/
