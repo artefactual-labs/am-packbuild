@@ -196,7 +196,6 @@ fi
 # Posttrans install script
 #
 
-%posttrans dashboard
 # Update old virtual environment paths in configuration files
 sed -i "s/\/usr\/share\/archivematica\/virtualenvs\/archivematica-\(dashboard\|mcp-server\|mcp-client\)\//\/usr\/share\/archivematica\/virtualenvs\/archivematica\//g" \
   /etc/sysconfig/archivematica-mcp-server \
