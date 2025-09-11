@@ -121,8 +121,8 @@ bash -c " \
   source /etc/sysconfig/archivematica-storage-service \
     || (echo 'Environment file not found'; exit 1)
   cd /usr/lib/archivematica/storage_service
-  /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py collectstatic --noinput --clear
-  /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py compilemessages
+  /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python3 -m archivematica.storage_service.manage collectstatic --noinput --clear
+  /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python3 -m archivematica.storage_service.manage compilemessages
 ";
 chown -R archivematica:archivematica /usr/lib/archivematica/storage_service/assets
 chown -R archivematica:archivematica /usr/lib/archivematica/storage_service/locale
