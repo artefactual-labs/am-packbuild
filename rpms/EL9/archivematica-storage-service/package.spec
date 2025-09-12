@@ -60,9 +60,12 @@ mkdir -p \
 virtualenv /usr/share/archivematica/virtualenvs/archivematica-storage-service
 /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/pip install --upgrade pip setuptools
 /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/pip install -r %{_sourcedir}/%{name}/requirements.txt
+/usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/pip install %{_sourcedir}/%{name}
 cp -rf /usr/share/archivematica/virtualenvs/archivematica-storage-service/* %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-storage-service/
-
-cp -rf %{_sourcedir}/%{name}/src/archivematica/storage_service/* %{buildroot}/usr/lib/archivematica/storage_service/
+# Copy static content
+cp -rf %{_sourcedir}/%{name}/src/archivematica/storage_service/static/  %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-storage-service/lib/python3.9/site-packages/archivematica/storage_service/
+cp -rf %{_sourcedir}/%{name}/src/archivematica/storage_service/templates/  %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-storage-service/lib/python3.9/site-packages/archivematica/storage_service/
+# Copy config files
 cp %{_sourcedir}/%{name}/install/storage-service.gunicorn-config.py %{buildroot}/etc/archivematica/storage-service.gunicorn-config.py
 cp %{_sourcedir}/%{name}/install/storageService.logging.json %{buildroot}/etc/archivematica/storageService.logging.json
 cp %{_etcdir}/archivematica-storage-service.service %{buildroot}/usr/lib/systemd/system/archivematica-storage-service.service
@@ -114,14 +117,13 @@ fi
 # because the old virtualenv files need to be removed from the old package.
 # https://github.com/archivematica/Issues/issues/1312
 # https://docs.fedoraproject.org/en-US/packaging-guidelines/Scriptlets/#ordering
-mkdir -p /usr/lib/archivematica/storage_service/assets
 bash -c " \
   set -a -e -x
   source /etc/sysconfig/archivematica-storage-service \
     || (echo 'Environment file not found'; exit 1)
   cd /usr/lib/archivematica/storage_service
-  /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py collectstatic --noinput --clear
-  /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py compilemessages
+  /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python3 -m archivematica.storage_service.manage collectstatic --noinput --clear
+  /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python3 -m archivematica.storage_service.manage compilemessages
 ";
 chown -R archivematica:archivematica /usr/lib/archivematica/storage_service/assets
 chown -R archivematica:archivematica /usr/lib/archivematica/storage_service/locale
