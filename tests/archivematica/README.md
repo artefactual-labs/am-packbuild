@@ -10,6 +10,7 @@
 - [Set up EL9 packages](#set-up-el9-packages)
   - [Install EL9 packages from archivematica.org](#install-el9-packages-from-archivematicaorg)
   - [Install EL9 packages from a local repository](#install-el9-packages-from-a-local-repository)
+  - [Install EL9 packages with Ansible](#install-el9-packages-with-ansible)
 - [Set up Ubuntu 22.04 Jammy packages](#set-up-ubuntu-2204-jammy-packages)
   - [Install jammy packages from archivematica.org](#install-jammy-packages-from-archivematicaorg)
   - [Install jammy packages from a local repository](#install-jammy-packages-from-a-local-repository)
@@ -79,6 +80,49 @@ Install `EL9` packages using the local repository:
 
 ```shell
 podman-compose exec --env LOCAL_REPOSITORY="yes" --user ubuntu archivematica /am-packbuild/tests/archivematica/EL9/install.sh
+```
+
+### Install EL9 packages with Ansible
+
+Test using a local repository built from the `/rpms/EL9` directory of this
+repository using Ansible.
+
+Create the local repository:
+
+```shell
+make -C ../../rpms/EL9/archivematica
+make -C ../../rpms/EL9/archivematica-storage-service
+make -C ../../rpms/EL9 createrepo
+```
+
+Install Ansible:
+
+```shell
+python3 -m pip install ansible
+```
+
+Install the playbook requirements:
+
+```shell
+ansible-galaxy install -f -p EL9/ansible/roles/ -r EL9/ansible/requirements.yml
+```
+
+Copy your SSH public key to the container:
+
+```shell
+podman-compose exec -u root archivematica bash -c 'mkdir -p /home/ubuntu/.ssh'
+podman cp $HOME/.ssh/id_rsa.pub archivematica-package-testing_archivematica_1:/home/ubuntu/.ssh/authorized_keys
+podman-compose exec -u root archivematica bash -c 'chown -R ubuntu:ubuntu /home/ubuntu/'
+```
+
+Run the Archivematica installation playbook:
+
+```shell
+export ANSIBLE_HOST_KEY_CHECKING=False
+export ANSIBLE_REMOTE_PORT=2222
+ansible-playbook -i localhost, EL9/ansible/playbook.yml \
+    -u ubuntu \
+    -v
 ```
 
 ## Set up Ubuntu 22.04 Jammy packages
