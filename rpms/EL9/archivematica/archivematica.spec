@@ -93,16 +93,14 @@ Archivematica dashboard with Nginx + gunicorn.
 # Archivematica
 %files
 /usr/share/archivematica/virtualenvs/archivematica/
+/opt/archivematica/archivematica/
 
 # Common
 %files common
-/usr/lib/archivematica/archivematicaCommon/
-/usr/lib/archivematica/search/
 /var/archivematica/sharedDirectory/
 
 # MCPServer
 %files mcp-server
-/usr/lib/archivematica/MCPServer/
 /usr/lib/systemd/system/archivematica-mcp-server.service
 %config(noreplace) /etc/sysconfig/archivematica-mcp-server
 %config(noreplace) /etc/archivematica/serverConfig.conf
@@ -110,7 +108,6 @@ Archivematica dashboard with Nginx + gunicorn.
 
 # MCPClient
 %files mcp-client
-/usr/lib/archivematica/MCPClient/
 /usr/lib/systemd/system/archivematica-mcp-client.service
 %config(noreplace) /etc/sysconfig/archivematica-mcp-client
 %config(noreplace) /etc/archivematica/clientConfig.conf
@@ -118,7 +115,6 @@ Archivematica dashboard with Nginx + gunicorn.
 
 # Dashboard
 %files dashboard
-/usr/share/archivematica/dashboard/
 /usr/lib/systemd/system/archivematica-dashboard.service
 %config(noreplace) /etc/sysconfig/archivematica-dashboard
 %config(noreplace) /etc/nginx/conf.d/archivematica-dashboard.conf
@@ -131,7 +127,6 @@ Archivematica dashboard with Nginx + gunicorn.
 
 %prep
 rm -rf /usr/share/python/archivematica*
-rm -rf /usr/lib/archivematica
 rm -rf %{_sourcedir}/*
 rm -rf %{buildroot}/*
 mkdir -p %{buildroot}/%{install_dir}
@@ -155,36 +150,36 @@ git clone \
 %install
 mkdir -p \
   %{buildroot}/etc/archivematica/ \
-  %{buildroot}/usr/lib/archivematica/MCPServer \
-  %{buildroot}/usr/lib/archivematica/MCPClient \
-  %{buildroot}/usr/lib/archivematica/archivematicaCommon \
-  %{buildroot}/usr/lib/archivematica/search \
   %{buildroot}/usr/share/archivematica/virtualenvs/archivematica \
-  %{buildroot}/usr/share/archivematica/dashboard \
+  %{buildroot}/opt/archivematica/archivematica/src/archivematica/dashboard/media/js/build/ \
   %{buildroot}/var/archivematica/sharedDirectory \
   %{buildroot}/etc/sysconfig \
   %{buildroot}/usr/lib/systemd/system \
   %{buildroot}/etc/nginx/conf.d
 
+# Create runtime source directory under /opt and make the same path available in
+# the buildroot. This path is used for editable install.
+mkdir -p /opt/archivematica/archivematica
+cp -a %{_sourcedir}/%{name}/. /opt/archivematica/archivematica/
+cp -a %{_sourcedir}/%{name}/. %{buildroot}/opt/archivematica/archivematica/
+
 # Archivematica virtual environment
 virtualenv /usr/share/archivematica/virtualenvs/archivematica
 /usr/share/archivematica/virtualenvs/archivematica/bin/pip install --upgrade pip setuptools
 /usr/share/archivematica/virtualenvs/archivematica/bin/pip install -r %{_sourcedir}/%{name}/requirements.txt
+
+# Install the application in editable mode so the source directory under /opt is
+# importable by the virtualenv at runtime.
+/usr/share/archivematica/virtualenvs/archivematica/bin/pip install --no-deps --editable /opt/archivematica/archivematica
 cp -rf /usr/share/archivematica/virtualenvs/archivematica/* %{buildroot}/usr/share/archivematica/virtualenvs/archivematica/
 
-# Common
-cp -rf %{_sourcedir}/%{name}/src/archivematica/archivematicaCommon/* %{buildroot}/usr/lib/archivematica/archivematicaCommon/
-cp -rf %{_sourcedir}/%{name}/src/archivematica/search/* %{buildroot}/usr/lib/archivematica/search/
-
 # MCPServer
-cp -rf %{_sourcedir}/%{name}/src/archivematica/MCPServer/* %{buildroot}/usr/lib/archivematica/MCPServer/
 cp %{_sourcedir}/%{name}/src/archivematica/MCPServer/install/serverConfig.logging.json %{buildroot}/etc/archivematica/serverConfig.logging.json
 cp %{_sourcedir}/%{name}/src/archivematica/MCPServer/install/serverConfig.conf %{buildroot}/etc/archivematica/serverConfig.conf
 cp %{_etcdir}/archivematica-mcp-server.service %{buildroot}/usr/lib/systemd/system/archivematica-mcp-server.service
 cp %{_etcdir}/archivematica-mcp-server.env %{buildroot}/etc/sysconfig/archivematica-mcp-server
 
 # MCPClient
-cp -rf %{_sourcedir}/%{name}/src/archivematica/MCPClient/* %{buildroot}/usr/lib/archivematica/MCPClient
 cp %{_sourcedir}/%{name}/src/archivematica/MCPClient/install/clientConfig.logging.json %{buildroot}/etc/archivematica/clientConfig.logging.json
 cp %{_sourcedir}/%{name}/src/archivematica/MCPClient/install/clientConfig.conf %{buildroot}/etc/archivematica/clientConfig.conf
 cp %{_etcdir}/archivematica-mcp-client.service %{buildroot}/usr/lib/systemd/system/archivematica-mcp-client.service
@@ -198,7 +193,7 @@ cp %{_etcdir}/archivematica-dashboard.env %{buildroot}/etc/sysconfig/archivemati
 cp %{_etcdir}/dashboard.nginx %{buildroot}/etc/nginx/conf.d/archivematica-dashboard.conf
 
 cd %{_sourcedir}/%{name}/src/archivematica/dashboard/frontend/ && npm install --unsafe-perm
-cp -rf %{_sourcedir}/%{name}/src/archivematica/dashboard/* %{buildroot}/usr/share/archivematica/dashboard/
+cp %{_sourcedir}/%{name}/src/archivematica/dashboard/media/js/build/dashboard.js %{buildroot}/opt/archivematica/archivematica/src/archivematica/dashboard/media/js/build/dashboard.js
 
 #
 # Clean up build directory
@@ -254,9 +249,6 @@ fi
 #
 # Posttrans install script
 #
-%posttrans mcp-client
-# Update PYTHONPATH in configuration file
-sed -i "s/^PYTHONPATH=.*$/PYTHONPATH=\/usr\/lib\/:\/usr\/share\//g" /etc/sysconfig/archivematica-mcp-client
 
 %posttrans dashboard
 # Update old virtual environment paths in configuration files
@@ -273,16 +265,16 @@ systemctl daemon-reload
 # because the old virtualenv files need to be removed from the old package.
 # https://github.com/archivematica/Issues/issues/1312
 # https://docs.fedoraproject.org/en-US/packaging-guidelines/Scriptlets/#ordering
-mkdir -p /usr/share/archivematica/dashboard/static
+mkdir -p /opt/archivematica/archivematica/src/archivematica/dashboard/static
 bash -c " \
   set -a -e -x
   source /etc/sysconfig/archivematica-dashboard \
     || (echo 'Environment file not found'; exit 1)
-  cd /usr/share/archivematica/dashboard
-  /usr/share/archivematica/virtualenvs/archivematica/bin/python manage.py collectstatic --noinput --clear
-  /usr/share/archivematica/virtualenvs/archivematica/bin/python manage.py compilemessages
+  cd /opt/archivematica/archivematica/
+  /usr/share/archivematica/virtualenvs/archivematica/bin/python -m archivematica.dashboard.manage collectstatic --noinput --clear
+  /usr/share/archivematica/virtualenvs/archivematica/bin/python -m archivematica.dashboard.manage compilemessages
 ";
 chown -R archivematica:archivematica /var/log/archivematica/dashboard
-chown -R archivematica:archivematica /usr/share/archivematica/dashboard/static
-chown -R archivematica:archivematica /usr/share/archivematica/dashboard/locale
+chown -R archivematica:archivematica /opt/archivematica/archivematica/src/archivematica/dashboard/static
+chown -R archivematica:archivematica /opt/archivematica/archivematica/src/archivematica/dashboard/locale
 systemctl daemon-reload
