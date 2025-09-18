@@ -114,18 +114,17 @@ sudo -u archivematica bash -c " \
     source /etc/default/archivematica-dashboard || \
         source /etc/sysconfig/archivematica-dashboard \
             || (echo 'Environment file not found'; exit 1)
-    cd /usr/share/archivematica/dashboard
-      /usr/share/archivematica/virtualenvs/archivematica/bin/python manage.py install \
-          --username="admin" \
-          --password="archivematica" \
-          --email="example@example.com" \
-          --org-name="test" \
-          --org-id="test" \
-          --api-key="apikey" \
-          --ss-url="http://localhost:8000" \
-          --ss-user="admin" \
-          --ss-api-key="apikey" \
-          --site-url="http://localhost"
+    /usr/share/archivematica/virtualenvs/archivematica/bin/python -m archivematica.dashboard.manage install \
+        --username="admin" \
+        --password="archivematica" \
+        --email="example@example.com" \
+        --org-name="test" \
+        --org-id="test" \
+        --api-key="apikey" \
+        --ss-url="http://localhost:8000" \
+        --ss-user="admin" \
+        --ss-api-key="apikey" \
+        --site-url="http://localhost"
 ";
 
 sudo -u archivematica bash -c " \
@@ -133,8 +132,7 @@ sudo -u archivematica bash -c " \
     source /etc/default/archivematica-dashboard || \
         source /etc/sysconfig/archivematica-dashboard \
             || (echo 'Environment file not found'; exit 1)
-    cd /usr/share/archivematica/dashboard
-      /usr/share/archivematica/virtualenvs/archivematica/bin/python manage.py collectstatic --noinput --clear
+    /usr/share/archivematica/virtualenvs/archivematica/bin/python -m archivematica.dashboard.manage collectstatic --noinput --clear
 ";
 
 sudo -u archivematica bash -c " \
@@ -142,8 +140,8 @@ sudo -u archivematica bash -c " \
     source /etc/default/archivematica-dashboard || \
         source /etc/sysconfig/archivematica-dashboard \
             || (echo 'Environment file not found'; exit 1)
-    cd /usr/share/archivematica/dashboard
-      /usr/share/archivematica/virtualenvs/archivematica/bin/python manage.py compilemessages
+    cd /opt/archivematica/archivematica
+    /usr/share/archivematica/virtualenvs/archivematica/bin/python -m archivematica.dashboard.manage compilemessages
 ";
 
 

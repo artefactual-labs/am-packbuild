@@ -3,11 +3,39 @@
 export LC_ALL=C.UTF-8
 export DH_VIRTUALENV_INSTALL_ROOT=/usr/share/archivematica/virtualenvs
 
+VENV_DIR := $(CURDIR)/debian/archivematica/usr/share/archivematica/virtualenvs/archivematica
+SRC_STAGE := $(CURDIR)/debian/archivematica/opt/archivematica/archivematica
+ABS_RUNTIME := /opt/archivematica/archivematica
+
 %:
 	dh $@ --with python-virtualenv
 
+override_dh_install:
+	dh_install
+	rm -rf $(SRC_STAGE)
+	install -d $(SRC_STAGE)
+	rsync -a --delete \
+	  --exclude "/debian/" \
+	  --exclude "/.git/" \
+	  --exclude "/.github/" \
+	  --exclude "/.gitmodules" \
+	  --exclude "/.gitignore" \
+	  --exclude "/.gitattributes" \
+	  ./ $(SRC_STAGE)
+
 override_dh_virtualenv:
 	dh_virtualenv --python=python3 --preinstall "setuptools>=75" --requirements=requirements.txt --skip-install
+	# Bail out if a real installation already exists in the runtime location.
+	if [ -e $(ABS_RUNTIME) ]; then \
+	  echo "$(ABS_RUNTIME) exists; refusing to overwrite" >&2; exit 1; \
+	fi
+	# Stage the runtime tree under /opt so pip installs the exact layout we'll ship.
+	install -d $(ABS_RUNTIME)
+	rsync -a --delete $(SRC_STAGE)/ $(ABS_RUNTIME)/
+	# Editable install into the package virtualenv without re-resolving dependencies.
+	$(VENV_DIR)/bin/python -m pip install --no-deps --editable $(ABS_RUNTIME)
+	# Drop the temporary /opt copy; the package will deliver it during install.
+	rm -rf $(ABS_RUNTIME)
 
 # Ignore orjson because the *.so file included its Python 3.10 wheel contains
 # an 8-byte build ID which debugedit does not support.
