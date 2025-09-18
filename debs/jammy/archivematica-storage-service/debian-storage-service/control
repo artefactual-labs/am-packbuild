@@ -15,7 +15,8 @@ Build-Depends:
     dh-virtualenv,
     libldap2-dev,
     libsasl2-dev,
-	pkg-config,
+    rsync,
+    pkg-config,
     zlib1g-dev
 Standards-Version: 3.9.8
 X-Python3-Version: >= 3.8

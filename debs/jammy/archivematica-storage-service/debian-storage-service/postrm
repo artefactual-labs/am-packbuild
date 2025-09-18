@@ -21,7 +21,7 @@ if [ $1 = "remove" ]; then
     rm -f /etc/nginx/sites-available/storage
     rm -f /etc/uwsgi/apps-enabled/storage.ini
     rm -f /etc/uwsgi/apps-available/storage.ini
-    rm -rf /usr/lib/archivematica/storage*
+    rm -rf /opt/archivematica/archivematica-storage-service
 fi
 
 if [ "$1" = "purge" ]; then
