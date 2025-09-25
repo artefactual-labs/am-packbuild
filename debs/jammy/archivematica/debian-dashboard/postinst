@@ -1,12 +1,15 @@
 #!/bin/bash
 
-# Runs Django's command-line utility for administrative tasks inside the
-# Python virtual environment bundled with the package.
-function dashboard::manage {
-    # Certain tasks like compilemessages rely on the current directory.
-    pushd /usr/share/archivematica/dashboard
-    /usr/share/archivematica/virtualenvs/archivematica/bin/python manage.py "$@"
-    popd
+ARCHIVEMATICA_ENV_DIR="/usr/share/archivematica/virtualenvs/archivematica"
+DASHBOARD_MODULE_PATH="archivematica.dashboard.manage"
+DASHBOARD_SOURCE_DIR="/opt/archivematica/archivematica/src/archivematica/dashboard"
+DASHBOARD_STATIC_DIR="${DASHBOARD_SOURCE_DIR}/static"
+DASHBOARD_LOCALE_DIR="${DASHBOARD_SOURCE_DIR}/locale"
+
+# Runs Django's administrative tasks inside the packaged virtual environment.
+function dashboard_manage {
+    (cd "${DASHBOARD_SOURCE_DIR}" && \
+        "${ARCHIVEMATICA_ENV_DIR}/bin/python" -m "${DASHBOARD_MODULE_PATH}" "$@")
 }
 
 # Create logs directory
@@ -39,7 +42,7 @@ sed -i "s/^\(ARCHIVEMATICA_DASHBOARD_CLIENT_PORT=\).*/\1$DBPORT/g" /etc/default/
 ucfr archivematica-dashboard /etc/default/archivematica-dashboard
 ucf --debconf-ok /etc/default/archivematica-dashboard /etc/default/archivematica-dashboard
 
-find /usr/share/archivematica/dashboard/ -name '*.pyc' -delete
+find "${DASHBOARD_SOURCE_DIR}" -name '*.pyc' -delete
 
 #this is required to allow syncdb to work properly
 set -a
@@ -47,17 +50,17 @@ source /etc/default/archivematica-dashboard
 set +a
 
 # Run migrations
-dashboard::manage migrate --settings='settings.production' --noinput
+dashboard_manage migrate --noinput
 
 # Collect static content
-mkdir -p /usr/share/archivematica/dashboard/static
-dashboard::manage collectstatic --noinput --clear
+mkdir -p "${DASHBOARD_STATIC_DIR}"
+dashboard_manage collectstatic --noinput --clear
 
 # Compile messages
-dashboard::manage compilemessages
+dashboard_manage compilemessages
 
 # Set permissions.
-chown -R archivematica:archivematica /usr/share/archivematica/dashboard/static
-chown -R archivematica:archivematica /usr/share/archivematica/dashboard/locale
+chown -R archivematica:archivematica "${DASHBOARD_STATIC_DIR}"
+chown -R archivematica:archivematica "${DASHBOARD_LOCALE_DIR}"
 
 #DEBHELPER#

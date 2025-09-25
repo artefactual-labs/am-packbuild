@@ -101,13 +101,12 @@ sudo -u archivematica bash -c " \
     source /etc/default/archivematica-storage-service || \
         source /etc/sysconfig/archivematica-storage-service \
             || (echo 'Environment file not found'; exit 1)
-    cd /usr/lib/archivematica/storage_service
-      /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py create_user \
-          --username=admin \
-          --password=archivematica \
-          --email="example@example.com" \
-          --api-key="apikey" \
-          --superuser
+    /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python -m archivematica.storage_service.manage create_user \
+        --username=admin \
+        --password=archivematica \
+        --email="example@example.com" \
+        --api-key="apikey" \
+        --superuser
 ";
 
 sudo -u archivematica bash -c " \
@@ -115,18 +114,17 @@ sudo -u archivematica bash -c " \
     source /etc/default/archivematica-dashboard || \
         source /etc/sysconfig/archivematica-dashboard \
             || (echo 'Environment file not found'; exit 1)
-    cd /usr/share/archivematica/dashboard
-      /usr/share/archivematica/virtualenvs/archivematica/bin/python manage.py install \
-          --username="admin" \
-          --password="archivematica" \
-          --email="example@example.com" \
-          --org-name="test" \
-          --org-id="test" \
-          --api-key="apikey" \
-          --ss-url="http://localhost:8000" \
-          --ss-user="admin" \
-          --ss-api-key="apikey" \
-          --site-url="http://localhost"
+    /usr/share/archivematica/virtualenvs/archivematica/bin/python -m archivematica.dashboard.manage install \
+        --username="admin" \
+        --password="archivematica" \
+        --email="example@example.com" \
+        --org-name="test" \
+        --org-id="test" \
+        --api-key="apikey" \
+        --ss-url="http://localhost:8000" \
+        --ss-user="admin" \
+        --ss-api-key="apikey" \
+        --site-url="http://localhost"
 ";
 
 sudo -u archivematica bash -c " \
@@ -134,8 +132,7 @@ sudo -u archivematica bash -c " \
     source /etc/default/archivematica-dashboard || \
         source /etc/sysconfig/archivematica-dashboard \
             || (echo 'Environment file not found'; exit 1)
-    cd /usr/share/archivematica/dashboard
-      /usr/share/archivematica/virtualenvs/archivematica/bin/python manage.py collectstatic --noinput --clear
+    /usr/share/archivematica/virtualenvs/archivematica/bin/python -m archivematica.dashboard.manage collectstatic --noinput --clear
 ";
 
 sudo -u archivematica bash -c " \
@@ -143,8 +140,8 @@ sudo -u archivematica bash -c " \
     source /etc/default/archivematica-dashboard || \
         source /etc/sysconfig/archivematica-dashboard \
             || (echo 'Environment file not found'; exit 1)
-    cd /usr/share/archivematica/dashboard
-      /usr/share/archivematica/virtualenvs/archivematica/bin/python manage.py compilemessages
+    cd /opt/archivematica/archivematica
+    /usr/share/archivematica/virtualenvs/archivematica/bin/python -m archivematica.dashboard.manage compilemessages
 ";
 
 
@@ -153,8 +150,7 @@ sudo -u archivematica bash -c " \
     source /etc/default/archivematica-storage-service || \
         source /etc/sysconfig/archivematica-storage-service \
             || (echo 'Environment file not found'; exit 1)
-    cd /usr/lib/archivematica/storage_service
-      /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py collectstatic --noinput --clear
+    /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python -m archivematica.storage_service.manage collectstatic --noinput --clear
 ";
 
 sudo -u archivematica bash -c " \
@@ -162,6 +158,6 @@ sudo -u archivematica bash -c " \
     source /etc/default/archivematica-storage-service || \
         source /etc/sysconfig/archivematica-storage-service \
             || (echo 'Environment file not found'; exit 1)
-    cd /usr/lib/archivematica/storage_service
-      /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python manage.py compilemessages
+    cd /opt/archivematica/archivematica-storage-service/
+    /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python -m archivematica.storage_service.manage compilemessages
 ";

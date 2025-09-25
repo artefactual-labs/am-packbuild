@@ -20,5 +20,6 @@ RUN apt-get update \
 		libxslt-dev \
 		pkg-config \
 		python3-dev \
-        software-properties-common \
+		rsync \
+		software-properties-common \
 	&& rm -rf /var/lib/apt/lists/*

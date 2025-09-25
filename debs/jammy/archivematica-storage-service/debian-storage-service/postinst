@@ -14,6 +14,10 @@ if [ -f /usr/share/dbconfig-common/dpkg/postinst.mysql ]; then
 fi
 
 SS_ENV_DIR="/usr/share/archivematica/virtualenvs/archivematica-storage-service"
+SS_SOURCE_DIR="/opt/archivematica/archivematica-storage-service"
+SS_MODULE_PATH="archivematica.storage_service.manage"
+SS_STATIC_DIR="${SS_SOURCE_DIR}/src/archivematica/storage_service/assets"
+SS_LOCALE_DIR="${SS_SOURCE_DIR}/src/archivematica/storage_service/locale"
 
 echo "postinst called with:" $1 $2
 
@@ -47,15 +51,15 @@ set -a
 source /etc/default/archivematica-storage-service
 set +a
 
-find /usr/lib/archivematica/storage_service/ -name '*.pyc' -delete
+find ${SS_SOURCE_DIR} -name '*.pyc' -delete
 
 echo "configuring django database and static files"
-cd /usr/lib/archivematica/storage_service
-${SS_ENV_DIR}/bin/python manage.py migrate
-mkdir -p /usr/lib/archivematica/storage_service/assets
-${SS_ENV_DIR}/bin/python manage.py collectstatic --noinput --clear
-${SS_ENV_DIR}/bin/python manage.py compilemessages
-${SS_ENV_DIR}/bin/python manage.py backfill_api_keys
+cd ${SS_SOURCE_DIR}
+${SS_ENV_DIR}/bin/python -m ${SS_MODULE_PATH} migrate
+mkdir -p ${SS_STATIC_DIR}
+${SS_ENV_DIR}/bin/python -m ${SS_MODULE_PATH} collectstatic --noinput --clear
+${SS_ENV_DIR}/bin/python -m ${SS_MODULE_PATH} compilemessages
+${SS_ENV_DIR}/bin/python -m ${SS_MODULE_PATH} backfill_api_keys
 
 echo "updating directory permissions"
 chown -R archivematica:archivematica /var/archivematica/storage-service
@@ -63,8 +67,8 @@ chown -R archivematica:archivematica /var/archivematica/.storage-service
 chown -R archivematica:archivematica ${SS_ENV_DIR}
 mkdir -p /var/log/archivematica/storage-service
 chown -R archivematica:archivematica /var/log/archivematica/storage-service
-chown -R archivematica:archivematica /usr/lib/archivematica/storage_service/assets
-chown -R archivematica:archivematica /usr/lib/archivematica/storage_service/locale
+chown -R archivematica:archivematica ${SS_STATIC_DIR}
+chown -R archivematica:archivematica ${SS_LOCALE_DIR}
 
 rm -f /tmp/storage_service.log
 
