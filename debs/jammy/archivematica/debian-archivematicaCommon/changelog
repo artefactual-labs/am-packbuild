@@ -1,3 +1,10 @@
+archivematica-common (1:1.18.0-1~22.04) jammy; urgency=high
+
+  * commit: 243867858da329bb27ac9d5cf1747b3389d39149
+  * checkout: v1.18.0
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Fri, 26 Sep 2025 19:23:51 +0000
+
 archivematica-common (1:1.17.1-1~22.04) jammy; urgency=high
 
   * commit: 7b057688586eb8c5fa58ad94efc4ce8c9e811035
