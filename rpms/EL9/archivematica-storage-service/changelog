@@ -1,4 +1,7 @@
 %changelog
+* Fri Sep 26 2025 Artefactual <sysadmin@artefactual.com> - 0.24.0-1
+- Packbuild: 251c2f87c1168fc0cba8db27761f18988e7f4a3f
+- Storage Service: 0c3129d6f549e1223a119c07f0d3f9f972b9c890
 * Fri Dec 06 2024 Artefactual <sysadmin@artefactual.com> - 0.23.0-1
 - Packbuild: 599078cfa1f30e4b36705c38f1d18e9c59dd6387
 - Storage Service: b3e3f4bd595603940d5e98fe61ccf334b55c62e5
