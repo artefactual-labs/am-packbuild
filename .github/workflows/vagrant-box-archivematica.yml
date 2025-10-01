@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         ubuntu-version: [
-          "22.04",
+          "24.04",
         ]
     steps:
     - name: Check out code
@@ -56,7 +56,7 @@ jobs:
       fail-fast: false
       matrix:
         ubuntu-version: [
-          "22.04",
+          "24.04",
         ]
     permissions:
       contents: "read"
@@ -107,9 +107,14 @@ jobs:
           ${{ github.workspace }}/archivematica-vagrant-${{ github.event.inputs.version }}.box
     - name: Provision a test VM with the new image
       run: |
+        sudo rm -rf "$VAGRANT_HOME"
+        sudo mkdir -p "$VAGRANT_HOME"
+        sudo chown "$USER:$USER" "$VAGRANT_HOME"
         vagrant init --minimal --no-tty archivematica-vagrant-${{ github.event.inputs.version }} file://${{ github.workspace }}/archivematica-vagrant-${{ github.event.inputs.version }}.box
         cat Vagrantfile
         vagrant up --debug-timestamp --provider virtualbox
+      env:
+        VAGRANT_HOME: "/mnt/vagrant"
     - name: Test AM is running in the test VM
       run: |
         sleep 180
