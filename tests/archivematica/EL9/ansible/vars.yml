@@ -41,7 +41,7 @@ archivematica_src_rpm_repositories:
     baseurl: "file:///am-packbuild/rpms/EL9/_yum_repository/"
     gpgcheck: 0
   archivematica-extras:
-    baseurl: "https://packages.archivematica.org/1.18.x/rocky9-extras"
+    baseurl: "https://packages.archivematica.org/1.19.x/rocky9-extras"
     gpgkey: "https://packages.archivematica.org/GPG-KEY-archivematica-sha512"
     gpgcheck: 1
 
