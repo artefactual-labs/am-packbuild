@@ -29,22 +29,17 @@ update-changelog: build-docker-image
 build:
 	@echo "==> Building deb."
 	@docker run --rm \
-		-e GPG_ID=$(GPG_ID) \
-		-e GPG_KEY \
 		--volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) make -C $(DOCKER_VOLUME) deb-build
 
 deb-build: deb-clean
-	@echo "===> Install gpg key"
-	if [ -f "$(DOCKER_VOLUME)/GPG-KEY" ]; then gpg --import $(DOCKER_VOLUME)/GPG-KEY; fi
-	if [ x"$$GPG_KEY" != x ]; then echo "$$GPG_KEY" | gpg --import - ; fi
-	@echo "==> Install dependencies."
-	cd /debbuild/$(NAME) && yes | mk-build-deps --install debian/control
-	@echo "==> Update changelog."
-	cd /debbuild/$(NAME) && dch -v $(VERSION)-$(RELEASE) -D $(DISTRO_CODENAME) "New upstream release"
-	@echo "==> Build package."
-	cd /debbuild/$(NAME) && dpkg-buildpackage
-	@echo "==> Copying built  files."
-	mkdir -p $(DOCKER_VOLUME)/build/
+	echo "==> Install dependencies."; \
+	cd /debbuild/$(NAME) && yes | mk-build-deps --install debian/control; \
+	echo "==> Update changelog."; \
+	cd /debbuild/$(NAME) && dch -v $(VERSION)-$(RELEASE) -D $(DISTRO_CODENAME) "New upstream release"; \
+	echo "==> Build package (unsigned)."; \
+	cd /debbuild/$(NAME) && dpkg-buildpackage -us -uc; \
+	echo "==> Copying built  files."; \
+	mkdir -p $(DOCKER_VOLUME)/build/; \
 	cp  $(DEB_TOPDIR)/*.*  $(DOCKER_VOLUME)/build/
 
 deb-clean:
