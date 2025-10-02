@@ -1,0 +1,171 @@
+name: Build packages for arm64
+
+# This is mainly for manual runs, but we also allow it to trigger on PRs
+# targeting dev/bulk-extractor-* branches (useful for testing).
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - qa/1.x
+    paths:
+      - '**/bulk_extractor/**'
+      - '**/siegfried/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+# CI builds unsigned pkgs only. APT trusts repo metadata, not .deb sigs.
+# Repo signing happens later via reprepro (key in conf/distributions), e.g.:
+#   reprepro include noble /path/to/artifacts/*.changes
+
+jobs:
+  build:
+    name: Build ${{ matrix.display }}
+    runs-on: ubuntu-24.04-arm # arm64 hosted runners
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: bulk-extractor-el8
+            display: "bulk_extractor 2.1.1 - EL8 (arm64)"
+            make_dir: rpms/EL8/bulk_extractor
+            artifact_name: bulk-extractor-el8-arm64
+            artifacts: |
+              rpms/EL8/bulk_extractor/bulk_extractor-2.1.1-1.el8.aarch64.rpm
+              rpms/EL8/bulk_extractor/bulk_extractor-2.1.1-1.el8.src.rpm
+          - id: bulk-extractor-el9
+            display: "bulk_extractor 2.1.1 - EL9 (arm64)"
+            make_dir: rpms/EL9/bulk_extractor
+            artifact_name: bulk-extractor-el9-arm64
+            artifacts: |
+              rpms/EL9/bulk_extractor/bulk_extractor-2.1.1-1.el9.aarch64.rpm
+              rpms/EL9/bulk_extractor/bulk_extractor-2.1.1-1.el9.src.rpm
+          - id: bulk-extractor-jammy
+            display: "bulk_extractor 2.1.1 - Ubuntu 22.04 (arm64)"
+            make_dir: debs/jammy/bulk_extractor
+            artifact_name: bulk-extractor-ubuntu-22.04-arm64
+            artifacts: |
+              debs/jammy/bulk_extractor/build/bulk-extractor_2.1.1-1~22.04_arm64.buildinfo
+              debs/jammy/bulk_extractor/build/bulk-extractor_2.1.1-1~22.04_arm64.changes
+              debs/jammy/bulk_extractor/build/bulk-extractor_2.1.1-1~22.04_arm64.deb
+              debs/jammy/bulk_extractor/build/bulk-extractor_2.1.1-1~22.04.dsc
+              debs/jammy/bulk_extractor/build/bulk-extractor_2.1.1-1~22.04.tar.gz
+              debs/jammy/bulk_extractor/build/bulk-extractor-dbgsym_2.1.1-1~22.04_arm64.ddeb
+          - id: bulk-extractor-noble
+            display: "bulk_extractor 2.1.1 - Ubuntu 24.04 (arm64)"
+            make_dir: debs/noble/bulk_extractor
+            artifact_name: bulk-extractor-ubuntu-24.04-arm64
+            artifacts: |
+              debs/noble/bulk_extractor/build/bulk-extractor_2.1.1-1~24.04_arm64.buildinfo
+              debs/noble/bulk_extractor/build/bulk-extractor_2.1.1-1~24.04_arm64.changes
+              debs/noble/bulk_extractor/build/bulk-extractor_2.1.1-1~24.04_arm64.deb
+              debs/noble/bulk_extractor/build/bulk-extractor_2.1.1-1~24.04.dsc
+              debs/noble/bulk_extractor/build/bulk-extractor_2.1.1-1~24.04.tar.gz
+              debs/noble/bulk_extractor/build/bulk-extractor-dbgsym_2.1.1-1~24.04_arm64.ddeb
+          - id: siegfried-el8
+            display: "siegfried 1.11.2 - EL8 (arm64)"
+            make_dir: rpms/EL8/siegfried
+            artifact_name: siegfried-el8-arm64
+            env:
+              GOARCH: arm64
+            artifacts: |
+              rpms/EL8/siegfried/siegfried-1.11.2-1.el8.aarch64.rpm
+              rpms/EL8/siegfried/siegfried-1.11.2-1.el8.src.rpm
+          - id: siegfried-el9
+            display: "siegfried 1.11.2 - EL9 (arm64)"
+            make_dir: rpms/EL9/siegfried
+            artifact_name: siegfried-el9-arm64
+            env:
+              GOARCH: arm64
+            artifacts: |
+              rpms/EL9/siegfried/siegfried-1.11.2-1.el9.aarch64.rpm
+              rpms/EL9/siegfried/siegfried-1.11.2-1.el9.src.rpm
+          - id: siegfried-jammy
+            display: "siegfried 1.11.2 - Ubuntu 22.04 (arm64)"
+            make_dir: debs/siegfried
+            artifact_name: siegfried-ubuntu-22.04-arm64
+            env:
+              GOARCH: arm64
+            artifacts: |
+              debs/siegfried/build/siegfried_1.11.2-1_arm64.changes
+              debs/siegfried/build/siegfried_1.11.2-1_arm64.deb
+              debs/siegfried/build/siegfried_1.11.2-1.dsc
+              debs/siegfried/build/siegfried_1.11.2-1.tar.gz
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Build package
+        env:
+          MATRIX_ENV: ${{ toJson(matrix.env) }}
+        run: |
+          # Build make arguments.
+          MAKE_ARGS=""
+          if [[ "$MATRIX_ENV" != 'null' && "$MATRIX_ENV" != '' ]]; then
+            MAKE_ARGS=$(echo "$MATRIX_ENV" | jq -r 'to_entries|map("\(.key)=\(.value|@sh)")|join(" ")')
+          fi
+          make -C ${{ matrix.make_dir }} $MAKE_ARGS
+      - name: Upload artifact
+        if: success()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifacts }}
+          retention-days: 7
+      - name: Record result
+        if: always()
+        run: |
+          mkdir -p result
+          {
+            echo "id=${{ matrix.id }}"
+            echo "display=${{ matrix.display }}"
+            echo "status=${{ job.status }}"
+          } > result/result-${{ matrix.id }}.env
+      - name: Upload result metadata
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: result-${{ matrix.id }}
+          path: result/result-${{ matrix.id }}.env
+          retention-days: 7
+  report:
+    name: Report
+    needs: build
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all result artifacts
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          pattern: result-*
+          merge-multiple: true
+      - name: Build summary
+        shell: bash
+        run: |
+          echo "Successfully ran the arm64 matrix." >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          mapfile -d '' files < <(find . -type f -name 'result-*.env' -print0)
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "No result metadata artifacts were found." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo "| Build | Result |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          for f in "${files[@]}"; do
+            status=$(awk -F= '/^status=/{print substr($0,index($0,"=")+1); exit}' "$f" | tr -d '\r')
+            display=$(awk -F= '/^display=/{print substr($0,index($0,"=")+1); exit}' "$f" | tr -d '\r')
+            # Fallbacks if keys are missing
+            : "${status:=unknown}"
+            : "${display:=$(basename "$f")}"
+            case "$status" in
+              success) badge="✅ success" ;;
+              failure) badge="❌ failure" ;;
+              cancelled) badge="⚠️ cancelled" ;;
+              *) badge="❓ $status" ;;
+            esac
+            # Escape pipe characters so the table renders correctly
+            display=${display//|/\\|}
+            echo "| ${display} | ${badge} |" >> "$GITHUB_STEP_SUMMARY"
+          done
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Package artifacts are attached above for any successful builds." >> "$GITHUB_STEP_SUMMARY"
