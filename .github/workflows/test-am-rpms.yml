@@ -279,6 +279,7 @@ jobs:
         export ANSIBLE_REMOTE_PORT=2222
         ansible-playbook -i localhost, EL9/ansible/playbook.yml \
             -u ubuntu \
+            -e "archivematica_src_rpm_repository_use_local_baseurl=${{ env.build_packages }}" \
             -v
     - name: Test AM API - Get processing configurations
       run: |

@@ -36,9 +36,18 @@ archivematica_src_install_ss: "rpm"
 
 install_rpm_repositories: "true"
 
+archivematica_src_rpm_repository_local_baseurl: "file:///am-packbuild/rpms/EL9/_yum_repository/"
+archivematica_src_rpm_repository_public_baseurl: "https://packages.archivematica.org/1.18.x/rocky9"
+archivematica_src_rpm_repository_use_local_baseurl: true
+
+archivematica_src_rpm_repository_baseurl: >-
+  {{ archivematica_src_rpm_repository_local_baseurl
+     if archivematica_src_rpm_repository_use_local_baseurl | bool
+     else archivematica_src_rpm_repository_public_baseurl }}
+
 archivematica_src_rpm_repositories:
   archivematica:
-    baseurl: "file:///am-packbuild/rpms/EL9/_yum_repository/"
+    baseurl: "{{ archivematica_src_rpm_repository_baseurl }}"
     gpgcheck: 0
   archivematica-extras:
     baseurl: "https://packages.archivematica.org/1.18.x/rocky9-extras"
