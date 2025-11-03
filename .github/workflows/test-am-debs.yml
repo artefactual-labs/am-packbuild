@@ -11,6 +11,8 @@ on:
     paths:
       - "debs/jammy/archivematica/**"
       - "debs/jammy/archivematica-storage-service/**"
+      - "debs/noble/archivematica/**"
+      - "debs/noble/archivematica-storage-service/**"
       - "tests/archivematica/**"
       - "!tests/archivematica/README.md"
       - "!tests/archivematica/EL9/**"
@@ -21,6 +23,8 @@ on:
     paths:
       - "debs/jammy/archivematica/**"
       - "debs/jammy/archivematica-storage-service/**"
+      - "debs/noble/archivematica/**"
+      - "debs/noble/archivematica-storage-service/**"
       - "tests/archivematica/**"
       - "!tests/archivematica/README.md"
       - "!tests/archivematica/EL9/**"
@@ -28,73 +32,105 @@ on:
     - cron: "0 2 * * *"
 jobs:
   build-am-packages:
-    name: Build Archivematica packages
+    name: Build Archivematica packages (${{ matrix.codename }})
     runs-on: ubuntu-latest
     if: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - codename: jammy
+            ubuntu_version: "22.04"
+          - codename: noble
+            ubuntu_version: "24.04"
     steps:
     - name: Check out code
       uses: actions/checkout@v4
     - name: Build
       run: |
-        make -C ${{ github.workspace }}/debs/jammy/archivematica
+        make -C ${{ github.workspace }}/debs/${{ matrix.codename }}/archivematica
     - name: Save artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: archivematica-packages
+        name: archivematica-packages-${{ matrix.codename }}
         path: |
-          ${{ github.workspace }}/debs/jammy/archivematica/repo
+          ${{ github.workspace }}/debs/${{ matrix.codename }}/archivematica/repo
   build-ss-packages:
-    name: Build Storage Service packages
+    name: Build Storage Service packages (${{ matrix.codename }})
     runs-on: ubuntu-latest
     if: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - codename: jammy
+            ubuntu_version: "22.04"
+          - codename: noble
+            ubuntu_version: "24.04"
     steps:
     - name: Check out code
       uses: actions/checkout@v4
     - name: Build
       run: |
-        make -C ${{ github.workspace }}/debs/jammy/archivematica-storage-service
+        make -C ${{ github.workspace }}/debs/${{ matrix.codename }}/archivematica-storage-service
     - name: Save artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: archivematica-storage-service-packages
+        name: archivematica-storage-service-packages-${{ matrix.codename }}
         path: |
-          ${{ github.workspace }}/debs/jammy/archivematica-storage-service/repo
+          ${{ github.workspace }}/debs/${{ matrix.codename }}/archivematica-storage-service/repo
   create-package-repo:
-    name: Create package repository
+    name: Create package repository (${{ matrix.codename }})
     runs-on: ubuntu-latest
     if: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
     needs:
     - build-am-packages
     - build-ss-packages
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - codename: jammy
+            ubuntu_version: "22.04"
+          - codename: noble
+            ubuntu_version: "24.04"
     steps:
     - name: Check out code
       uses: actions/checkout@v4
     - name: Restore Archivematica packages
       uses: actions/download-artifact@v4
       with:
-        name: archivematica-packages
+        name: archivematica-packages-${{ matrix.codename }}
         path: |
-          ${{ github.workspace }}/debs/jammy/archivematica/repo
+          ${{ github.workspace }}/debs/${{ matrix.codename }}/archivematica/repo
     - name: Restore Storage Service packages
       uses: actions/download-artifact@v4
       with:
-        name: archivematica-storage-service-packages
+        name: archivematica-storage-service-packages-${{ matrix.codename }}
         path: |
-          ${{ github.workspace }}/debs/jammy/archivematica-storage-service/repo
+          ${{ github.workspace }}/debs/${{ matrix.codename }}/archivematica-storage-service/repo
     - name: Create repository
       run: |
-        make -C ${{ github.workspace }}/debs/jammy createrepo
+        make -C ${{ github.workspace }}/debs/${{ matrix.codename }} createrepo
     - name: Save package repository
       uses: actions/upload-artifact@v4
       with:
-        name: package-repository
+        name: package-repository-${{ matrix.codename }}
         path: |
-          ${{ github.workspace }}/debs/jammy/_deb_repository
+          ${{ github.workspace }}/debs/${{ matrix.codename }}/_deb_repository
   test:
-    name: Test packages
+    name: Test packages (${{ matrix.codename }})
     needs: create-package-repo
     runs-on: ubuntu-22.04
     if: "${{ always() }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - codename: jammy
+            ubuntu_version: "22.04"
+          - codename: noble
+            ubuntu_version: "24.04"
     env:
       build_packages: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
     steps:
@@ -108,8 +144,8 @@ jobs:
       if: needs.create-package-repo.result == 'success'
       uses: actions/download-artifact@v4
       with:
-        name: package-repository
-        path: ${{ github.workspace }}/debs/jammy/_deb_repository
+        name: package-repository-${{ matrix.codename }}
+        path: ${{ github.workspace }}/debs/${{ matrix.codename }}/_deb_repository
     - name: "Upgrade crun (supports Ubuntu's systemd in the Dockerfile)"
       run: |
         wget https://github.com/containers/crun/releases/download/1.15/crun-1.15-linux-amd64
@@ -128,7 +164,7 @@ jobs:
       with:
         path: |
           tests/archivematica/.venv/
-        key: "os-${{ runner.os }}-python_version-${{ env.python_version }}-hash-${{ hashFiles('tests/archivematica/requirements.txt') }}"
+        key: "os-${{ runner.os }}-python_version-${{ env.python_version }}-codename-${{ matrix.codename }}-hash-${{ hashFiles('tests/archivematica/requirements.txt') }}"
     - name: "Set up the virtual environment"
       if: "steps.venv-cache.outputs.cache-hit == false"
       working-directory: "${{ github.workspace }}/tests/archivematica"
@@ -143,13 +179,16 @@ jobs:
       working-directory: "${{ github.workspace }}/tests/archivematica"
       env:
         DOCKER_IMAGE_NAME: "ubuntu"
-        DOCKER_IMAGE_TAG: "22.04"
+        DOCKER_IMAGE_TAG: "${{ matrix.ubuntu_version }}"
       run: |
         podman-compose up --detach
     - name: Install packages
       working-directory: ${{ github.workspace }}/tests/archivematica
       run: |
-        podman-compose exec --env LOCAL_REPOSITORY="${{ env.build_packages }}" --user ubuntu archivematica /am-packbuild/tests/archivematica/jammy/install.sh
+        podman-compose exec \
+          --env LOCAL_REPOSITORY="${{ env.build_packages }}" \
+          --user ubuntu \
+          archivematica /am-packbuild/tests/archivematica/${{ matrix.codename }}/install.sh
     - name: Test AM API - Get processing configurations
       run: |
         test $( \

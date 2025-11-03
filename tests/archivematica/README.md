@@ -14,6 +14,9 @@
 - [Set up Ubuntu 22.04 Jammy packages](#set-up-ubuntu-2204-jammy-packages)
   - [Install jammy packages from archivematica.org](#install-jammy-packages-from-archivematicaorg)
   - [Install jammy packages from a local repository](#install-jammy-packages-from-a-local-repository)
+- [Set up Ubuntu 24.04 Noble packages](#set-up-ubuntu-2404-noble-packages)
+  - [Install noble packages from archivematica.org](#install-noble-packages-from-archivematicaorg)
+  - [Install noble packages from a local repository](#install-noble-packages-from-a-local-repository)
 - [Test the Archivematica installation](#test-the-archivematica-installation)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -29,6 +32,7 @@ it is based on the official Docker images:
 
 - rockylinux:9
 - ubuntu:22.04
+- ubuntu:24.04
 
 ## Set up a Python virtual environment
 
@@ -160,6 +164,48 @@ Install `jammy` packages using the local repository:
 
 ```shell
 podman-compose exec --env LOCAL_REPOSITORY="yes" --user ubuntu archivematica /am-packbuild/tests/archivematica/jammy/install.sh
+```
+
+## Set up Ubuntu 24.04 Noble packages
+
+Start the Compose environment:
+
+```shell
+export DOCKER_IMAGE_NAME=ubuntu
+export DOCKER_IMAGE_TAG=24.04
+podman-compose up --detach
+```
+
+> **Note**
+>
+> The `ubuntu-externals` archive currently publishes Jammy packages only. The
+> Noble installer reuses that repository until a Noble suite becomes available.
+
+### Install noble packages from archivematica.org
+
+Install `noble` packages from the published Archivematica repository:
+
+```shell
+podman-compose exec --user ubuntu archivematica /am-packbuild/tests/archivematica/noble/install.sh
+```
+
+### Install noble packages from a local repository
+
+Alternatively, test using a local repository built from the `/debs/noble`
+directory of this repository.
+
+Create the local repository:
+
+```shell
+make -C ../../debs/noble/archivematica
+make -C ../../debs/noble/archivematica-storage-service
+make -C ../../debs/noble createrepo
+```
+
+Install `noble` packages using the local repository:
+
+```shell
+podman-compose exec --env LOCAL_REPOSITORY="yes" --user ubuntu archivematica /am-packbuild/tests/archivematica/noble/install.sh
 ```
 
 ## Test the Archivematica installation

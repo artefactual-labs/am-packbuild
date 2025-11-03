@@ -14,6 +14,7 @@ on:
       - "tests/archivematica/**"
       - "!tests/archivematica/README.md"
       - "!tests/archivematica/jammy/**"
+      - "!tests/archivematica/noble/**"
   push:
     branches:
       - "stable/**"
@@ -24,6 +25,7 @@ on:
       - "tests/archivematica/**"
       - "!tests/archivematica/README.md"
       - "!tests/archivematica/jammy/**"
+      - "!tests/archivematica/noble/**"
   schedule:
     - cron: "0 2 * * *"
 jobs:
