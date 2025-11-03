@@ -1,0 +1,48 @@
+#!/bin/sh
+# source debconf stuff
+. /usr/share/debconf/confmodule
+
+# Set the default database encoding to utf8mb4
+dbc_mysql_createdb_encoding="utf8mb4"
+
+dbc_go archivematica-mcp-server $@
+
+# source dbconfig-common shell library, and call the hook function
+if [ -f /usr/share/dbconfig-common/dpkg/postinst.mysql ]; then
+	. /usr/share/dbconfig-common/dpkg/postinst.mysql
+	dbc_go archivematica-mcp-server $@
+fi
+
+# Create sharedDirectory and rsync content
+mkdir -p /var/archivematica/sharedDirectory/
+chown -R archivematica:archivematica /var/archivematica/
+
+# Create logs dir
+logdir=/var/log/archivematica/MCPServer
+mkdir -p $logdir
+chown -R archivematica:archivematica $logdir
+chmod -R g+s $logdir
+
+# Populate default mysql config
+DBPASS=$(grep "dbc_dbpass=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(ARCHIVEMATICA_MCPSERVER_CLIENT_PASSWORD=\).*/\1$DBPASS/g" /etc/default/archivematica-mcp-server
+
+DBUSER=$(grep "dbc_dbuser=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(ARCHIVEMATICA_MCPSERVER_CLIENT_USER=\).*/\1$DBUSER/g" /etc/default/archivematica-mcp-server
+
+DBNAME=$(grep "dbc_dbname=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(ARCHIVEMATICA_MCPSERVER_CLIENT_DATABASE=\).*/\1$DBNAME/g" /etc/default/archivematica-mcp-server
+
+DBSERVER=$(grep "dbc_dbserver=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(ARCHIVEMATICA_MCPSERVER_CLIENT_HOST=\).*/\1$DBSERVER/g" /etc/default/archivematica-mcp-server
+
+DBPORT=$(grep "dbc_dbport=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(ARCHIVEMATICA_MCPSERVER_CLIENT_PORT=\).*/\1$DBPORT/g" /etc/default/archivematica-mcp-server
+
+# Use ucf to preserve user changes in the default file
+ucfr archivematica-mcp-server /etc/default/archivematica-mcp-server
+ucf --debconf-ok /etc/default/archivematica-mcp-server /etc/default/archivematica-mcp-server
+
+find "/opt/archivematica/archivematica/src/archivematica/MCPServer" -name '*.pyc' -delete
+
+#DEBHELPER#

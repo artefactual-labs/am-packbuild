@@ -1,0 +1,66 @@
+#!/bin/bash
+
+ARCHIVEMATICA_ENV_DIR="/usr/share/archivematica/virtualenvs/archivematica"
+DASHBOARD_MODULE_PATH="archivematica.dashboard.manage"
+DASHBOARD_SOURCE_DIR="/opt/archivematica/archivematica/src/archivematica/dashboard"
+DASHBOARD_STATIC_DIR="${DASHBOARD_SOURCE_DIR}/static"
+DASHBOARD_LOCALE_DIR="${DASHBOARD_SOURCE_DIR}/locale"
+
+# Runs Django's administrative tasks inside the packaged virtual environment.
+function dashboard_manage {
+    (cd "${DASHBOARD_SOURCE_DIR}" && \
+        "${ARCHIVEMATICA_ENV_DIR}/bin/python" -m "${DASHBOARD_MODULE_PATH}" "$@")
+}
+
+# Create logs directory
+logdir=/var/log/archivematica/dashboard
+mkdir -p $logdir
+chown -R archivematica:archivematica $logdir
+chmod -R g+s $logdir
+
+# Create Django key
+KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 50 | head -n 1)
+sed -i "s/CHANGE_ME_WITH_A_SECRET_KEY/\"$KEY\"/g" /etc/default/archivematica-dashboard
+
+# Populate default mysql config
+DBPASS=$(grep "dbc_dbpass=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(ARCHIVEMATICA_DASHBOARD_CLIENT_PASSWORD=\).*/\1$DBPASS/g" /etc/default/archivematica-dashboard
+
+DBUSER=$(grep "dbc_dbuser=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(ARCHIVEMATICA_DASHBOARD_CLIENT_USER=\).*/\1$DBUSER/g" /etc/default/archivematica-dashboard
+
+DBNAME=$(grep "dbc_dbname=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(ARCHIVEMATICA_DASHBOARD_CLIENT_DATABASE=\).*/\1$DBNAME/g" /etc/default/archivematica-dashboard
+
+DBSERVER=$(grep "dbc_dbserver=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(ARCHIVEMATICA_DASHBOARD_CLIENT_HOST=\).*/\1$DBSERVER/g" /etc/default/archivematica-dashboard
+
+DBPORT=$(grep "dbc_dbport=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(ARCHIVEMATICA_DASHBOARD_CLIENT_PORT=\).*/\1$DBPORT/g" /etc/default/archivematica-dashboard
+
+# Use ucf to preserve user changes in the default file
+ucfr archivematica-dashboard /etc/default/archivematica-dashboard
+ucf --debconf-ok /etc/default/archivematica-dashboard /etc/default/archivematica-dashboard
+
+find "${DASHBOARD_SOURCE_DIR}" -name '*.pyc' -delete
+
+#this is required to allow syncdb to work properly
+set -a
+source /etc/default/archivematica-dashboard
+set +a
+
+# Run migrations
+dashboard_manage migrate --noinput
+
+# Collect static content
+mkdir -p "${DASHBOARD_STATIC_DIR}"
+dashboard_manage collectstatic --noinput --clear
+
+# Compile messages
+dashboard_manage compilemessages
+
+# Set permissions.
+chown -R archivematica:archivematica "${DASHBOARD_STATIC_DIR}"
+chown -R archivematica:archivematica "${DASHBOARD_LOCALE_DIR}"
+
+#DEBHELPER#

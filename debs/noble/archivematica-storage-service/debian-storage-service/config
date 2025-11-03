@@ -1,0 +1,17 @@
+#!/bin/sh
+# config maintainer script for archivematica-storage-service
+
+# source debconf stuff
+. /usr/share/debconf/confmodule
+
+dbc_dbname=SS
+dbc_dbuser=ss
+dbc_dbpass=demo
+dbc_dbserver=localhost
+dbc_dbport=3306
+
+# source dbconfig-common shell library, and call the hook function
+if [ -f /usr/share/dbconfig-common/dpkg/config.mysql ]; then
+  . /usr/share/dbconfig-common/dpkg/config.mysql
+  dbc_go archivematica-storage-service $@
+fi

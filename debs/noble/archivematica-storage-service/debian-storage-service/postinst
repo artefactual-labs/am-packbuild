@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+
+
+# source debconf stuff
+. /usr/share/debconf/confmodule
+
+# Set the default database encoding to utf8mb4
+dbc_mysql_createdb_encoding="utf8mb4"
+
+# source dbconfig-common shell library, and call the hook function
+if [ -f /usr/share/dbconfig-common/dpkg/postinst.mysql ]; then
+	. /usr/share/dbconfig-common/dpkg/postinst.mysql
+	dbc_go archivematica-storage-service $@
+fi
+
+SS_ENV_DIR="/usr/share/archivematica/virtualenvs/archivematica-storage-service"
+SS_SOURCE_DIR="/opt/archivematica/archivematica-storage-service"
+SS_MODULE_PATH="archivematica.storage_service.manage"
+SS_STATIC_DIR="${SS_SOURCE_DIR}/src/archivematica/storage_service/assets"
+SS_LOCALE_DIR="${SS_SOURCE_DIR}/src/archivematica/storage_service/locale"
+
+echo "postinst called with:" $1 $2
+
+echo "creating archivematica user"
+userID=`id -u archivematica`
+
+if [ "${userID}" = 333 ]; then
+  echo "User archivematica exists"
+else
+  adduser --uid 333 --group --system --home /var/lib/archivematica/ archivematica
+fi
+
+
+# Populate default mysql config
+DBPASS=$(grep "dbc_dbpass=" /etc/dbconfig-common/archivematica-storage-service.conf| cut -d\= -f2- | tr -d \')
+DBUSER=$(grep "dbc_dbuser=" /etc/dbconfig-common/archivematica-storage-service.conf| cut -d\= -f2- | tr -d \')
+DBSERVER=$(grep "dbc_dbserver=" /etc/dbconfig-common/archivematica-storage-service.conf| cut -d\= -f2- | tr -d \')
+DBPORT=$(grep "dbc_dbport=" /etc/dbconfig-common/archivematica-storage-service.conf| cut -d\= -f2- | tr -d \')
+DBNAME=$(grep "dbc_dbname=" /etc/dbconfig-common/archivematica-storage-service.conf| cut -d\= -f2- | tr -d \')
+sed -i "s/^\(SS_DB_URL\=mysql\:\/\/\).*/\1${DBUSER}:${DBPASS}\@${DBSERVER}\:${DBPORT}\/${DBNAME}/g" /etc/default/archivematica-storage-service
+
+echo "creating django secret key"
+KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 50 | head -n 1)
+sed -i "s/CHANGE_ME_WITH_A_SECRET_KEY/\"$KEY\"/g" /etc/default/archivematica-storage-service
+
+# Use ucf to preserve user changes in the default file
+ucfr archivematica-storage-service /etc/default/archivematica-storage-service
+ucf --debconf-ok /etc/default/archivematica-storage-service /etc/default/archivematica-storage-service
+
+set -a
+source /etc/default/archivematica-storage-service
+set +a
+
+find ${SS_SOURCE_DIR} -name '*.pyc' -delete
+
+echo "configuring django database and static files"
+cd ${SS_SOURCE_DIR}
+${SS_ENV_DIR}/bin/python -m ${SS_MODULE_PATH} migrate
+mkdir -p ${SS_STATIC_DIR}
+${SS_ENV_DIR}/bin/python -m ${SS_MODULE_PATH} collectstatic --noinput --clear
+${SS_ENV_DIR}/bin/python -m ${SS_MODULE_PATH} compilemessages
+${SS_ENV_DIR}/bin/python -m ${SS_MODULE_PATH} backfill_api_keys
+
+echo "updating directory permissions"
+chown -R archivematica:archivematica /var/archivematica/storage-service
+chown -R archivematica:archivematica /var/archivematica/.storage-service
+chown -R archivematica:archivematica ${SS_ENV_DIR}
+mkdir -p /var/log/archivematica/storage-service
+chown -R archivematica:archivematica /var/log/archivematica/storage-service
+chown -R archivematica:archivematica ${SS_STATIC_DIR}
+chown -R archivematica:archivematica ${SS_LOCALE_DIR}
+
+rm -f /tmp/storage_service.log
+
+#DEBHELPER#

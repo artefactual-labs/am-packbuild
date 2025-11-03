@@ -1,0 +1,11 @@
+LANG="en_US.UTF-8"
+LC_ALL="en_US.UTF-8"
+LC_LANG="en_US.UTF-8"
+
+SS_DB_URL=mysql://ss:demo@localhost:3306/SS
+DJANGO_ALLOWED_HOSTS=*
+DJANGO_SETTINGS_MODULE=archivematica.storage_service.storage_service.settings.production
+DJANGO_SECRET_KEY=CHANGE_ME_WITH_A_SECRET_KEY
+SS_GUNICORN_BIND=127.0.0.1:8001
+
+REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
