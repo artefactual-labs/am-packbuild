@@ -1,66 +1,153 @@
 #!/bin/bash
 
-ARCHIVEMATICA_ENV_DIR="/usr/share/archivematica/virtualenvs/archivematica"
-DASHBOARD_MODULE_PATH="archivematica.dashboard.manage"
-DASHBOARD_SOURCE_DIR="/opt/archivematica/archivematica/src/archivematica/dashboard"
+ARCHIVEMATICA_RUNTIME_DIR="/opt/archivematica/archivematica"
+ARCHIVEMATICA_VENV_DIR="/usr/share/archivematica/virtualenvs/archivematica"
+
+DASHBOARD_SOURCE_DIR="${ARCHIVEMATICA_RUNTIME_DIR}/src/archivematica/dashboard"
 DASHBOARD_STATIC_DIR="${DASHBOARD_SOURCE_DIR}/static"
 DASHBOARD_LOCALE_DIR="${DASHBOARD_SOURCE_DIR}/locale"
+DASHBOARD_LOG_DIR="/var/log/archivematica/dashboard"
+
+LEGACY_DASHBOARD_SOURCE_DIR="/usr/share/archivematica/dashboard"
+
+DASHBOARD_DEFAULTS_FILE="/etc/default/archivematica-dashboard"
+DASHBOARD_DBCONFIG_FILE="/etc/dbconfig-common/archivematica-mcp-server.conf"
+DASHBOARD_MODULE_PATH="archivematica.dashboard.manage"
+DEFAULT_SECRET_PLACEHOLDER="CHANGE_ME_WITH_A_SECRET_KEY"
+DASHBOARD_DEFAULTS_AVAILABLE=0
+
+# Guard sections that require the runtime tree plus the packaged virtualenv
+# to run Django management commands.
+DJANGO_ENV_READY=0
+if [ -d "${DASHBOARD_SOURCE_DIR}" ] && [ -x "${ARCHIVEMATICA_VENV_DIR}/bin/python" ]; then
+	DJANGO_ENV_READY=1
+fi
+
+extract_secret_from_file() {
+	local file_path="$1"
+	[ -f "${file_path}" ] || return 0
+	local secret
+	secret=$(sed -n 's/^ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_SECRET_KEY=//p' "${file_path}" | tail -n 1)
+	secret=${secret%\"}
+	secret=${secret#\"}
+	printf "%s" "${secret}"
+}
+
+escape_sed_replacement() {
+	local value="${1//\\/\\\\}"
+	value="${value//&/\\&}"
+	value="${value//|/\\|}"
+	printf "%s" "${value}"
+}
 
 # Runs Django's administrative tasks inside the packaged virtual environment.
-function dashboard_manage {
-    (cd "${DASHBOARD_SOURCE_DIR}" && \
-        "${ARCHIVEMATICA_ENV_DIR}/bin/python" -m "${DASHBOARD_MODULE_PATH}" "$@")
+function django_manage {
+	if [ "${DJANGO_ENV_READY}" -ne 1 ]; then
+		return 0
+	fi
+	(
+		cd "${DASHBOARD_SOURCE_DIR}" && \
+			"${ARCHIVEMATICA_VENV_DIR}/bin/python" -m "${DASHBOARD_MODULE_PATH}" "$@"
+	)
 }
 
 # Create logs directory
-logdir=/var/log/archivematica/dashboard
-mkdir -p $logdir
-chown -R archivematica:archivematica $logdir
-chmod -R g+s $logdir
+mkdir -p "${DASHBOARD_LOG_DIR}"
+chown -R archivematica:archivematica "${DASHBOARD_LOG_DIR}"
+chmod -R g+s "${DASHBOARD_LOG_DIR}"
 
-# Create Django key
-KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 50 | head -n 1)
-sed -i "s/CHANGE_ME_WITH_A_SECRET_KEY/\"$KEY\"/g" /etc/default/archivematica-dashboard
+# Update defaults when the file is present.
+if [ -f "${DASHBOARD_DEFAULTS_FILE}" ]; then
+	DASHBOARD_DEFAULTS_AVAILABLE=1
+	# Create Django key only if the placeholder remains.
+	if grep -Eq '^ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_SECRET_KEY="?'"${DEFAULT_SECRET_PLACEHOLDER}"'"?$' "${DASHBOARD_DEFAULTS_FILE}"; then
+		KEY_SOURCE=""
+		candidate_secret=""
+		for candidate in \
+			"${DASHBOARD_DEFAULTS_FILE}.ucf-old" \
+			"${DASHBOARD_DEFAULTS_FILE}.ucf-dist" \
+			"${DASHBOARD_DEFAULTS_FILE}.dpkg-old"
+		do
+			candidate_secret=$(extract_secret_from_file "${candidate}")
+			if [ -n "${candidate_secret}" ] && [ "${candidate_secret}" != "${DEFAULT_SECRET_PLACEHOLDER}" ]; then
+				KEY_SOURCE=${candidate_secret}
+				break
+			fi
+		done
+		if [ -z "${KEY_SOURCE}" ]; then
+			KEY_SOURCE=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 50 | head -n 1)
+		fi
+		ESCAPED_KEY=$(escape_sed_replacement "${KEY_SOURCE}")
+		sed -i "s|^ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_SECRET_KEY=.*|ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_SECRET_KEY=\"${ESCAPED_KEY}\"|" "${DASHBOARD_DEFAULTS_FILE}"
+	fi
 
-# Populate default mysql config
-DBPASS=$(grep "dbc_dbpass=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
-sed -i "s/^\(ARCHIVEMATICA_DASHBOARD_CLIENT_PASSWORD=\).*/\1$DBPASS/g" /etc/default/archivematica-dashboard
+	# Populate default mysql config
+	DBPASS=$(grep "dbc_dbpass=" "${DASHBOARD_DBCONFIG_FILE}" | cut -d'=' -f2- | tr -d "'")
+		ESCAPED_DBPASS=$(escape_sed_replacement "${DBPASS}")
+		sed -i "s|^ARCHIVEMATICA_DASHBOARD_CLIENT_PASSWORD=.*|ARCHIVEMATICA_DASHBOARD_CLIENT_PASSWORD=${ESCAPED_DBPASS}|" "${DASHBOARD_DEFAULTS_FILE}"
 
-DBUSER=$(grep "dbc_dbuser=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
-sed -i "s/^\(ARCHIVEMATICA_DASHBOARD_CLIENT_USER=\).*/\1$DBUSER/g" /etc/default/archivematica-dashboard
+		DBUSER=$(grep "dbc_dbuser=" "${DASHBOARD_DBCONFIG_FILE}" | cut -d'=' -f2- | tr -d "'")
+		ESCAPED_DBUSER=$(escape_sed_replacement "${DBUSER}")
+		sed -i "s|^ARCHIVEMATICA_DASHBOARD_CLIENT_USER=.*|ARCHIVEMATICA_DASHBOARD_CLIENT_USER=${ESCAPED_DBUSER}|" "${DASHBOARD_DEFAULTS_FILE}"
 
-DBNAME=$(grep "dbc_dbname=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
-sed -i "s/^\(ARCHIVEMATICA_DASHBOARD_CLIENT_DATABASE=\).*/\1$DBNAME/g" /etc/default/archivematica-dashboard
+		DBNAME=$(grep "dbc_dbname=" "${DASHBOARD_DBCONFIG_FILE}" | cut -d'=' -f2- | tr -d "'")
+		ESCAPED_DBNAME=$(escape_sed_replacement "${DBNAME}")
+		sed -i "s|^ARCHIVEMATICA_DASHBOARD_CLIENT_DATABASE=.*|ARCHIVEMATICA_DASHBOARD_CLIENT_DATABASE=${ESCAPED_DBNAME}|" "${DASHBOARD_DEFAULTS_FILE}"
 
-DBSERVER=$(grep "dbc_dbserver=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
-sed -i "s/^\(ARCHIVEMATICA_DASHBOARD_CLIENT_HOST=\).*/\1$DBSERVER/g" /etc/default/archivematica-dashboard
+		DBSERVER=$(grep "dbc_dbserver=" "${DASHBOARD_DBCONFIG_FILE}" | cut -d'=' -f2- | tr -d "'")
+		ESCAPED_DBSERVER=$(escape_sed_replacement "${DBSERVER}")
+		sed -i "s|^ARCHIVEMATICA_DASHBOARD_CLIENT_HOST=.*|ARCHIVEMATICA_DASHBOARD_CLIENT_HOST=${ESCAPED_DBSERVER}|" "${DASHBOARD_DEFAULTS_FILE}"
 
-DBPORT=$(grep "dbc_dbport=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
-sed -i "s/^\(ARCHIVEMATICA_DASHBOARD_CLIENT_PORT=\).*/\1$DBPORT/g" /etc/default/archivematica-dashboard
+		DBPORT=$(grep "dbc_dbport=" "${DASHBOARD_DBCONFIG_FILE}" | cut -d'=' -f2- | tr -d "'")
+		ESCAPED_DBPORT=$(escape_sed_replacement "${DBPORT}")
+		sed -i "s|^ARCHIVEMATICA_DASHBOARD_CLIENT_PORT=.*|ARCHIVEMATICA_DASHBOARD_CLIENT_PORT=${ESCAPED_DBPORT}|" "${DASHBOARD_DEFAULTS_FILE}"
 
-# Use ucf to preserve user changes in the default file
-ucfr archivematica-dashboard /etc/default/archivematica-dashboard
-ucf --debconf-ok /etc/default/archivematica-dashboard /etc/default/archivematica-dashboard
+	# Use ucf to preserve user changes in the default file
+	ucfr archivematica-dashboard "${DASHBOARD_DEFAULTS_FILE}"
+	ucf --debconf-ok "${DASHBOARD_DEFAULTS_FILE}" "${DASHBOARD_DEFAULTS_FILE}"
+else
+	# Default file missing; fall back to exporting a runtime secret.
+	KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 50 | head -n 1)
+	export ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_SECRET_KEY="${KEY}"
+	echo "Generated runtime django secret key (defaults file missing)"
+fi
 
-find "${DASHBOARD_SOURCE_DIR}" -name '*.pyc' -delete
+if [ -d "${DASHBOARD_SOURCE_DIR}" ]; then
+	find "${DASHBOARD_SOURCE_DIR}" -name '*.pyc' -delete
+fi
 
-#this is required to allow syncdb to work properly
-set -a
-source /etc/default/archivematica-dashboard
-set +a
+if [ -d "${LEGACY_DASHBOARD_SOURCE_DIR}" ]; then
+	rm -rf "${LEGACY_DASHBOARD_SOURCE_DIR}"
+fi
 
-# Run migrations
-dashboard_manage migrate --noinput
+if [ "${DJANGO_ENV_READY}" -eq 1 ]; then
+	if [ "${DASHBOARD_DEFAULTS_AVAILABLE}" -ne 1 ]; then
+		echo "archivematica-dashboard defaults file missing; skipped Django setup. Re-run 'dpkg-reconfigure archivematica-dashboard' after restoring /etc/default/archivematica-dashboard." >&2
+	else
+		#this is required to allow syncdb to work properly
+		set -a
+		# shellcheck disable=SC1090
+		source "${DASHBOARD_DEFAULTS_FILE}"
+		set +a
 
-# Collect static content
-mkdir -p "${DASHBOARD_STATIC_DIR}"
-dashboard_manage collectstatic --noinput --clear
+		if ! django_manage migrate --noinput; then
+			exit 1
+		fi
 
-# Compile messages
-dashboard_manage compilemessages
+		mkdir -p "${DASHBOARD_STATIC_DIR}"
+		if ! django_manage collectstatic --noinput --clear; then
+			exit 1
+		fi
 
-# Set permissions.
-chown -R archivematica:archivematica "${DASHBOARD_STATIC_DIR}"
-chown -R archivematica:archivematica "${DASHBOARD_LOCALE_DIR}"
+		if ! django_manage compilemessages; then
+			exit 1
+		fi
+
+		chown -R archivematica:archivematica "${DASHBOARD_STATIC_DIR}"
+		chown -R archivematica:archivematica "${DASHBOARD_LOCALE_DIR}"
+	fi
+else
+	echo "archivematica-dashboard: runtime files not present; skipped Django setup. Re-run 'dpkg-reconfigure archivematica-dashboard' after installing archivematica." >&2
+fi
 
 #DEBHELPER#

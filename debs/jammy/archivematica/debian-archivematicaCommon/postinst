@@ -1,3 +1,13 @@
 #!/bin/bash
 
-find "/opt/archivematica/archivematica/src/archivematica/archivematicaCommon" -name '*.pyc' -delete
+ARCHIVEMATICA_RUNTIME_DIR="/opt/archivematica/archivematica"
+ARCHIVEMATICA_COMMON_SOURCE_DIR="${ARCHIVEMATICA_RUNTIME_DIR}/src/archivematica/archivematicaCommon"
+LEGACY_ARCHIVEMATICA_COMMON_DIR="/usr/lib/archivematica/archivematicaCommon"
+
+if [ -d "${ARCHIVEMATICA_COMMON_SOURCE_DIR}" ]; then
+	find "${ARCHIVEMATICA_COMMON_SOURCE_DIR}" -name '*.pyc' -delete
+fi
+
+if [ -d "${LEGACY_ARCHIVEMATICA_COMMON_DIR}" ]; then
+	rm -rf "${LEGACY_ARCHIVEMATICA_COMMON_DIR}"
+fi

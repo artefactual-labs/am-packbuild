@@ -9,10 +9,10 @@ X-Python3-Version: >= 3.8
 
 Package: archivematica-common
 Architecture: amd64
+Pre-Depends:
+	archivematica (= ${binary:Version})
 Depends:
 	${misc:Depends},
-	python3,
-	python3-distutils,
-	archivematica (>= 1.18.0)
+	python3
 Description: Archivematica shared libraries.
 Homepage: https://www.archivematica.org

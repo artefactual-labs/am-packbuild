@@ -1,48 +1,77 @@
 #!/bin/sh
+# shellcheck disable=SC1091  # debconf helper lives outside repo but is present in package environment
 # source debconf stuff
+# shellcheck source=/usr/share/debconf/confmodule
 . /usr/share/debconf/confmodule
 
-# Set the default database encoding to utf8mb4
-dbc_mysql_createdb_encoding="utf8mb4"
+ARCHIVEMATICA_RUNTIME_DIR="/opt/archivematica/archivematica"
+MCP_SERVER_SOURCE_DIR="${ARCHIVEMATICA_RUNTIME_DIR}/src/archivematica/MCPServer"
+LEGACY_MCP_SERVER_DIR="/usr/lib/archivematica/MCPServer"
 
-dbc_go archivematica-mcp-server $@
+MCP_SERVER_DEFAULTS_FILE="/etc/default/archivematica-mcp-server"
+MCP_SERVER_DBCONFIG_FILE="/etc/dbconfig-common/archivematica-mcp-server.conf"
+
+MCP_SERVER_SHARED_DIR="/var/archivematica"
+MCP_SERVER_LOG_DIR="/var/log/archivematica/MCPServer"
+
+escape_sed_replacement() {
+	printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/&/\\\&/g' -e 's/|/\\|/g'
+}
+
+update_default_value() {
+	target_file="$1"
+	key="$2"
+	raw_value="$3"
+	escaped_value=$(escape_sed_replacement "$raw_value")
+	sed -i "s|^${key}=.*|${key}=${escaped_value}|" "${target_file}"
+}
+
+# Set the default database encoding to utf8mb4
+# shellcheck disable=SC2034  # variable consumed by dbconfig-common after sourcing
+dbc_mysql_createdb_encoding="utf8mb4"
 
 # source dbconfig-common shell library, and call the hook function
 if [ -f /usr/share/dbconfig-common/dpkg/postinst.mysql ]; then
+	# shellcheck source=/usr/share/dbconfig-common/dpkg/postinst.mysql
 	. /usr/share/dbconfig-common/dpkg/postinst.mysql
-	dbc_go archivematica-mcp-server $@
+	dbc_go archivematica-mcp-server "$@"
 fi
 
 # Create sharedDirectory and rsync content
-mkdir -p /var/archivematica/sharedDirectory/
-chown -R archivematica:archivematica /var/archivematica/
+mkdir -p "${MCP_SERVER_SHARED_DIR}/sharedDirectory/"
+chown -R archivematica:archivematica "${MCP_SERVER_SHARED_DIR}/"
 
 # Create logs dir
-logdir=/var/log/archivematica/MCPServer
-mkdir -p $logdir
-chown -R archivematica:archivematica $logdir
-chmod -R g+s $logdir
+mkdir -p "${MCP_SERVER_LOG_DIR}"
+chown -R archivematica:archivematica "${MCP_SERVER_LOG_DIR}"
+chmod -R g+s "${MCP_SERVER_LOG_DIR}"
 
 # Populate default mysql config
-DBPASS=$(grep "dbc_dbpass=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
-sed -i "s/^\(ARCHIVEMATICA_MCPSERVER_CLIENT_PASSWORD=\).*/\1$DBPASS/g" /etc/default/archivematica-mcp-server
+DBPASS=$(grep "dbc_dbpass=" "${MCP_SERVER_DBCONFIG_FILE}" | cut -d'=' -f2- | tr -d "'")
+update_default_value "${MCP_SERVER_DEFAULTS_FILE}" "ARCHIVEMATICA_MCPSERVER_CLIENT_PASSWORD" "${DBPASS}"
 
-DBUSER=$(grep "dbc_dbuser=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
-sed -i "s/^\(ARCHIVEMATICA_MCPSERVER_CLIENT_USER=\).*/\1$DBUSER/g" /etc/default/archivematica-mcp-server
+DBUSER=$(grep "dbc_dbuser=" "${MCP_SERVER_DBCONFIG_FILE}" | cut -d'=' -f2- | tr -d "'")
+update_default_value "${MCP_SERVER_DEFAULTS_FILE}" "ARCHIVEMATICA_MCPSERVER_CLIENT_USER" "${DBUSER}"
 
-DBNAME=$(grep "dbc_dbname=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
-sed -i "s/^\(ARCHIVEMATICA_MCPSERVER_CLIENT_DATABASE=\).*/\1$DBNAME/g" /etc/default/archivematica-mcp-server
+DBNAME=$(grep "dbc_dbname=" "${MCP_SERVER_DBCONFIG_FILE}" | cut -d'=' -f2- | tr -d "'")
+update_default_value "${MCP_SERVER_DEFAULTS_FILE}" "ARCHIVEMATICA_MCPSERVER_CLIENT_DATABASE" "${DBNAME}"
 
-DBSERVER=$(grep "dbc_dbserver=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
-sed -i "s/^\(ARCHIVEMATICA_MCPSERVER_CLIENT_HOST=\).*/\1$DBSERVER/g" /etc/default/archivematica-mcp-server
+DBSERVER=$(grep "dbc_dbserver=" "${MCP_SERVER_DBCONFIG_FILE}" | cut -d'=' -f2- | tr -d "'")
+update_default_value "${MCP_SERVER_DEFAULTS_FILE}" "ARCHIVEMATICA_MCPSERVER_CLIENT_HOST" "${DBSERVER}"
 
-DBPORT=$(grep "dbc_dbport=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
-sed -i "s/^\(ARCHIVEMATICA_MCPSERVER_CLIENT_PORT=\).*/\1$DBPORT/g" /etc/default/archivematica-mcp-server
+DBPORT=$(grep "dbc_dbport=" "${MCP_SERVER_DBCONFIG_FILE}" | cut -d'=' -f2- | tr -d "'")
+update_default_value "${MCP_SERVER_DEFAULTS_FILE}" "ARCHIVEMATICA_MCPSERVER_CLIENT_PORT" "${DBPORT}"
 
 # Use ucf to preserve user changes in the default file
-ucfr archivematica-mcp-server /etc/default/archivematica-mcp-server
-ucf --debconf-ok /etc/default/archivematica-mcp-server /etc/default/archivematica-mcp-server
+ucfr archivematica-mcp-server "${MCP_SERVER_DEFAULTS_FILE}"
+ucf --debconf-ok "${MCP_SERVER_DEFAULTS_FILE}" "${MCP_SERVER_DEFAULTS_FILE}"
 
-find "/opt/archivematica/archivematica/src/archivematica/MCPServer" -name '*.pyc' -delete
+if [ -d "${MCP_SERVER_SOURCE_DIR}" ]; then
+	find "${MCP_SERVER_SOURCE_DIR}" -name '*.pyc' -delete
+fi
+
+if [ -d "${LEGACY_MCP_SERVER_DIR}" ]; then
+	rm -rf "${LEGACY_MCP_SERVER_DIR}"
+fi
 
 #DEBHELPER#
