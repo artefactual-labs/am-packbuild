@@ -2,6 +2,11 @@ name: Archivematica DEB Packages Test
 on:
   workflow_dispatch:
     inputs:
+      archivematica_packages_repo_version:
+        description: "Archivematica packages repository version (e.g. 1.18.x)"
+        required: false
+        default: "1.18.x"
+        type: "string"
       build_packages:
         description: "Build local packages"
         required: true
@@ -26,6 +31,9 @@ on:
       - "!tests/archivematica/EL9/**"
   schedule:
     - cron: "0 2 * * *"
+
+env:
+  ARCHIVEMATICA_PACKAGES_REPO_VERSION: ${{ inputs.archivematica_packages_repo_version || '1.18.x' }}
 jobs:
   build-am-packages:
     name: Build Archivematica packages
@@ -94,14 +102,16 @@ jobs:
     name: Test packages
     needs: create-package-repo
     runs-on: ubuntu-22.04
-    if: "${{ always() }}"
+    if: >-
+      ${{
+        always() && (
+          needs.create-package-repo.result == 'success' ||
+          (github.event_name == 'workflow_dispatch' && inputs.build_packages == false)
+        )
+      }}
     env:
       build_packages: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
     steps:
-    - name: Check if the repository creation job failed
-      if: "${{ needs.create-package-repo.result != 'skipped' && ! env.build_packages }}"
-      run: |
-        exit 1
     - name: Check out code
       uses: actions/checkout@v4
     - name: Restore package repository
@@ -149,7 +159,12 @@ jobs:
     - name: Install packages
       working-directory: ${{ github.workspace }}/tests/archivematica
       run: |
-        podman-compose exec --env LOCAL_REPOSITORY="${{ env.build_packages }}" --user ubuntu archivematica /am-packbuild/tests/archivematica/jammy/install.sh
+        podman-compose exec \
+          --env LOCAL_REPOSITORY="${{ env.build_packages }}" \
+          --env ARCHIVEMATICA_PACKAGES_REPO_VERSION="${{ env.ARCHIVEMATICA_PACKAGES_REPO_VERSION }}" \
+          --user ubuntu \
+          archivematica \
+          /am-packbuild/tests/archivematica/jammy/install.sh
     - name: Test AM API - Get processing configurations
       run: |
         test $( \
@@ -170,3 +185,25 @@ jobs:
                 'http://localhost:8001/api/v2/pipeline/' \
             | jq -r '.meta.total_count == 1' \
         ) == true
+    - name: "Save common logs on failure"
+      if: "${{ failure() }}"
+      working-directory: "${{ github.workspace }}/tests/archivematica"
+      run: |
+        podman-compose exec --user root archivematica mkdir -p /tmp/logs/journalctl
+        podman-compose exec --user root archivematica bash -c 'journalctl -u archivematica-mcp-client --no-pager > /tmp/logs/journalctl/archivematica-mcp-client'
+    - name: "Save logs on failure"
+      if: "${{ failure() }}"
+      working-directory: "${{ github.workspace }}/tests/archivematica"
+      run: |
+        podman-compose exec --user root archivematica bash -c 'cp -r /var/log/{archivematica,mysql,elasticsearch,gearman-job-server,clamav,nginx} /tmp/logs'
+    - name: "Copy logs from VM"
+      if: "${{ failure() }}"
+      working-directory: "${{ github.workspace }}/tests/archivematica"
+      run: |
+        podman cp archivematica-package-testing_archivematica_1:/tmp/logs/ .
+    - name: "Upload logs on failure"
+      if: "${{ failure() }}"
+      uses: "actions/upload-artifact@v4"
+      with:
+        name: "logs-test-ubuntu"
+        path: "${{ github.workspace }}/tests/archivematica/logs"
