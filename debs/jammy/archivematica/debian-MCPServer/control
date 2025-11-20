@@ -9,6 +9,8 @@ X-Python3-Version: >= 3.8
 
 Package: archivematica-mcp-server
 Architecture: amd64
+Pre-Depends:
+	archivematica (= ${binary:Version})
 Depends:
 	${misc:Depends},
 	archivematica-common (>= 1.18.0),

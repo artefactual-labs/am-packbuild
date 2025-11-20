@@ -1,12 +1,15 @@
 #!/bin/sh
 
+# shellcheck disable=SC1091  # debconf helper lives outside repo but is present in package environment
 if [ -f /usr/share/debconf/confmodule ]; then
+    # shellcheck source=/usr/share/debconf/confmodule
     . /usr/share/debconf/confmodule
 fi
 
 if [ -f /usr/share/dbconfig-common/dpkg/postrm.mysql ]; then
+    # shellcheck source=/usr/share/dbconfig-common/dpkg/postrm.mysql
     . /usr/share/dbconfig-common/dpkg/postrm.mysql
-    dbc_go archivematica-mcp-server $@
+    dbc_go archivematica-mcp-server "$@"
 fi
 
 if [ "$1" = "purge" ]; then

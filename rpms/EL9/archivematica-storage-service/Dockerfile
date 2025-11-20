@@ -16,8 +16,8 @@ RUN set -ex \
 RUN set -ex \
     localedef --no-archive -i en_US -f UTF-8 en_US.UTF-8
 
-ENV LANG en_US.UTF-8
-ENV LC_ALL en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LC_ALL=en_US.UTF-8
 
 RUN set -ex \
     && yum -y update \

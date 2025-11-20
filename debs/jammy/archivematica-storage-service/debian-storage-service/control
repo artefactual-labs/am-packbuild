@@ -29,7 +29,7 @@ Depends:
     unar (>= 1.8.1-4~),
     python3,
     rng-tools,
-    gnupg1,
+    gnupg,
     gettext,
     libmysqlclient-dev,
     dbconfig-common,

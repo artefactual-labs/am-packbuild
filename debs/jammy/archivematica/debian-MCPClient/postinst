@@ -1,30 +1,56 @@
 #!/bin/sh
 
-logdir=/var/log/archivematica/MCPClient
-mkdir -p $logdir
-chown -R archivematica:archivematica $logdir
-chmod -R g+s $logdir
+ARCHIVEMATICA_RUNTIME_DIR="/opt/archivematica/archivematica"
+MCP_CLIENT_SOURCE_DIR="${ARCHIVEMATICA_RUNTIME_DIR}/src/archivematica/MCPClient"
+LEGACY_MCP_CLIENT_DIR="/usr/lib/archivematica/MCPClient"
+
+MCP_CLIENT_DEFAULTS_FILE="/etc/default/archivematica-mcp-client"
+MCP_CLIENT_DBCONFIG_FILE="/etc/dbconfig-common/archivematica-mcp-server.conf"
+
+MCP_CLIENT_LOG_DIR="/var/log/archivematica/MCPClient"
+
+escape_sed_replacement() {
+	printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/&/\\\&/g' -e 's/|/\\|/g'
+}
+
+update_default_value() {
+	target_file="$1"
+	key="$2"
+	raw_value="$3"
+	escaped_value=$(escape_sed_replacement "$raw_value")
+	sed -i "s|^${key}=.*|${key}=${escaped_value}|" "${target_file}"
+}
+
+mkdir -p "${MCP_CLIENT_LOG_DIR}"
+chown -R archivematica:archivematica "${MCP_CLIENT_LOG_DIR}"
+chmod -R g+s "${MCP_CLIENT_LOG_DIR}"
 
 # Populate default mysql config
-DBPASS=$(grep "dbc_dbpass=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
-sed -i "s/^\(ARCHIVEMATICA_MCPCLIENT_CLIENT_PASSWORD=\).*/\1$DBPASS/g" /etc/default/archivematica-mcp-client
+DBPASS=$(grep "dbc_dbpass=" "${MCP_CLIENT_DBCONFIG_FILE}" | cut -d'=' -f2- | tr -d "'")
+update_default_value "${MCP_CLIENT_DEFAULTS_FILE}" "ARCHIVEMATICA_MCPCLIENT_CLIENT_PASSWORD" "${DBPASS}"
 
-DBUSER=$(grep "dbc_dbuser=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
-sed -i "s/^\(ARCHIVEMATICA_MCPCLIENT_CLIENT_USER=\).*/\1$DBUSER/g" /etc/default/archivematica-mcp-client
+DBUSER=$(grep "dbc_dbuser=" "${MCP_CLIENT_DBCONFIG_FILE}" | cut -d'=' -f2- | tr -d "'")
+update_default_value "${MCP_CLIENT_DEFAULTS_FILE}" "ARCHIVEMATICA_MCPCLIENT_CLIENT_USER" "${DBUSER}"
 
-DBNAME=$(grep "dbc_dbname=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
-sed -i "s/^\(ARCHIVEMATICA_MCPCLIENT_CLIENT_DATABASE=\).*/\1$DBNAME/g" /etc/default/archivematica-mcp-client
+DBNAME=$(grep "dbc_dbname=" "${MCP_CLIENT_DBCONFIG_FILE}" | cut -d'=' -f2- | tr -d "'")
+update_default_value "${MCP_CLIENT_DEFAULTS_FILE}" "ARCHIVEMATICA_MCPCLIENT_CLIENT_DATABASE" "${DBNAME}"
 
-DBSERVER=$(grep "dbc_dbserver=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
-sed -i "s/^\(ARCHIVEMATICA_MCPCLIENT_CLIENT_HOST=\).*/\1$DBSERVER/g" /etc/default/archivematica-mcp-client
+DBSERVER=$(grep "dbc_dbserver=" "${MCP_CLIENT_DBCONFIG_FILE}" | cut -d'=' -f2- | tr -d "'")
+update_default_value "${MCP_CLIENT_DEFAULTS_FILE}" "ARCHIVEMATICA_MCPCLIENT_CLIENT_HOST" "${DBSERVER}"
 
-DBPORT=$(grep "dbc_dbport=" /etc/dbconfig-common/archivematica-mcp-server.conf| cut -d\= -f2- | tr -d \')
-sed -i "s/^\(ARCHIVEMATICA_MCPCLIENT_CLIENT_PORT=\).*/\1$DBPORT/g" /etc/default/archivematica-mcp-client
+DBPORT=$(grep "dbc_dbport=" "${MCP_CLIENT_DBCONFIG_FILE}" | cut -d'=' -f2- | tr -d "'")
+update_default_value "${MCP_CLIENT_DEFAULTS_FILE}" "ARCHIVEMATICA_MCPCLIENT_CLIENT_PORT" "${DBPORT}"
 
 # Use ucf to preserve user changes in the default file
-ucfr archivematica-mcp-client /etc/default/archivematica-mcp-client
-ucf --debconf-ok /etc/default/archivematica-mcp-client /etc/default/archivematica-mcp-client
+ucfr archivematica-mcp-client "${MCP_CLIENT_DEFAULTS_FILE}"
+ucf --debconf-ok "${MCP_CLIENT_DEFAULTS_FILE}" "${MCP_CLIENT_DEFAULTS_FILE}"
 
-find "/opt/archivematica/archivematica/src/archivematica/MCPClient" -name '*.pyc' -delete
+if [ -d "${MCP_CLIENT_SOURCE_DIR}" ]; then
+	find "${MCP_CLIENT_SOURCE_DIR}" -name '*.pyc' -delete
+fi
+
+if [ -d "${LEGACY_MCP_CLIENT_DIR}" ]; then
+	rm -rf "${LEGACY_MCP_CLIENT_DIR}"
+fi
 
 #DEBHELPER#

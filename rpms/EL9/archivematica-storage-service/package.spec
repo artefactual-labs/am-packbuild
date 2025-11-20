@@ -118,6 +118,17 @@ if [ x$(semanage port -l | grep http_port_t | grep 8001 | wc -l) == x0 ]; then
 fi
 
 %posttrans
+if [ -f /etc/sysconfig/archivematica-storage-service ]; then
+  if grep -Eq '^DJANGO_SETTINGS_MODULE="?storage_service.settings.production"?$' /etc/sysconfig/archivematica-storage-service; then
+    sed -i 's#^DJANGO_SETTINGS_MODULE=.*#DJANGO_SETTINGS_MODULE=archivematica.storage_service.storage_service.settings.production#' /etc/sysconfig/archivematica-storage-service
+  fi
+  if grep -Eq '^PYTHONPATH="?/usr/lib/archivematica/storage-service"?$' /etc/sysconfig/archivematica-storage-service; then
+    sed -i -E '/^PYTHONPATH="?\/usr\/lib\/archivematica\/storage-service"?$/d' /etc/sysconfig/archivematica-storage-service
+  fi
+  if grep -Eq '^DJANGO_STATIC_ROOT="?/usr/lib/archivematica/storage-service/assets"?$' /etc/sysconfig/archivematica-storage-service; then
+    sed -i 's#^DJANGO_STATIC_ROOT=.*#DJANGO_STATIC_ROOT=/opt/archivematica/archivematica-storage-service/src/archivematica/storage_service/assets#' /etc/sysconfig/archivematica-storage-service
+  fi
+fi
 # Run django collectstatic and compilemessages.
 # These tasks need to be run after postrun script on upgrades
 # because the old virtualenv files need to be removed from the old package.

@@ -18,3 +18,19 @@ repos:
       (?x)^(
         tests/archivematica/README\.md
       )
+- repo: https://github.com/koalaman/shellcheck-precommit
+  rev: v0.11.0
+  hooks:
+  - id: shellcheck
+    files: |
+      (?x)^(
+        tests/
+        |debs/jammy/archivematica/
+        |debs/jammy/archivematica-storage-service/
+        |rpms/EL9/archivematica/
+        |rpms/EL9/archivematica-storage-service/
+      )
+    types_or:
+    - shell
+    args:
+    - --external-sources

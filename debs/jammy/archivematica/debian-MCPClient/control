@@ -9,6 +9,8 @@ X-Python3-Version: >= 3.8
 
 Package: archivematica-mcp-client
 Architecture: amd64
+Pre-Depends:
+	archivematica (= ${binary:Version})
 Depends:
 	${misc:Depends},
 	archivematica-common (>= 1.18.0),
@@ -17,7 +19,7 @@ Depends:
 	clamav,
 	clamav-daemon,
 	ffmpeg (>= 7:3.0),
-	libavcodec-extra58,
+	libavcodec-extra,
 	gearman,
 	imagemagick (>=8:6.7.7.10),
 	inkscape,

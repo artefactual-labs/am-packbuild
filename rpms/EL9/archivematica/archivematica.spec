@@ -250,7 +250,44 @@ fi
 # Posttrans install script
 #
 
+%posttrans mcp-server
+if [ -f /etc/sysconfig/archivematica-mcp-server ]; then
+  if grep -Eq '^DJANGO_SETTINGS_MODULE="?settings.common"?$' /etc/sysconfig/archivematica-mcp-server; then
+    sed -i 's#^DJANGO_SETTINGS_MODULE=.*#DJANGO_SETTINGS_MODULE=archivematica.MCPServer.settings.common#' /etc/sysconfig/archivematica-mcp-server
+  fi
+  if grep -Eq '^PYTHONPATH="?/usr/lib/archivematica/archivematicaCommon/:/usr/share/archivematica/dashboard/"?$' /etc/sysconfig/archivematica-mcp-server; then
+    sed -i -E '/^PYTHONPATH="?\/usr\/lib\/archivematica\/archivematicaCommon\/:\/usr\/share\/archivematica\/dashboard\/"?$/d' /etc/sysconfig/archivematica-mcp-server
+  fi
+fi
+
+%posttrans mcp-client
+if [ -f /etc/sysconfig/archivematica-mcp-client ]; then
+  if grep -Eq '^DJANGO_SETTINGS_MODULE="?settings.common"?$' /etc/sysconfig/archivematica-mcp-client; then
+    sed -i 's#^DJANGO_SETTINGS_MODULE=.*#DJANGO_SETTINGS_MODULE=archivematica.MCPClient.settings.common#' /etc/sysconfig/archivematica-mcp-client
+  fi
+  if grep -Eq '^PYTHONPATH="?/usr/lib/archivematica/MCPClient:/usr/lib/archivematica/MCPClient/clientScripts:/usr/lib/archivematica/archivematicaCommon/:/usr/share/archivematica/dashboard/"?$' /etc/sysconfig/archivematica-mcp-client; then
+    sed -i -E '/^PYTHONPATH="?\/usr\/lib\/archivematica\/MCPClient:\/usr\/lib\/archivematica\/MCPClient\/clientScripts:\/usr\/lib\/archivematica\/archivematicaCommon\/:\/usr\/share\/archivematica\/dashboard\/"?$/d' /etc/sysconfig/archivematica-mcp-client
+  fi
+  if grep -Eq '^ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_ELASTICSEARCHSERVER="?localhost:9200"?$' /etc/sysconfig/archivematica-mcp-client; then
+    sed -i 's#^ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_ELASTICSEARCHSERVER=.*#ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_ELASTICSEARCHSERVER=http://localhost:9200#' /etc/sysconfig/archivematica-mcp-client
+  fi
+fi
+
 %posttrans dashboard
+if [ -f /etc/sysconfig/archivematica-dashboard ]; then
+  if grep -Eq '^DJANGO_SETTINGS_MODULE="?settings.production"?$' /etc/sysconfig/archivematica-dashboard; then
+    sed -i 's#^DJANGO_SETTINGS_MODULE=.*#DJANGO_SETTINGS_MODULE=archivematica.dashboard.settings.production#' /etc/sysconfig/archivematica-dashboard
+  fi
+  if grep -Eq '^PYTHONPATH="?/usr/lib/archivematica/archivematicaCommon/:/usr/share/archivematica/dashboard"?$' /etc/sysconfig/archivematica-dashboard; then
+    sed -i -E '/^PYTHONPATH="?\/usr\/lib\/archivematica\/archivematicaCommon\/:\/usr\/share\/archivematica\/dashboard"?$/d' /etc/sysconfig/archivematica-dashboard
+  fi
+  if grep -Eq '^ARCHIVEMATICA_DASHBOARD_DASHBOARD_ELASTICSEARCH_SERVER="?localhost:9200"?$' /etc/sysconfig/archivematica-dashboard; then
+    sed -i 's#^ARCHIVEMATICA_DASHBOARD_DASHBOARD_ELASTICSEARCH_SERVER=.*#ARCHIVEMATICA_DASHBOARD_DASHBOARD_ELASTICSEARCH_SERVER=http://localhost:9200#' /etc/sysconfig/archivematica-dashboard
+  fi
+  if ! grep -q '^DJANGO_STATIC_ROOT=' /etc/sysconfig/archivematica-dashboard; then
+    echo 'DJANGO_STATIC_ROOT=/opt/archivematica/archivematica/src/archivematica/dashboard/static' >> /etc/sysconfig/archivematica-dashboard
+  fi
+fi
 # Update old virtual environment paths in configuration files
 sed -i "s/\/usr\/share\/archivematica\/virtualenvs\/archivematica-\(dashboard\|mcp-server\|mcp-client\)\//\/usr\/share\/archivematica\/virtualenvs\/archivematica\//g" \
   /etc/sysconfig/archivematica-mcp-server \

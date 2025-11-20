@@ -4,30 +4,22 @@ set -o errexit
 set -o pipefail
 set -x
 
-
-function get_env_boolean() {
-    local name="$1"
-    local default="$2"
-    local ret="${default}"
-    if [ "${default}" == "true" ]; then
-        if [ "${!name}" == "no" ] || [ "${!name}" == "false" ] || [ "${!name}" == "0" ]; then
-            ret="false"
-        fi
-    fi
-    if [ "${default}" == "false" ]; then
-        if [ "${!name}" == "yes" ] || [ "${!name}" == "true" ] || [ "${!name}" == "1" ]; then
-            ret="true"
-        fi
-    fi
-    echo -n "${ret}"
-}
+THIS_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+# shellcheck source=tests/archivematica/common/helpers.sh
+source "${THIS_DIR}/../common/helpers.sh"
 
 search_enabled=$(get_env_boolean "SEARCH_ENABLED" "true")
 local_repository=$(get_env_boolean "LOCAL_REPOSITORY" "false")
+packages_repo_version="${ARCHIVEMATICA_PACKAGES_REPO_VERSION:-1.18.x}"
+elasticsearch_repo_version="${ELASTICSEARCH_PACKAGES_REPO_VERSION:-8.x}"
+elasticsearch_package_version="${ELASTICSEARCH_PACKAGE_VERSION:-}"
 
-echo "~~~~~~~~ DEBUG ~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-while read -r line; do echo "$line=${!line}"; done < <(compgen -v | grep -v '[^[:lower:]_]' | grep -v '^_$')
-echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+dump_lowercase_environment_variables
+echo "Using Archivematica packages repository version: ${packages_repo_version}"
+echo "Using Elasticsearch packages repository version: ${elasticsearch_repo_version}"
+if [ -n "${elasticsearch_package_version}" ]; then
+    echo "Using Elasticsearch package version: ${elasticsearch_package_version}"
+fi
 
 export DEBIAN_FRONTEND=noninteractive
 sudo debconf-set-selections <<< "postfix postfix/mailname string your.hostname.com"
@@ -39,16 +31,7 @@ sudo debconf-set-selections <<< "archivematica-mcp-server archivematica-mcp-serv
 sudo debconf-set-selections <<< "archivematica-mcp-server archivematica-mcp-server/mysql/app-pass password demo-am"
 sudo debconf-set-selections <<< "archivematica-mcp-server archivematica-mcp-server/app-password-confirm password demo-am"
 
-curl -fsSL https://packages.archivematica.org/1.18.x/key.asc | sudo gpg --dearmor -o /etc/apt/keyrings/archivematica-1.18.x.gpg
-sudo sh -c 'echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/archivematica-1.18.x.gpg] http://packages.archivematica.org/1.18.x/ubuntu-externals jammy main" > /etc/apt/sources.list.d/archivematica-externals.list'
-
-if [ "${local_repository}" == "true" ] ; then
-    sudo -u root bash -c 'cat << EOF > /etc/apt/sources.list.d/archivematica.list
-deb file:/am-packbuild/debs/jammy/_deb_repository ./
-EOF'
-else
-    sudo sh -c 'echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/archivematica-1.18.x.gpg] http://packages.archivematica.org/1.18.x/ubuntu jammy main" > /etc/apt/sources.list.d/archivematica.list'
-fi
+configure_archivematica_apt_repos "${local_repository}" "${packages_repo_version}"
 
 sudo apt-get -o Acquire::AllowInsecureRepositories=true update
 sudo apt-get -y upgrade
@@ -59,14 +42,7 @@ sudo service mysql restart
 sudo systemctl enable mysql
 
 if [ "${search_enabled}" == "true" ] ; then
-    curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearmor -o /etc/apt/keyrings/elasticsearch-8.x.gpg
-    echo "deb [signed-by=/etc/apt/keyrings/elasticsearch-8.x.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-8.x.list
-    sudo apt-get -o Acquire::AllowInsecureRepositories=true update
-    sudo apt-get install -y elasticsearch
-    sudo sed -i -e 's/xpack.security.enabled: true/xpack.security.enabled: false/g' /etc/elasticsearch/elasticsearch.yml
-    sudo systemctl daemon-reload
-    sudo service elasticsearch restart
-    sudo systemctl enable elasticsearch
+    install_elasticsearch_deb "${elasticsearch_repo_version}" "${elasticsearch_package_version}"
 fi
 
 sudo apt-get install -y --allow-unauthenticated archivematica-storage-service
@@ -75,89 +51,60 @@ sudo rm -f /etc/nginx/sites-enabled/default
 sudo ln -sf /etc/nginx/sites-available/storage /etc/nginx/sites-enabled/storage
 
 sudo apt-get install -y --allow-unauthenticated archivematica-mcp-server
-sudo apt-get install -y --allow-unauthenticated archivematica-dashboard
-sudo apt-get install -y --allow-unauthenticated archivematica-mcp-client
-
 if [ "${search_enabled}" != "true" ] ; then
-    sudo sh -c 'echo "ARCHIVEMATICA_DASHBOARD_DASHBOARD_SEARCH_ENABLED=false" >> /etc/default/archivematica-dashboard'
-    sudo sh -c 'echo "ARCHIVEMATICA_MCPSERVER_MCPSERVER_SEARCH_ENABLED=false" >> /etc/default/archivematica-mcp-server'
-    sudo sh -c 'echo "ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_SEARCH_ENABLED=false" >> /etc/default/archivematica-mcp-client'
+    set_search_env_flags "/etc/default" "false" "mcp-server"
+fi
+
+sudo apt-get install -y --allow-unauthenticated archivematica-dashboard
+if [ "${search_enabled}" != "true" ] ; then
+    set_search_env_flags "/etc/default" "false" "dashboard"
+fi
+
+sudo apt-get install -y --allow-unauthenticated archivematica-mcp-client
+if [ "${search_enabled}" != "true" ] ; then
+    set_search_env_flags "/etc/default" "false" "mcp-client"
 fi
 
 sudo ln -sf /etc/nginx/sites-available/dashboard.conf /etc/nginx/sites-enabled/dashboard.conf
 
 sudo service clamav-freshclam restart
 sleep 120s
-sudo service clamav-daemon start
-sudo service gearman-job-server restart
-sudo service archivematica-mcp-server start
-sudo service archivematica-mcp-client restart
-sudo service archivematica-storage-service start
-sudo service archivematica-dashboard restart
-sudo service nginx restart
+declare -a SERVICE_OPERATIONS=(
+    "start clamav-daemon"
+    "restart gearman-job-server"
+    "start archivematica-mcp-server"
+    "restart archivematica-mcp-client"
+    "start archivematica-storage-service"
+    "restart archivematica-dashboard"
+    "restart nginx"
+)
 
-sudo -u archivematica bash -c " \
-    set -a -e -x
-    source /etc/default/archivematica-storage-service || \
-        source /etc/sysconfig/archivematica-storage-service \
-            || (echo 'Environment file not found'; exit 1)
-    /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python -m archivematica.storage_service.manage create_user \
-        --username=admin \
-        --password=archivematica \
-        --email="example@example.com" \
-        --api-key="apikey" \
-        --superuser
-";
+for operation in "${SERVICE_OPERATIONS[@]}"; do
+    read -r action service <<<"${operation}"
+    sudo service "${service}" "${action}"
+done
 
-sudo -u archivematica bash -c " \
-    set -a -e -x
-    source /etc/default/archivematica-dashboard || \
-        source /etc/sysconfig/archivematica-dashboard \
-            || (echo 'Environment file not found'; exit 1)
-    /usr/share/archivematica/virtualenvs/archivematica/bin/python -m archivematica.dashboard.manage install \
-        --username="admin" \
-        --password="archivematica" \
-        --email="example@example.com" \
-        --org-name="test" \
-        --org-id="test" \
-        --api-key="apikey" \
-        --ss-url="http://localhost:8000" \
-        --ss-user="admin" \
-        --ss-api-key="apikey" \
-        --site-url="http://localhost"
-";
+run_archivematica_manage storage-service create_user \
+    --username=admin \
+    --password=archivematica \
+    --email="example@example.com" \
+    --api-key="apikey" \
+    --superuser
 
-sudo -u archivematica bash -c " \
-    set -a -e -x
-    source /etc/default/archivematica-dashboard || \
-        source /etc/sysconfig/archivematica-dashboard \
-            || (echo 'Environment file not found'; exit 1)
-    /usr/share/archivematica/virtualenvs/archivematica/bin/python -m archivematica.dashboard.manage collectstatic --noinput --clear
-";
+run_archivematica_manage dashboard install \
+    --username="admin" \
+    --password="archivematica" \
+    --email="example@example.com" \
+    --org-name="test" \
+    --org-id="test" \
+    --api-key="apikey" \
+    --ss-url="http://localhost:8000" \
+    --ss-user="admin" \
+    --ss-api-key="apikey" \
+    --site-url="http://localhost"
 
-sudo -u archivematica bash -c " \
-    set -a -e -x
-    source /etc/default/archivematica-dashboard || \
-        source /etc/sysconfig/archivematica-dashboard \
-            || (echo 'Environment file not found'; exit 1)
-    cd /opt/archivematica/archivematica
-    /usr/share/archivematica/virtualenvs/archivematica/bin/python -m archivematica.dashboard.manage compilemessages
-";
+run_archivematica_manage dashboard collectstatic --noinput --clear
+run_archivematica_manage dashboard --chdir /opt/archivematica/archivematica compilemessages
 
-
-sudo -u archivematica bash -c " \
-    set -a -e -x
-    source /etc/default/archivematica-storage-service || \
-        source /etc/sysconfig/archivematica-storage-service \
-            || (echo 'Environment file not found'; exit 1)
-    /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python -m archivematica.storage_service.manage collectstatic --noinput --clear
-";
-
-sudo -u archivematica bash -c " \
-    set -a -e -x
-    source /etc/default/archivematica-storage-service || \
-        source /etc/sysconfig/archivematica-storage-service \
-            || (echo 'Environment file not found'; exit 1)
-    cd /opt/archivematica/archivematica-storage-service/
-    /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python -m archivematica.storage_service.manage compilemessages
-";
+run_archivematica_manage storage-service collectstatic --noinput --clear
+run_archivematica_manage storage-service --chdir /opt/archivematica/archivematica-storage-service/ compilemessages
