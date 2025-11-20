@@ -13,6 +13,8 @@ Build-Depends:
 	libssl-dev,
 	libxml2-dev,
 	libxslt1-dev,
+	nodejs,
+	npm,
 	pkg-config,
 	rsync,
 Standards-Version: 3.9.8

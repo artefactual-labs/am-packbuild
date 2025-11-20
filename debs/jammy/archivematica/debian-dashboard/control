@@ -9,6 +9,8 @@ X-Python3-Version: >= 3.8
 
 Package: archivematica-dashboard
 Architecture: any
+Pre-Depends:
+	archivematica (= ${binary:Version})
 Depends:
 	${shlibs:Depends},
 	${misc:Depends},
