@@ -61,8 +61,8 @@ For Ubuntu packages:
         reprepro includedsc trusty /path/to/packages/*.deb
 
 This needs to be repeated for each Ubuntu release and package. More info about
-managing Ubuntu repositories using reprepro can be found
-[here](https://wiki.archivematica.org/Release_Process#Build_deb.2Frpm_packages).
+managing Ubuntu repositories using `reprepro` can be found in the
+[Archivematica release process documentation](https://wiki.archivematica.org/Release_Process#Build_deb.2Frpm_packages).
 
 ## Test package
 
