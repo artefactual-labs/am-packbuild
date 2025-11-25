@@ -7,6 +7,17 @@ ARCHIVEMATICA_SERVICES=(
     archivematica-storage-service
 )
 
+first_existing_dir() {
+    local dir
+    for dir in "$@"; do
+        if [ -d "${dir}" ]; then
+            echo "${dir}"
+            return 0
+        fi
+    done
+    return 1
+}
+
 function get_env_boolean() {
     local name="$1"
     local default="$2"
@@ -29,13 +40,17 @@ function get_env_boolean() {
 
 function stop_archivematica_services() {
     for service in "${ARCHIVEMATICA_SERVICES[@]}"; do
-        sudo -u root systemctl stop "${service}"
+        if ! sudo -u root systemctl stop "${service}"; then
+            echo "Warning: could not stop ${service}; continuing" >&2
+        fi
     done
 }
 
 function restart_archivematica_services() {
     for service in "${ARCHIVEMATICA_SERVICES[@]}"; do
-        sudo -u root systemctl restart "${service}"
+        if ! sudo -u root systemctl restart "${service}"; then
+            echo "Warning: could not restart ${service}; continuing" >&2
+        fi
     done
 }
 
@@ -101,12 +116,46 @@ enabled=1
 EOF"
 }
 
-function append_env_var() {
+function set_env_var() {
     local file="$1"
     local variable="$2"
     local value="$3"
 
-    echo "${variable}=${value}" | sudo -u root tee -a "${file}" >/dev/null
+    sudo -u root touch "${file}"
+
+    local escaped_variable
+    escaped_variable=$(printf '%s' "${variable}" | sed -e 's/[][\\\/.^$*+?|(){}-]/\\&/g')
+
+    if sudo -u root grep -qE "^${escaped_variable}=" "${file}"; then
+        sudo -u root sed -i -E "s|^${escaped_variable}=.*|${variable}=${value}|" "${file}"
+    else
+        echo "${variable}=${value}" | sudo -u root tee -a "${file}" >/dev/null
+    fi
+}
+
+function ensure_elasticsearch_setting() {
+    local key="$1"
+    local value="$2"
+    local file="${3:-/etc/elasticsearch/elasticsearch.yml}"
+
+    local key_regex
+    key_regex=$(printf '%s' "${key}" | sed -e 's/[][\\\/.^$*+?|(){}]/\\&/g')
+
+    local match_regex="^[[:space:]]*${key_regex}:"
+
+    if sudo -u root grep -Eq "${match_regex}" "${file}"; then
+        sudo -u root sed -i -E "s|${match_regex}.*|${key}: ${value}|" "${file}"
+    else
+        printf '%s: %s\n' "${key}" "${value}" | sudo -u root tee -a "${file}" >/dev/null
+    fi
+}
+
+function configure_elasticsearch_settings() {
+    sudo -u root sed -i 's/^xpack\.security\.enabled:.*/xpack.security.enabled: false/' /etc/elasticsearch/elasticsearch.yml
+    sudo -u root sed -i '/xpack\.security\.http\.ssl:/,/^xpack\.security/{s/^\(\s*\)enabled:.*/\1enabled: false/}' /etc/elasticsearch/elasticsearch.yml
+    sudo -u root sed -i '/xpack\.security\.transport\.ssl:/,/^xpack\.security/{s/^\(\s*\)enabled:.*/\1enabled: false/}' /etc/elasticsearch/elasticsearch.yml
+    ensure_elasticsearch_setting "reindex.remote.whitelist" "localhost:9500"
+    ensure_elasticsearch_setting "xpack.ml.enabled" "false"
 }
 
 function set_search_env_flags() {
@@ -122,13 +171,13 @@ function set_search_env_flags() {
     for component in "${components[@]}"; do
         case "${component}" in
             dashboard)
-                append_env_var "${base_dir}/archivematica-dashboard" "ARCHIVEMATICA_DASHBOARD_DASHBOARD_SEARCH_ENABLED" "${value}"
+                set_env_var "${base_dir}/archivematica-dashboard" "ARCHIVEMATICA_DASHBOARD_DASHBOARD_SEARCH_ENABLED" "${value}"
                 ;;
             mcp-server)
-                append_env_var "${base_dir}/archivematica-mcp-server" "ARCHIVEMATICA_MCPSERVER_MCPSERVER_SEARCH_ENABLED" "${value}"
+                set_env_var "${base_dir}/archivematica-mcp-server" "ARCHIVEMATICA_MCPSERVER_MCPSERVER_SEARCH_ENABLED" "${value}"
                 ;;
             mcp-client)
-                append_env_var "${base_dir}/archivematica-mcp-client" "ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_SEARCH_ENABLED" "${value}"
+                set_env_var "${base_dir}/archivematica-mcp-client" "ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_SEARCH_ENABLED" "${value}"
                 ;;
             *)
                 echo "Unknown component '${component}'" >&2
@@ -168,7 +217,7 @@ function run_archivematica_manage() {
 
     local env_candidates=()
     local virtualenv_python=""
-    local module=""
+    local module_candidates=()
 
     case "${component}" in
         storage-service)
@@ -177,7 +226,10 @@ function run_archivematica_manage() {
                 /etc/sysconfig/archivematica-storage-service
             )
             virtualenv_python=/usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/python
-            module=archivematica.storage_service.manage
+            module_candidates=(
+                archivematica.storage_service.manage
+                storage_service.manage
+            )
             ;;
         dashboard)
             env_candidates=(
@@ -185,7 +237,10 @@ function run_archivematica_manage() {
                 /etc/sysconfig/archivematica-dashboard
             )
             virtualenv_python=/usr/share/archivematica/virtualenvs/archivematica/bin/python
-            module=archivematica.dashboard.manage
+            module_candidates=(
+                archivematica.dashboard.manage
+                dashboard.manage
+            )
             ;;
         *)
             echo "Unknown component '${component}'" >&2
@@ -206,7 +261,64 @@ function run_archivematica_manage() {
         exit 1
     fi
 
-    local command=("${virtualenv_python}" -m "${module}" "$@")
+    local module=""
+    for candidate_module in "${module_candidates[@]}"; do
+        if sudo -u archivematica bash -c "set -a -e
+source ${env_file}
+${virtualenv_python} -c \"import importlib.util, sys; sys.exit(0 if importlib.util.find_spec('${candidate_module}') else 1)\"
+" >/dev/null 2>&1; then
+            module="${candidate_module}"
+            break
+        fi
+    done
+
+    local command=()
+    local activate_path=""
+    if [ -n "${module}" ]; then
+        command=("${virtualenv_python}" "-m" "${module}" "$@")
+        activate_path=$(dirname "${virtualenv_python}")/activate
+    else
+        # Fall back to manage.py for very old virtualenv layouts lacking modules.
+        local manage_py=""
+        local manage_candidates=()
+        case "${component}" in
+            storage-service)
+                manage_candidates=(
+                    /usr/share/archivematica/storage-service/manage.py
+                    /usr/lib/archivematica/storage-service/manage.py
+                )
+                ;;
+            dashboard)
+                # Older 1.17.x packages install manage.py under dashboard/.
+                manage_candidates=(
+                    /usr/share/archivematica/dashboard/manage.py
+                    /usr/lib/archivematica/dashboard/manage.py
+                )
+                ;;
+        esac
+
+        for candidate_manage in "${manage_candidates[@]}"; do
+            if [ -f "${candidate_manage}" ]; then
+                manage_py="${candidate_manage}"
+                break
+            fi
+        done
+
+        if [ ! -f "${manage_py}" ]; then
+            echo "Unable to find Python manage module for component '${component}'" >&2
+            exit 1
+        fi
+
+        local manage_dir
+        manage_dir=$(dirname "${manage_py}")
+        local default_venv="${manage_dir}/../src/virtualenv/bin/activate"
+        if [ ! -f "${default_venv}" ]; then
+            default_venv="${manage_dir}/../src/dashboard/virtualenv/bin/activate"
+        fi
+
+        command=("${virtualenv_python}" "${manage_py}" "$@")
+        activate_path="${default_venv}"
+    fi
     local command_string=""
     printf -v command_string '%q ' "${command[@]}"
     command_string=${command_string% }
@@ -214,6 +326,10 @@ function run_archivematica_manage() {
     local script="set -a -e -x
 source ${env_file}
 "
+    if [ -n "${activate_path}" ] && [ -f "${activate_path}" ]; then
+        script+="source ${activate_path}
+"
+    fi
     if [ -n "${chdir}" ]; then
         script+="cd ${chdir}
 "
@@ -227,6 +343,7 @@ source ${env_file}
 function install_elasticsearch_deb() {
     local repo_version="${1:-${ELASTICSEARCH_PACKAGES_REPO_VERSION:-8.x}}"
     local package_version="${2:-${ELASTICSEARCH_PACKAGE_VERSION:-}}"
+    local local_repository="${3:-$(get_env_boolean "LOCAL_REPOSITORY" "false")}"
     local version_slug="${repo_version//\//-}"
     local keyring_path="/etc/apt/keyrings/elasticsearch-${version_slug}.gpg"
     local repo_file="/etc/apt/sources.list.d/elasticsearch-${version_slug}.list"
@@ -237,16 +354,19 @@ function install_elasticsearch_deb() {
 deb [signed-by=${keyring_path}] https://artifacts.elastic.co/packages/${repo_version}/apt stable main
 EOF"
 
-    sudo -u root apt-get -o Acquire::AllowInsecureRepositories=true update
+    local apt_update_cmd=(sudo -u root apt-get)
+    if [ "${local_repository}" == "true" ]; then
+        apt_update_cmd+=(-o Acquire::AllowInsecureRepositories=true)
+    fi
+    apt_update_cmd+=(update)
+    "${apt_update_cmd[@]}"
     if [ -n "${package_version}" ]; then
         sudo -u root apt-get install -y "elasticsearch=${package_version}"
     else
         sudo -u root apt-get install -y elasticsearch
     fi
 
-    sudo -u root sed -i 's/^xpack\.security\.enabled:.*/xpack.security.enabled: false/' /etc/elasticsearch/elasticsearch.yml
-    sudo -u root sed -i '/xpack\.security\.http\.ssl:/,/^xpack\.security/{s/^\(\s*\)enabled:.*/\1enabled: false/}' /etc/elasticsearch/elasticsearch.yml
-    sudo -u root sed -i '/xpack\.security\.transport\.ssl:/,/^xpack\.security/{s/^\(\s*\)enabled:.*/\1enabled: false/}' /etc/elasticsearch/elasticsearch.yml
+    configure_elasticsearch_settings
 
     sudo -u root systemctl daemon-reload
     sudo -u root service elasticsearch restart
@@ -279,9 +399,7 @@ EOF"
         sudo -u root yum install -y elasticsearch
     fi
 
-    sudo -u root sed -i 's/^xpack\.security\.enabled:.*/xpack.security.enabled: false/' /etc/elasticsearch/elasticsearch.yml
-    sudo -u root sed -i '/xpack\.security\.http\.ssl:/,/^xpack\.security/{s/^\(\s*\)enabled:.*/\1enabled: false/}' /etc/elasticsearch/elasticsearch.yml
-    sudo -u root sed -i '/xpack\.security\.transport\.ssl:/,/^xpack\.security/{s/^\(\s*\)enabled:.*/\1enabled: false/}' /etc/elasticsearch/elasticsearch.yml
+    configure_elasticsearch_settings
 
     sudo -u root systemctl enable elasticsearch
     sudo -u root systemctl start elasticsearch

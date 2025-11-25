@@ -1,0 +1,46 @@
+name: "Setup Archivematica tests virtual environment"
+description: "Installs Python, provisions the Archivematica tests virtualenv, and adds it to PATH."
+inputs:
+  python-version:
+    description: "Python version to install"
+    required: false
+    default: "3.10"
+  requirements-file:
+    description: "Requirements filename relative to the working directory"
+    required: false
+    default: "requirements.txt"
+  working-directory:
+    description: "Directory where the virtualenv should be created"
+    required: false
+    default: "tests/archivematica"
+  venv-path:
+    description: "Virtualenv directory relative to the working directory"
+    required: false
+    default: ".venv"
+runs:
+  using: "composite"
+  steps:
+    - name: "Install Python"
+      uses: "actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548" # v6.1.0
+      with:
+        python-version: "${{ inputs.python-version }}"
+        cache: "pip"
+        cache-dependency-path: "${{ format('{0}/{1}', inputs.working-directory, inputs.requirements-file) }}"
+    - name: "Cache the virtual environment"
+      id: "venv-cache"
+      uses: "actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830" # v4.3.0
+      with:
+        path: "${{ inputs.working-directory }}/${{ inputs.venv-path }}/"
+        key: "os-${{ runner.os }}-python_version-${{ inputs.python-version }}-hash-${{ hashFiles(format('{0}/{1}', inputs.working-directory, inputs.requirements-file)) }}"
+    - name: "Set up the virtual environment"
+      if: "steps.venv-cache.outputs.cache-hit != 'true'"
+      shell: bash
+      working-directory: "${{ inputs.working-directory }}"
+      run: |
+        python3 -m venv "${{ inputs.venv-path }}"
+        "${{ inputs.venv-path }}/bin/python" -m pip install -r "${{ inputs.requirements-file }}"
+    - name: "Add virtual environment to PATH"
+      shell: bash
+      working-directory: "${{ inputs.working-directory }}"
+      run: |
+        echo "$PWD/${{ inputs.venv-path }}/bin" >> "$GITHUB_PATH"

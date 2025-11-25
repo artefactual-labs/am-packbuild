@@ -8,6 +8,22 @@ THIS_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 # shellcheck source=tests/archivematica/common/helpers.sh
 source "${THIS_DIR}/../common/helpers.sh"
 
+wait_for_service_active() {
+    local service="$1"
+    local timeout="${2:-120}"
+    local interval="${3:-5}"
+    local elapsed=0
+
+    until sudo systemctl is-active --quiet "${service}"; do
+        if [ "${elapsed}" -ge "${timeout}" ]; then
+            echo "Service ${service} did not become active within ${timeout}s" >&2
+            return 1
+        fi
+        sleep "${interval}"
+        elapsed=$((elapsed + interval))
+    done
+}
+
 search_enabled=$(get_env_boolean "SEARCH_ENABLED" "true")
 local_repository=$(get_env_boolean "LOCAL_REPOSITORY" "false")
 packages_repo_version="${ARCHIVEMATICA_PACKAGES_REPO_VERSION:-1.18.x}"
@@ -33,7 +49,11 @@ sudo debconf-set-selections <<< "archivematica-mcp-server archivematica-mcp-serv
 
 configure_archivematica_apt_repos "${local_repository}" "${packages_repo_version}"
 
-sudo apt-get -o Acquire::AllowInsecureRepositories=true update
+if [ "${local_repository}" == "true" ]; then
+    sudo apt-get -o Acquire::AllowInsecureRepositories=true update
+else
+    sudo apt-get update
+fi
 sudo apt-get -y upgrade
 
 sudo apt-get install -y openjdk-8-jre-headless mysql-server
@@ -42,33 +62,38 @@ sudo service mysql restart
 sudo systemctl enable mysql
 
 if [ "${search_enabled}" == "true" ] ; then
-    install_elasticsearch_deb "${elasticsearch_repo_version}" "${elasticsearch_package_version}"
+    install_elasticsearch_deb "${elasticsearch_repo_version}" "${elasticsearch_package_version}" "${local_repository}"
 fi
 
-sudo apt-get install -y --allow-unauthenticated archivematica-storage-service
+apt_auth_flags=()
+if [ "${local_repository}" == "true" ]; then
+    apt_auth_flags+=("--allow-unauthenticated")
+fi
+
+sudo apt-get install -y "${apt_auth_flags[@]}" archivematica-storage-service
 
 sudo rm -f /etc/nginx/sites-enabled/default
 sudo ln -sf /etc/nginx/sites-available/storage /etc/nginx/sites-enabled/storage
 
-sudo apt-get install -y --allow-unauthenticated archivematica-mcp-server
+sudo apt-get install -y "${apt_auth_flags[@]}" archivematica-mcp-server
 if [ "${search_enabled}" != "true" ] ; then
     set_search_env_flags "/etc/default" "false" "mcp-server"
 fi
 
-sudo apt-get install -y --allow-unauthenticated archivematica-dashboard
+sudo apt-get install -y "${apt_auth_flags[@]}" archivematica-dashboard
 if [ "${search_enabled}" != "true" ] ; then
     set_search_env_flags "/etc/default" "false" "dashboard"
 fi
 
-sudo apt-get install -y --allow-unauthenticated archivematica-mcp-client
+sudo apt-get install -y "${apt_auth_flags[@]}" archivematica-mcp-client
 if [ "${search_enabled}" != "true" ] ; then
     set_search_env_flags "/etc/default" "false" "mcp-client"
 fi
 
 sudo ln -sf /etc/nginx/sites-available/dashboard.conf /etc/nginx/sites-enabled/dashboard.conf
 
-sudo service clamav-freshclam restart
-sleep 120s
+sudo systemctl restart clamav-freshclam
+wait_for_service_active "clamav-freshclam" 120 5
 declare -a SERVICE_OPERATIONS=(
     "start clamav-daemon"
     "restart gearman-job-server"
@@ -103,8 +128,27 @@ run_archivematica_manage dashboard install \
     --ss-api-key="apikey" \
     --site-url="http://localhost"
 
+if ! dashboard_code_dir=$(
+    first_existing_dir \
+        /opt/archivematica/archivematica \
+        /usr/share/archivematica/dashboard \
+        /usr/lib/archivematica/dashboard
+); then
+    echo "Unable to locate dashboard source directory" >&2
+    exit 1
+fi
+
 run_archivematica_manage dashboard collectstatic --noinput --clear
-run_archivematica_manage dashboard --chdir /opt/archivematica/archivematica compilemessages
+run_archivematica_manage dashboard --chdir "${dashboard_code_dir}" compilemessages
 
 run_archivematica_manage storage-service collectstatic --noinput --clear
-run_archivematica_manage storage-service --chdir /opt/archivematica/archivematica-storage-service/ compilemessages
+if ! storage_service_code_dir=$(
+    first_existing_dir \
+        /opt/archivematica/archivematica-storage-service \
+        /usr/share/archivematica/storage-service \
+        /usr/lib/archivematica/storage-service
+); then
+    echo "Unable to locate storage service source directory" >&2
+    exit 1
+fi
+run_archivematica_manage storage-service --chdir "${storage_service_code_dir}" compilemessages

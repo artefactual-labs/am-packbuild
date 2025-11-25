@@ -1,0 +1,269 @@
+name: Archivematica RPM Packages Upgrade Test
+on:
+  workflow_dispatch:
+    inputs:
+      baseline_archivematica_packages_repo_version:
+        description: "Archivematica packages repository version to install before the upgrade (e.g. 1.17.x)"
+        required: false
+        default: "1.17.x"
+        type: "string"
+      baseline_elasticsearch_repo_version:
+        description: "Elasticsearch repository version for the baseline install (e.g. 6.x)"
+        required: false
+        default: "6.x"
+        type: "string"
+      upgrade_archivematica_packages_repo_version:
+        description: "Archivematica packages repository version to upgrade to (e.g. 1.18.x)"
+        required: false
+        default: "1.18.x"
+        type: "string"
+      upgrade_elasticsearch_repo_version:
+        description: "Elasticsearch repository version for the upgraded system (e.g. 8.x)"
+        required: false
+        default: "8.x"
+        type: "string"
+      build_packages:
+        description: "Build local packages for the upgrade target"
+        required: true
+        default: true
+        type: "boolean"
+  pull_request:
+    paths:
+      - "rpms/EL9/archivematica/**"
+      - "rpms/EL9/archivematica-storage-service/**"
+      - "tests/archivematica/**"
+      - "!tests/archivematica/README.md"
+      - "!tests/archivematica/jammy/**"
+  push:
+    branches:
+      - "stable/**"
+      - "qa/**"
+    paths:
+      - "rpms/EL9/archivematica/**"
+      - "rpms/EL9/archivematica-storage-service/**"
+      - "tests/archivematica/**"
+      - "!tests/archivematica/README.md"
+      - "!tests/archivematica/jammy/**"
+  schedule:
+    - cron: "0 5 * * *"
+
+env:
+  BASELINE_ARCHIVEMATICA_PACKAGES_REPO_VERSION: ${{ inputs.baseline_archivematica_packages_repo_version || '1.17.x' }}
+  BASELINE_ELASTICSEARCH_PACKAGES_REPO_VERSION: ${{ inputs.baseline_elasticsearch_repo_version || '6.x' }}
+  UPGRADE_ARCHIVEMATICA_PACKAGES_REPO_VERSION: ${{ inputs.upgrade_archivematica_packages_repo_version || '1.18.x' }}
+  UPGRADE_ELASTICSEARCH_PACKAGES_REPO_VERSION: ${{ inputs.upgrade_elasticsearch_repo_version || '8.x' }}
+
+jobs:
+  build-am-packages:
+    name: Build Archivematica packages
+    runs-on: ubuntu-latest
+    if: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
+    steps:
+    - name: Check out code
+      uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+    - name: Build
+      run: |
+        make -C ${{ github.workspace }}/rpms/EL9/archivematica
+    - name: Save artifacts
+      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+      with:
+        name: archivematica-packages
+        path: |
+          ${{ github.workspace }}/rpms/EL9/archivematica/*.rpm
+  build-ss-packages:
+    name: Build Storage Service packages
+    runs-on: ubuntu-latest
+    if: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
+    steps:
+    - name: Check out code
+      uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+    - name: Build
+      run: |
+        make -C ${{ github.workspace }}/rpms/EL9/archivematica-storage-service
+    - name: Save artifacts
+      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+      with:
+        name: archivematica-storage-service-packages
+        path: |
+          ${{ github.workspace }}/rpms/EL9/archivematica-storage-service/*.rpm
+  create-package-repo:
+    name: Create package repository
+    runs-on: ubuntu-latest
+    if: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
+    needs:
+    - build-am-packages
+    - build-ss-packages
+    steps:
+    - name: Check out code
+      uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+    - name: Restore Archivematica packages
+      uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+      with:
+        name: archivematica-packages
+        path: |
+          ${{ github.workspace }}/rpms/EL9/archivematica/
+    - name: Restore Storage Service packages
+      uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+      with:
+        name: archivematica-storage-service-packages
+        path: |
+          ${{ github.workspace }}/rpms/EL9/archivematica-storage-service
+    - name: Create repository
+      run: |
+        make -C ${{ github.workspace }}/rpms/EL9 createrepo
+    - name: Save package repository
+      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+      with:
+        name: package-repository
+        path: |
+          ${{ github.workspace }}/rpms/EL9/_yum_repository
+  test-upgrade:
+    name: Test upgrade path
+    needs: create-package-repo
+    runs-on: ubuntu-22.04
+    if: >-
+      ${{
+        always() && (
+          needs.create-package-repo.result == 'success' ||
+          (github.event_name == 'workflow_dispatch' && inputs.build_packages == false)
+        )
+      }}
+    env:
+      build_packages: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
+      python_version: "3.10"
+    steps:
+    - name: Check out code
+      uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+    - name: Restore package repository
+      if: ${{ env.build_packages == 'true' && needs.create-package-repo.result == 'success' }}
+      uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+      with:
+        name: package-repository
+        path: ${{ github.workspace }}/rpms/EL9/_yum_repository
+    - name: "Upgrade crun (supports Ubuntu's systemd in the Dockerfile)"
+      run: |
+        wget https://github.com/containers/crun/releases/download/1.15/crun-1.15-linux-amd64
+        sudo install crun-1.15-linux-amd64 /usr/bin/crun
+        rm crun-1.15-linux-amd64
+    - name: "Prepare Archivematica test environment"
+      uses: ./.github/actions/setup-am-tests-venv
+      with:
+        python-version: "${{ env.python_version }}"
+        working-directory: "tests/archivematica"
+    - name: "Start the Compose environment"
+      working-directory: "${{ github.workspace }}/tests/archivematica"
+      env:
+        DOCKER_IMAGE_NAME: "rockylinux"
+        DOCKER_IMAGE_TAG: "9"
+      run: |
+        podman-compose up --detach
+    - name: "Install baseline packages"
+      working-directory: ${{ github.workspace }}/tests/archivematica
+      run: |
+        podman-compose exec \
+          --env LOCAL_REPOSITORY="false" \
+          --env ARCHIVEMATICA_PACKAGES_REPO_VERSION="${{ env.BASELINE_ARCHIVEMATICA_PACKAGES_REPO_VERSION }}" \
+          --env ELASTICSEARCH_PACKAGES_REPO_VERSION="${{ env.BASELINE_ELASTICSEARCH_PACKAGES_REPO_VERSION }}" \
+          --user ubuntu \
+          archivematica \
+          /am-packbuild/tests/archivematica/EL9/install.sh
+    - name: "Get baseline Archivematica version"
+      run: |
+        curl \
+          --silent \
+          --dump-header - \
+          --header 'Authorization: ApiKey admin:apikey' \
+          --header 'Content-Type: application/json' \
+          'http://localhost:8000/api/processing-configuration/' | grep X-Archivematica-Version
+    - name: Test baseline AM API - Get processing configurations
+      run: |
+        test $( \
+            curl \
+                --silent \
+                --header 'Authorization: ApiKey admin:apikey' \
+                --header 'Content-Type: application/json' \
+                'http://localhost:8000/api/processing-configuration/' \
+            | jq -r '.processing_configurations == ["automated", "default"]' \
+        ) == true
+    - name: Test baseline SS API - Get pipeline count
+      run: |
+        test $( \
+            curl \
+                --silent \
+                --header 'Authorization: ApiKey admin:apikey' \
+                --header 'Content-Type: application/json' \
+                'http://localhost:8001/api/v2/pipeline/' \
+            | jq -r '.meta.total_count == 1' \
+        ) == true
+    - name: "Upgrade packages"
+      working-directory: ${{ github.workspace }}/tests/archivematica
+      run: |
+        podman-compose exec \
+          --env LOCAL_REPOSITORY="${{ env.build_packages }}" \
+          --env ARCHIVEMATICA_PACKAGES_REPO_VERSION="${{ env.UPGRADE_ARCHIVEMATICA_PACKAGES_REPO_VERSION }}" \
+          --env ELASTICSEARCH_PACKAGES_REPO_VERSION="${{ env.UPGRADE_ELASTICSEARCH_PACKAGES_REPO_VERSION }}" \
+          --user ubuntu \
+          archivematica \
+          /am-packbuild/tests/archivematica/EL9/upgrade.sh
+    - name: "Get upgraded Archivematica version"
+      run: |
+        curl \
+          --silent \
+          --dump-header - \
+          --header 'Authorization: ApiKey admin:apikey' \
+          --header 'Content-Type: application/json' \
+          'http://localhost:8000/api/processing-configuration/' | grep X-Archivematica-Version
+    - name: Test AM API - Get processing configurations
+      run: |
+        test $( \
+            curl \
+                --silent \
+                --header 'Authorization: ApiKey admin:apikey' \
+                --header 'Content-Type: application/json' \
+                'http://localhost:8000/api/processing-configuration/' \
+            | jq -r '.processing_configurations == ["automated", "default"]' \
+        ) == true
+    - name: Test SS API - Get pipeline count
+      run: |
+        test $( \
+            curl \
+                --silent \
+                --header 'Authorization: ApiKey admin:apikey' \
+                --header 'Content-Type: application/json' \
+                'http://localhost:8001/api/v2/pipeline/' \
+            | jq -r '.meta.total_count == 1' \
+        ) == true
+    - name: "Save common logs on failure"
+      if: ${{ failure() }}
+      working-directory: "${{ github.workspace }}/tests/archivematica"
+      run: |
+        podman-compose exec --user root archivematica mkdir -p /tmp/logs/journalctl
+        podman-compose exec --user root archivematica bash -c 'journalctl -u archivematica-mcp-client --no-pager > /tmp/logs/journalctl/archivematica-mcp-client'
+    - name: "Save logs on failure"
+      if: ${{ failure() }}
+      working-directory: "${{ github.workspace }}/tests/archivematica"
+      run: |
+        podman-compose exec --user root archivematica bash -c 'journalctl -u mysqld --no-pager > /tmp/logs/journalctl/mysql'
+        podman-compose exec --user root archivematica bash -c 'journalctl -u clamd@scan --no-pager > /tmp/logs/journalctl/clamd'
+        podman-compose exec --user root archivematica bash -c '
+          set -euo pipefail
+          mkdir -p /tmp/logs
+          for path in /var/log/archivematica /var/log/mysqld.log /var/log/mysql /var/log/elasticsearch /var/log/nginx; do
+            if [ -e "$path" ]; then
+              cp -r "$path" /tmp/logs/
+            else
+              echo "Skipping missing log path: $path"
+            fi
+          done
+        '
+    - name: "Copy logs from VM"
+      if: ${{ failure() }}
+      working-directory: "${{ github.workspace }}/tests/archivematica"
+      run: |
+        podman cp archivematica-package-testing_archivematica_1:/tmp/logs/ .
+    - name: "Upload logs on failure"
+      if: ${{ failure() }}
+      uses: "actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4" # v5.0.0
+      with:
+        name: "logs-test-upgrade"
+        path: "${{ github.workspace }}/tests/archivematica/logs"
