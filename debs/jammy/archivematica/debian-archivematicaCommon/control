@@ -5,7 +5,7 @@ Maintainer: Artefactual Systems Inc. <sysadmin@artefactual.com>
 Build-Depends:
 	debhelper
 Standards-Version: 3.9.8
-X-Python3-Version: >= 3.8
+X-Python3-Version: >= 3.10
 
 Package: archivematica-common
 Architecture: amd64

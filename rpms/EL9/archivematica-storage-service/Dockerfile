@@ -32,6 +32,6 @@ RUN set -ex \
         openssl-devel \
         pkgconfig \
         postgresql-devel \
-        python3-devel \
+        python3.12-devel \
         python3-virtualenv \
     && yum clean all
