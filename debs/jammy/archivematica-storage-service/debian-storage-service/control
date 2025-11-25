@@ -19,7 +19,7 @@ Build-Depends:
     pkg-config,
     zlib1g-dev
 Standards-Version: 3.9.8
-X-Python3-Version: >= 3.8
+X-Python3-Version: >= 3.10
 
 Package: archivematica-storage-service
 Architecture: amd64

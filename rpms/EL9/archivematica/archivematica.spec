@@ -12,8 +12,8 @@ Summary: Archivematica digital preservation system
 Group: Application/System
 License: AGPLv3
 Source0: %{git_repo}
-BuildRequires: git, gcc, openldap-devel, openssl-devel, python3-virtualenv, mariadb-devel, libxslt-devel, python3-devel, libffi-devel, gcc-c++, postgresql-devel, nodejs, pkgconfig
-Requires: python3-devel
+BuildRequires: git, gcc, openldap-devel, openssl-devel, python3-virtualenv, mariadb-devel, libxslt-devel, python3.12-devel, libffi-devel, gcc-c++, postgresql-devel, nodejs, pkgconfig
+Requires: python3.12-devel
 AutoReq: No
 AutoProv: No
 %description
@@ -164,7 +164,7 @@ cp -a %{_sourcedir}/%{name}/. /opt/archivematica/archivematica/
 cp -a %{_sourcedir}/%{name}/. %{buildroot}/opt/archivematica/archivematica/
 
 # Archivematica virtual environment
-virtualenv /usr/share/archivematica/virtualenvs/archivematica
+virtualenv --python=python3.12 /usr/share/archivematica/virtualenvs/archivematica
 /usr/share/archivematica/virtualenvs/archivematica/bin/pip install --upgrade pip setuptools
 /usr/share/archivematica/virtualenvs/archivematica/bin/pip install -r %{_sourcedir}/%{name}/requirements.txt
 

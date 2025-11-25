@@ -9,8 +9,8 @@ Summary: Archivematica Storage Service
 Group: Application/System
 License: AGPLv3
 Source0: %{git_repo}
-BuildRequires: git, gcc, libffi-devel, openssl-devel, libxslt-devel, python3-virtualenv, python3-devel, mariadb-devel, postgresql-devel, gcc-c++, openldap-devel, pkgconfig
-Requires: gnupg, libxslt-devel, policycoreutils-python-utils, python3-devel, rng-tools, rsync, nginx, unar, p7zip, shadow-utils, gettext
+BuildRequires: git, gcc, libffi-devel, openssl-devel, libxslt-devel, python3-virtualenv, python3.12-devel, mariadb-devel, postgresql-devel, gcc-c++, openldap-devel, pkgconfig
+Requires: gnupg, libxslt-devel, policycoreutils-python-utils, python3.12-devel, rng-tools, rsync, nginx, unar, p7zip, shadow-utils, gettext
 AutoReq: No
 AutoProv: No
 %description
@@ -63,7 +63,7 @@ mkdir -p /opt/archivematica/archivematica-storage-service
 cp -rf %{_sourcedir}/%{name}/. /opt/archivematica/archivematica-storage-service/
 cp -rf %{_sourcedir}/%{name}/. %{buildroot}/opt/archivematica/archivematica-storage-service/
 
-virtualenv /usr/share/archivematica/virtualenvs/archivematica-storage-service
+virtualenv --python=python3.12 /usr/share/archivematica/virtualenvs/archivematica-storage-service
 /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/pip install --upgrade pip setuptools
 /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/pip install -r %{_sourcedir}/%{name}/requirements.txt
 
