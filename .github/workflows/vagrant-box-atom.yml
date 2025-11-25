@@ -23,7 +23,7 @@ jobs:
         ]
     steps:
     - name: Check out code
-      uses: actions/checkout@v4
+      uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
     - name: "Install packer and VirtualBox"
       run: |
         wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
@@ -41,7 +41,7 @@ jobs:
         packer init template.json.pkr.hcl
         packer build -on-error=abort -var-file=ubuntu-${{ matrix.ubuntu-version }}.pkvars.hcl template.json.pkr.hcl
     - name: Upload base image
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
       with:
         name: "base-image-${{ matrix.ubuntu-version }}"
         path: "${{ github.workspace }}/packer/builds/virtualbox/vagrant-base-ubuntu-amd64"
@@ -63,14 +63,14 @@ jobs:
       id-token: "write"
     steps:
     - name: Check out code
-      uses: actions/checkout@v4
+      uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
     - name: Set up HCP authentication
-      uses: hashicorp/hcp-auth-action@v0
+      uses: hashicorp/hcp-auth-action@b11d0bff4bbe76283448ddca08a4a4e93c5ed4b9 # v0.1.0
       with:
         workload_identity_provider: "${{ secrets.HCP_WORKLOAD_IDENTITY_PROVIDER }}"
         set_access_token: true
     - name: Set up the HCP CLI
-      uses: hashicorp/hcp-setup-action@v0
+      uses: hashicorp/hcp-setup-action@fa6934c14c661dfbe9b6cf9c47ddb41759d625aa # v0.1.0
       with:
         version: "latest"
     - name: Set the Vagrant Cloud token
@@ -79,7 +79,7 @@ jobs:
         echo "::add-mask::$VAGRANT_CLOUD_TOKEN"
         echo "VAGRANT_CLOUD_TOKEN=$VAGRANT_CLOUD_TOKEN" >> $GITHUB_ENV
     - name: Restore base image
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
       with:
         name: "base-image-${{ matrix.ubuntu-version }}"
         path: "${{ github.workspace }}/packer/builds/virtualbox/vagrant-base-ubuntu-amd64"
