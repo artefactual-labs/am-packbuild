@@ -41,12 +41,12 @@ jobs:
     if: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
     steps:
     - name: Check out code
-      uses: actions/checkout@v4
+      uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
     - name: Build
       run: |
         make -C ${{ github.workspace }}/debs/jammy/archivematica
     - name: Save artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
       with:
         name: archivematica-packages
         path: |
@@ -57,12 +57,12 @@ jobs:
     if: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
     steps:
     - name: Check out code
-      uses: actions/checkout@v4
+      uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
     - name: Build
       run: |
         make -C ${{ github.workspace }}/debs/jammy/archivematica-storage-service
     - name: Save artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
       with:
         name: archivematica-storage-service-packages
         path: |
@@ -76,15 +76,15 @@ jobs:
     - build-ss-packages
     steps:
     - name: Check out code
-      uses: actions/checkout@v4
+      uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
     - name: Restore Archivematica packages
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
       with:
         name: archivematica-packages
         path: |
           ${{ github.workspace }}/debs/jammy/archivematica/repo
     - name: Restore Storage Service packages
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
       with:
         name: archivematica-storage-service-packages
         path: |
@@ -93,7 +93,7 @@ jobs:
       run: |
         make -C ${{ github.workspace }}/debs/jammy createrepo
     - name: Save package repository
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
       with:
         name: package-repository
         path: |
@@ -113,10 +113,10 @@ jobs:
       build_packages: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
     steps:
     - name: Check out code
-      uses: actions/checkout@v4
+      uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
     - name: Restore package repository
       if: needs.create-package-repo.result == 'success'
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
       with:
         name: package-repository
         path: ${{ github.workspace }}/debs/jammy/_deb_repository
@@ -126,7 +126,7 @@ jobs:
         sudo install crun-1.15-linux-amd64 /usr/bin/crun
         rm crun-1.15-linux-amd64
     - name: "Install Python"
-      uses: "actions/setup-python@v5"
+      uses: "actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548" # v6.1.0
       with:
         python-version: "3.10"
         cache: "pip"
@@ -134,7 +134,7 @@ jobs:
           tests/archivematica/requirements.txt
     - name: "Cache the virtual environment"
       id: "venv-cache"
-      uses: "actions/cache@v4"
+      uses: "actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830" # v4.3.0
       with:
         path: |
           tests/archivematica/.venv/
@@ -203,7 +203,7 @@ jobs:
         podman cp archivematica-package-testing_archivematica_1:/tmp/logs/ .
     - name: "Upload logs on failure"
       if: "${{ failure() }}"
-      uses: "actions/upload-artifact@v4"
+      uses: "actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4" # v5.0.0
       with:
         name: "logs-test-ubuntu"
         path: "${{ github.workspace }}/tests/archivematica/logs"
