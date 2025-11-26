@@ -10,10 +10,14 @@
 - [Set up EL9 packages](#set-up-el9-packages)
   - [Install EL9 packages from archivematica.org](#install-el9-packages-from-archivematicaorg)
   - [Install EL9 packages from a local repository](#install-el9-packages-from-a-local-repository)
+  - [Upgrade EL9 packages from archivematica.org](#upgrade-el9-packages-from-archivematicaorg)
+  - [Upgrade EL9 packages from a local repository](#upgrade-el9-packages-from-a-local-repository)
   - [Install EL9 packages with Ansible](#install-el9-packages-with-ansible)
 - [Set up Ubuntu 22.04 Jammy packages](#set-up-ubuntu-2204-jammy-packages)
   - [Install jammy packages from archivematica.org](#install-jammy-packages-from-archivematicaorg)
   - [Install jammy packages from a local repository](#install-jammy-packages-from-a-local-repository)
+  - [Upgrade jammy packages from archivematica.org](#upgrade-jammy-packages-from-archivematicaorg)
+  - [Upgrade jammy packages from a local repository](#upgrade-jammy-packages-from-a-local-repository)
 - [Test the Archivematica installation](#test-the-archivematica-installation)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -80,6 +84,51 @@ Install `EL9` packages using the local repository:
 
 ```shell
 podman-compose exec --env LOCAL_REPOSITORY="yes" --user ubuntu archivematica /am-packbuild/tests/archivematica/EL9/install.sh
+```
+
+### Upgrade EL9 packages from archivematica.org
+
+Keep the same running container for both steps: install the release you want to
+upgrade _from_, then execute the upgrade script pointing at the release you
+want to validate. Swap the version numbers to match the scenario you're testing.
+Archivematica 1.17.x packages rely on Elasticsearch 6.x, while Archivematica
+1.18.x (and newer) use Elasticsearch 8.x. The install and upgrade scripts honor
+`ELASTICSEARCH_PACKAGES_REPO_VERSION` and `ELASTICSEARCH_PACKAGE_VERSION`, so
+set them explicitly any time you need a non-default combination.
+
+```shell
+# Example: install 1.17.x as the baseline (Elasticsearch 6.x)
+podman-compose exec \
+    --env ARCHIVEMATICA_PACKAGES_REPO_VERSION=1.17.x \
+    --env ELASTICSEARCH_PACKAGES_REPO_VERSION=6.x \
+    --user ubuntu \
+    archivematica /am-packbuild/tests/archivematica/EL9/install.sh
+
+# Upgrade that container to 1.18.x (Elasticsearch 8.x)
+podman-compose exec \
+    --env ARCHIVEMATICA_PACKAGES_REPO_VERSION=1.18.x \
+    --env ELASTICSEARCH_PACKAGES_REPO_VERSION=8.x \
+    --user ubuntu \
+    archivematica /am-packbuild/tests/archivematica/EL9/upgrade.sh
+```
+
+### Upgrade EL9 packages from a local repository
+
+Build the local RPM repository as shown above. Install your baseline packages
+from whichever source you prefer (published repos or a previous local build),
+then rerun the upgrade with `LOCAL_REPOSITORY="yes"` so `upgrade.sh` pulls the
+new bits from `/am-packbuild/rpms/EL9/_yum_repository`. Remember to set
+`ELASTICSEARCH_PACKAGES_REPO_VERSION=6.x` when installing 1.17.x as the
+baseline, and switch it to `8.x` (or whichever version you are validating) for
+the upgrade.
+
+```shell
+podman-compose exec \
+    --env LOCAL_REPOSITORY="yes" \
+    --env ARCHIVEMATICA_PACKAGES_REPO_VERSION=1.18.x \
+    --env ELASTICSEARCH_PACKAGES_REPO_VERSION=8.x \
+    --user ubuntu \
+    archivematica /am-packbuild/tests/archivematica/EL9/upgrade.sh
 ```
 
 ### Install EL9 packages with Ansible
@@ -160,6 +209,47 @@ Install `jammy` packages using the local repository:
 
 ```shell
 podman-compose exec --env LOCAL_REPOSITORY="yes" --user ubuntu archivematica /am-packbuild/tests/archivematica/jammy/install.sh
+```
+
+### Upgrade jammy packages from archivematica.org
+
+Just like on EL9, reuse the same container: install the source release, then run
+`upgrade.sh` with the repository version that contains the packages you want to
+test. Match the Elasticsearch repository to the Archivematica version you're
+testing—1.17.x needs Elasticsearch 6.x, while 1.18.x uses 8.x.
+
+```shell
+# Install the baseline release (example: 1.17.x, Elasticsearch 6.x)
+podman-compose exec \
+    --env ARCHIVEMATICA_PACKAGES_REPO_VERSION=1.17.x \
+    --env ELASTICSEARCH_PACKAGES_REPO_VERSION=6.x \
+    --user ubuntu \
+    archivematica /am-packbuild/tests/archivematica/jammy/install.sh
+
+# Upgrade to the candidate release (example: 1.18.x, Elasticsearch 8.x)
+podman-compose exec \
+    --env ARCHIVEMATICA_PACKAGES_REPO_VERSION=1.18.x \
+    --env ELASTICSEARCH_PACKAGES_REPO_VERSION=8.x \
+    --user ubuntu \
+    archivematica /am-packbuild/tests/archivematica/jammy/upgrade.sh
+```
+
+### Upgrade jammy packages from a local repository
+
+Create the local APT repository first. When you are ready to test the new
+packages, run the upgrade with `LOCAL_REPOSITORY="yes"` so the script points
+APT at `/am-packbuild/debs/jammy/_deb_repository`. Use
+`ELASTICSEARCH_PACKAGES_REPO_VERSION` to ensure the right Elasticsearch release
+is installed at each step (e.g., 6.x for 1.17.x installs and 8.x for 1.18.x
+upgrades).
+
+```shell
+podman-compose exec \
+    --env LOCAL_REPOSITORY="yes" \
+    --env ARCHIVEMATICA_PACKAGES_REPO_VERSION=1.18.x \
+    --env ELASTICSEARCH_PACKAGES_REPO_VERSION=8.x \
+    --user ubuntu \
+    archivematica /am-packbuild/tests/archivematica/jammy/upgrade.sh
 ```
 
 ## Test the Archivematica installation
