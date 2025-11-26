@@ -18,7 +18,7 @@ on:
       - "rpms/EL9/archivematica-storage-service/**"
       - "tests/archivematica/**"
       - "!tests/archivematica/README.md"
-      - "!tests/archivematica/jammy/**"
+      - "!tests/archivematica/{jammy,noble}/**"
   push:
     branches:
       - "stable/**"
@@ -28,7 +28,7 @@ on:
       - "rpms/EL9/archivematica-storage-service/**"
       - "tests/archivematica/**"
       - "!tests/archivematica/README.md"
-      - "!tests/archivematica/jammy/**"
+      - "!tests/archivematica/{jammy,noble}/**"
   schedule:
     - cron: "0 2 * * *"
 
@@ -127,6 +127,8 @@ jobs:
         rm crun-1.15-linux-amd64
     - name: "Prepare Archivematica test environment"
       uses: ./.github/actions/setup-am-tests-venv
+      with:
+        codename: rocky9
     - name: "Start the Compose environment"
       working-directory: "${{ github.workspace }}/tests/archivematica"
       env:
@@ -185,7 +187,7 @@ jobs:
       if: ${{ failure() }}
       uses: "actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4" # v5.0.0
       with:
-        name: "logs-test"
+        name: "logs-test-rocky9"
         path: "${{ github.workspace }}/tests/archivematica/logs"
   test-ansible:
     name: Test packages with Ansible
@@ -216,6 +218,8 @@ jobs:
         rm crun-1.15-linux-amd64
     - name: "Prepare Archivematica test environment"
       uses: ./.github/actions/setup-am-tests-venv
+      with:
+        codename: rocky9
     - name: "Start the Compose environment"
       working-directory: "${{ github.workspace }}/tests/archivematica"
       env:
@@ -296,5 +300,5 @@ jobs:
       if: ${{ failure() }}
       uses: "actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4" # v5.0.0
       with:
-        name: "logs-test-ansible"
+        name: "logs-test-rocky9-ansible"
         path: "${{ github.workspace }}/tests/archivematica/logs"
