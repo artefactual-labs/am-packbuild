@@ -1,0 +1,22 @@
+Source: archivematica-mcp-server
+Section: utils
+Priority: extra
+Maintainer: Artefactual Systems Inc. <sysadmin@artefactual.com>
+Build-Depends:
+	debhelper,
+Standards-Version: 3.9.8
+X-Python3-Version: >= 3.10
+
+Package: archivematica-mcp-server
+Architecture: amd64
+Pre-Depends:
+	archivematica (= ${binary:Version})
+Depends:
+	${misc:Depends},
+	archivematica-common (>= 1.18.0),
+	dbconfig-common,
+	dbconfig-mysql,
+	mysql-server,
+	gearman
+Description: Archivematica MCPServer (workflow engine)
+Homepage: https://www.archivematica.org

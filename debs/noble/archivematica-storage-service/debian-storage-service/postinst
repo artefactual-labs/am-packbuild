@@ -1,0 +1,251 @@
+#!/usr/bin/env bash
+
+
+# source debconf stuff
+. /usr/share/debconf/confmodule
+
+# Set the default database encoding to utf8mb4
+dbc_mysql_createdb_encoding="utf8mb4"
+
+# source dbconfig-common shell library, and call the hook function
+if [ -f /usr/share/dbconfig-common/dpkg/postinst.mysql ]; then
+	. /usr/share/dbconfig-common/dpkg/postinst.mysql
+	dbc_go archivematica-storage-service $@
+fi
+
+ARCHIVEMATICA_STORAGE_SERVICE_RUNTIME_DIR="/opt/archivematica/archivematica-storage-service"
+ARCHIVEMATICA_STORAGE_SERVICE_VENV_DIR="/usr/share/archivematica/virtualenvs/archivematica-storage-service"
+
+STORAGE_SERVICE_SOURCE_DIR="${ARCHIVEMATICA_STORAGE_SERVICE_RUNTIME_DIR}"
+STORAGE_SERVICE_STATIC_DIR="${STORAGE_SERVICE_SOURCE_DIR}/src/archivematica/storage_service/assets"
+STORAGE_SERVICE_LOCALE_DIR="${STORAGE_SERVICE_SOURCE_DIR}/src/archivematica/storage_service/locale"
+STORAGE_SERVICE_LOG_DIR="/var/log/archivematica/storage-service"
+
+ARCHIVEMATICA_USER="archivematica"
+ARCHIVEMATICA_GROUP="archivematica"
+ARCHIVEMATICA_UID="333"
+ARCHIVEMATICA_GID="333"
+ARCHIVEMATICA_HOME="/var/lib/archivematica"
+
+STORAGE_SERVICE_DEFAULTS_FILE="/etc/default/archivematica-storage-service"
+STORAGE_SERVICE_DBCONFIG_FILE="/etc/dbconfig-common/archivematica-storage-service.conf"
+
+STORAGE_SERVICE_MODULE_PATH="archivematica.storage_service.manage"
+STORAGE_SERVICE_LEGACY_MODULE="storage_service.settings.production"
+STORAGE_SERVICE_CURRENT_MODULE="archivematica.storage_service.storage_service.settings.production"
+DEFAULT_SECRET_PLACEHOLDER="CHANGE_ME_WITH_A_SECRET_KEY"
+
+# Guard sections that require the runtime tree plus the packaged virtualenv
+# to run Django management commands.
+DJANGO_ENV_READY=0
+if [ -d "${STORAGE_SERVICE_SOURCE_DIR}" ] && [ -x "${ARCHIVEMATICA_STORAGE_SERVICE_VENV_DIR}/bin/python" ]; then
+	DJANGO_ENV_READY=1
+fi
+
+extract_secret_from_file() {
+	local file_path="$1"
+	[ -f "${file_path}" ] || return 0
+	local secret
+	secret=$(sed -n 's/^DJANGO_SECRET_KEY=//p' "${file_path}" | tail -n 1)
+	secret=${secret%\"}
+	secret=${secret#\"}
+	printf "%s" "${secret}"
+}
+
+escape_sed_replacement() {
+	local value="${1//\\/\\\\}"
+	value="${value//&/\\&}"
+	value="${value//|/\\|}"
+	printf "%s" "${value}"
+}
+
+# Runs Django's administrative tasks inside the packaged virtual environment.
+django_manage() {
+	if [ "${DJANGO_ENV_READY}" -ne 1 ]; then
+		return 0
+	fi
+	(
+		cd "${STORAGE_SERVICE_SOURCE_DIR}" && \
+			"${ARCHIVEMATICA_STORAGE_SERVICE_VENV_DIR}/bin/python" -m "${STORAGE_SERVICE_MODULE_PATH}" "$@"
+	)
+}
+
+ensure_archivematica_group() {
+	if getent group "${ARCHIVEMATICA_GROUP}" >/dev/null; then
+		return 0
+	fi
+
+	if getent group "${ARCHIVEMATICA_GID}" >/dev/null; then
+		addgroup --system "${ARCHIVEMATICA_GROUP}"
+	else
+		addgroup --system --gid "${ARCHIVEMATICA_GID}" "${ARCHIVEMATICA_GROUP}"
+	fi
+}
+
+ensure_archivematica_user() {
+	if getent passwd "${ARCHIVEMATICA_USER}" >/dev/null; then
+		existing_uid=$(id -u "${ARCHIVEMATICA_USER}")
+		if [ "${existing_uid}" != "${ARCHIVEMATICA_UID}" ]; then
+			echo "archivematica user already present with uid ${existing_uid}; expected ${ARCHIVEMATICA_UID}" >&2
+		fi
+		return 0
+	fi
+
+	mkdir -p "${ARCHIVEMATICA_HOME}"
+
+	if getent passwd "${ARCHIVEMATICA_UID}" >/dev/null; then
+		adduser --system \
+			--ingroup "${ARCHIVEMATICA_GROUP}" \
+			--home "${ARCHIVEMATICA_HOME}" \
+			--shell /usr/sbin/nologin \
+			"${ARCHIVEMATICA_USER}"
+	else
+		adduser --system \
+			--uid "${ARCHIVEMATICA_UID}" \
+			--ingroup "${ARCHIVEMATICA_GROUP}" \
+			--home "${ARCHIVEMATICA_HOME}" \
+			--shell /usr/sbin/nologin \
+			"${ARCHIVEMATICA_USER}"
+	fi
+}
+
+echo "postinst called with:" $1 $2
+
+echo "ensuring archivematica user exists"
+ensure_archivematica_group
+ensure_archivematica_user
+
+# Create logs directory
+mkdir -p "${STORAGE_SERVICE_LOG_DIR}"
+chown -R archivematica:archivematica "${STORAGE_SERVICE_LOG_DIR}"
+chmod -R g+s "${STORAGE_SERVICE_LOG_DIR}"
+
+
+# Populate default mysql config when dbconfig data is available.
+if [ -r "${STORAGE_SERVICE_DBCONFIG_FILE}" ]; then
+	DBPASS=$(grep "dbc_dbpass=" "${STORAGE_SERVICE_DBCONFIG_FILE}" | cut -d\= -f2- | tr -d \')
+	DBUSER=$(grep "dbc_dbuser=" "${STORAGE_SERVICE_DBCONFIG_FILE}" | cut -d\= -f2- | tr -d \')
+	DBSERVER=$(grep "dbc_dbserver=" "${STORAGE_SERVICE_DBCONFIG_FILE}" | cut -d\= -f2- | tr -d \')
+	DBPORT=$(grep "dbc_dbport=" "${STORAGE_SERVICE_DBCONFIG_FILE}" | cut -d\= -f2- | tr -d \')
+	DBNAME=$(grep "dbc_dbname=" "${STORAGE_SERVICE_DBCONFIG_FILE}" | cut -d\= -f2- | tr -d \')
+	if [ -n "${DBPASS}" ] && [ -n "${DBUSER}" ] && [ -n "${DBSERVER}" ] && [ -n "${DBPORT}" ] && [ -n "${DBNAME}" ]; then
+		DB_URL="mysql://${DBUSER}:${DBPASS}@${DBSERVER}:${DBPORT}/${DBNAME}"
+		ESCAPED_DB_URL=$(escape_sed_replacement "${DB_URL}")
+		sed -i "s|^SS_DB_URL=.*|SS_DB_URL=${ESCAPED_DB_URL}|" "${STORAGE_SERVICE_DEFAULTS_FILE}"
+	else
+		echo "archivematica-storage-service: dbconfig credentials incomplete; leaving SS_DB_URL unchanged" >&2
+	fi
+else
+	echo "archivematica-storage-service: dbconfig file missing; leaving SS_DB_URL unchanged" >&2
+fi
+
+echo "ensuring django secret key"
+if [ -f "${STORAGE_SERVICE_DEFAULTS_FILE}" ]; then
+	if grep -Eq '^DJANGO_SECRET_KEY="?'"${DEFAULT_SECRET_PLACEHOLDER}"'"?$' "${STORAGE_SERVICE_DEFAULTS_FILE}"; then
+		RESTORED_SECRET=""
+		for candidate in "${STORAGE_SERVICE_DEFAULTS_FILE}.ucf-old" "${STORAGE_SERVICE_DEFAULTS_FILE}.ucf-dist" "${STORAGE_SERVICE_DEFAULTS_FILE}.dpkg-old"; do
+			if [ -z "${candidate}" ]; then
+				continue
+			fi
+			candidate_secret=$(extract_secret_from_file "${candidate}")
+			if [ -n "${candidate_secret}" ] && [ "${candidate_secret}" != "${DEFAULT_SECRET_PLACEHOLDER}" ]; then
+				RESTORED_SECRET="${candidate_secret}"
+				break
+			fi
+		done
+		if [ -n "${RESTORED_SECRET}" ]; then
+			escaped_secret=$(escape_sed_replacement "${RESTORED_SECRET}")
+			sed -i "s|^DJANGO_SECRET_KEY=.*|DJANGO_SECRET_KEY=\"${escaped_secret}\"|" "${STORAGE_SERVICE_DEFAULTS_FILE}"
+			echo "Restored existing django secret key"
+		else
+			KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 50 | head -n 1)
+			escaped_key=$(escape_sed_replacement "${KEY}")
+			sed -i "s|^DJANGO_SECRET_KEY=.*|DJANGO_SECRET_KEY=\"${escaped_key}\"|" "${STORAGE_SERVICE_DEFAULTS_FILE}"
+			echo "Generated new django secret key"
+		fi
+	fi
+else
+	# Default file missing; fall back to exporting a runtime secret.
+	KEY=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 50 | head -n 1)
+	export DJANGO_SECRET_KEY="${KEY}"
+	echo "Generated runtime django secret key (defaults file missing)"
+fi
+
+# On upgrades from 0.23.x the module path and PYTHONPATH still point at the
+# old layout under /usr/lib. Update them in-place so the new package layout
+# works without manual intervention.
+unset SHOW_LEGACY_UPGRADE_NOTICE
+if [ -f "${STORAGE_SERVICE_DEFAULTS_FILE}" ]; then
+	if grep -Eq "^DJANGO_SETTINGS_MODULE=\"?${STORAGE_SERVICE_LEGACY_MODULE}\"?\$" "${STORAGE_SERVICE_DEFAULTS_FILE}"; then
+		sed -i "s/^DJANGO_SETTINGS_MODULE=.*/DJANGO_SETTINGS_MODULE=${STORAGE_SERVICE_CURRENT_MODULE}/" "${STORAGE_SERVICE_DEFAULTS_FILE}"
+		SHOW_LEGACY_UPGRADE_NOTICE=1
+	fi
+	if grep -Eq '^PYTHONPATH="?/usr/lib/archivematica/storage-service"?$' "${STORAGE_SERVICE_DEFAULTS_FILE}"; then
+		sed -i -E '/^PYTHONPATH="?\/usr\/lib\/archivematica\/storage-service"?$/d' "${STORAGE_SERVICE_DEFAULTS_FILE}"
+		SHOW_LEGACY_UPGRADE_NOTICE=1
+	fi
+	if [ "${SHOW_LEGACY_UPGRADE_NOTICE:-0}" = "1" ]; then
+		echo "Updated archivematica-storage-service defaults for new module layout"
+	fi
+fi
+
+# Use ucf to preserve user changes in the default file
+ucfr archivematica-storage-service "${STORAGE_SERVICE_DEFAULTS_FILE}"
+ucf --debconf-ok "${STORAGE_SERVICE_DEFAULTS_FILE}" "${STORAGE_SERVICE_DEFAULTS_FILE}"
+
+# Remove the legacy code tree shipped by releases prior to 1:0.24
+if [ -d "/usr/lib/archivematica/storage-service" ]; then
+	echo "Removing legacy /usr/lib/archivematica/storage-service tree"
+	rm -rf /usr/lib/archivematica/storage-service
+fi
+
+# Ensure we do not carry a stale PYTHONPATH into the environment if the
+# conffile no longer defines it.
+unset PYTHONPATH
+
+if [ -f "${STORAGE_SERVICE_DEFAULTS_FILE}" ]; then
+	set -a
+	# shellcheck disable=SC1090
+	source "${STORAGE_SERVICE_DEFAULTS_FILE}"
+	set +a
+fi
+
+if [ "${DJANGO_SETTINGS_MODULE:-}" = "${STORAGE_SERVICE_LEGACY_MODULE}" ]; then
+	export DJANGO_SETTINGS_MODULE="${STORAGE_SERVICE_CURRENT_MODULE}"
+	echo "Using compat DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE} for runtime"
+fi
+
+if [ -d "${STORAGE_SERVICE_SOURCE_DIR}" ]; then
+	find "${STORAGE_SERVICE_SOURCE_DIR}" -name '*.pyc' -delete
+fi
+
+echo "configuring django database and static files"
+if [ "${DJANGO_ENV_READY}" -eq 1 ]; then
+	if ! django_manage migrate --noinput; then
+		exit 1
+	fi
+	mkdir -p "${STORAGE_SERVICE_STATIC_DIR}"
+	if ! django_manage collectstatic --noinput --clear; then
+		exit 1
+	fi
+	if ! django_manage compilemessages; then
+		exit 1
+	fi
+	if ! django_manage backfill_api_keys; then
+		exit 1
+	fi
+else
+	echo "archivematica-storage-service: runtime files not present; skipped Django setup. Re-run 'dpkg-reconfigure archivematica-storage-service' after installing archivematica." >&2
+fi
+
+echo "updating directory permissions"
+chown -R archivematica:archivematica /var/archivematica/storage-service
+chown -R archivematica:archivematica /var/archivematica/.storage-service
+chown -R archivematica:archivematica "${ARCHIVEMATICA_STORAGE_SERVICE_VENV_DIR}"
+chown -R archivematica:archivematica "${STORAGE_SERVICE_LOG_DIR}"
+chown -R archivematica:archivematica "${STORAGE_SERVICE_STATIC_DIR}"
+chown -R archivematica:archivematica "${STORAGE_SERVICE_LOCALE_DIR}"
+
+rm -f /tmp/storage_service.log
+
+#DEBHELPER#
