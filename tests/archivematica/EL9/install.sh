@@ -38,8 +38,12 @@ sudo -u root yum-config-manager --enable crb
 #
 
 if [ "$(getenforce)" != "Disabled" ]; then
-    sudo semanage port -m -t http_port_t -p tcp 80
-    sudo semanage port -a -t http_port_t -p tcp 8000
+    if ! sudo semanage port -m -t http_port_t -p tcp 80; then
+        sudo semanage port -a -t http_port_t -p tcp 80
+    fi
+    if ! sudo semanage port -m -t http_port_t -p tcp 8000; then
+        sudo semanage port -a -t http_port_t -p tcp 8000
+    fi
     sudo setsebool -P httpd_can_network_connect_db=1
     sudo setsebool -P httpd_can_network_connect=1
     sudo setsebool -P httpd_setrlimit 1
@@ -66,6 +70,7 @@ fi
 #
 
 sudo -H -u root mysql -hlocalhost -uroot -e "DROP DATABASE IF EXISTS SS; CREATE DATABASE SS CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
+sudo -H -u root mysql -hlocalhost -uroot -e "DROP USER IF EXISTS 'archivematica'@'localhost';"
 sudo -H -u root mysql -hlocalhost -uroot -e "CREATE USER 'archivematica'@'localhost' IDENTIFIED BY 'demo';"
 sudo -H -u root mysql -hlocalhost -uroot -e "GRANT ALL ON SS.* TO 'archivematica'@'localhost';"
 
@@ -92,7 +97,9 @@ sudo -H -u root mysql -hlocalhost -uroot -e "GRANT ALL ON MCP.* TO 'archivematic
 
 run_archivematica_manage dashboard migrate --noinput
 
-set_search_env_flags "/etc/sysconfig" "${search_enabled}" "dashboard" "mcp-server"
+if [ "${search_enabled}" != "true" ] ; then
+    set_search_env_flags "/etc/sysconfig" "${search_enabled}" "dashboard" "mcp-server"
+fi
 
 sudo -u root systemctl enable archivematica-mcp-server
 sudo -u root systemctl start archivematica-mcp-server
@@ -113,7 +120,9 @@ sudo -u root yum install -y archivematica-mcp-client
 sudo -u root sed -i 's/^#TCPSocket/TCPSocket/g' /etc/clamd.d/scan.conf
 sudo -u root sed -i 's/^Example//g' /etc/clamd.d/scan.conf
 
-set_search_env_flags "/etc/sysconfig" "${search_enabled}" "mcp-client"
+if [ "${search_enabled}" != "true" ] ; then
+    set_search_env_flags "/etc/sysconfig" "${search_enabled}" "mcp-client"
+fi
 
 sudo -u root systemctl enable archivematica-mcp-client
 sudo -u root systemctl start archivematica-mcp-client
@@ -154,8 +163,28 @@ run_archivematica_manage dashboard install \
     --ss-api-key="apikey" \
     --site-url="http://localhost"
 
+if ! dashboard_code_dir=$(
+    first_existing_dir \
+        /opt/archivematica/archivematica \
+        /usr/share/archivematica/dashboard \
+        /usr/lib/archivematica/dashboard
+); then
+    echo "Unable to locate dashboard source directory" >&2
+    exit 1
+fi
+
 run_archivematica_manage dashboard collectstatic --noinput --clear
-run_archivematica_manage dashboard --chdir /opt/archivematica/archivematica/ compilemessages
+run_archivematica_manage dashboard --chdir "${dashboard_code_dir}" compilemessages
+
+if ! storage_service_code_dir=$(
+    first_existing_dir \
+        /opt/archivematica/archivematica-storage-service \
+        /usr/share/archivematica/storage-service \
+        /usr/lib/archivematica/storage-service
+); then
+    echo "Unable to locate storage service source directory" >&2
+    exit 1
+fi
 
 run_archivematica_manage storage-service collectstatic --noinput --clear
-run_archivematica_manage storage-service --chdir /opt/archivematica/archivematica-storage-service/ compilemessages
+run_archivematica_manage storage-service --chdir "${storage_service_code_dir}" compilemessages
