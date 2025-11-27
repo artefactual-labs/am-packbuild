@@ -7,6 +7,11 @@ on:
         required: false
         default: "1.18.x"
         type: "string"
+      archivematica_packages_repo_baseurl:
+        description: "Optional Archivematica RPM repository base URL"
+        required: false
+        default: ""
+        type: "string"
       build_packages:
         description: "Build local packages"
         required: true
@@ -34,6 +39,7 @@ on:
 
 env:
   ARCHIVEMATICA_PACKAGES_REPO_VERSION: ${{ inputs.archivematica_packages_repo_version || '1.18.x' }}
+  ARCHIVEMATICA_PACKAGES_REPO_BASEURL: ${{ inputs.archivematica_packages_repo_baseurl || '' }}
 jobs:
   build-am-packages:
     name: Build Archivematica packages
@@ -142,6 +148,7 @@ jobs:
         podman-compose exec \
           --env LOCAL_REPOSITORY="${{ env.build_packages }}" \
           --env ARCHIVEMATICA_PACKAGES_REPO_VERSION="${{ env.ARCHIVEMATICA_PACKAGES_REPO_VERSION }}" \
+          --env ARCHIVEMATICA_PACKAGES_REPO_BASEURL="${{ env.ARCHIVEMATICA_PACKAGES_REPO_BASEURL }}" \
           --user ubuntu \
           archivematica \
           /am-packbuild/tests/archivematica/EL9/install.sh

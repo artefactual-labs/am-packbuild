@@ -8,11 +8,16 @@ export DEBFULLNAME="Artefactual Systems"
 export DEBEMAIL="sysadmin@artefactual.com"
 export DEB_BUILD_OPTIONS="noddebs"
 
+clean_build_deps_artifacts() {
+	find . -maxdepth 1 -type f -name "*build-deps*.*" -delete
+}
+
 # Create archivematica package.
 pushd "${SOURCE}"
 COMMIT=$(git rev-parse HEAD)
 cp -rf "${BASE}/debian-archivematica" debian
 mk-build-deps -i debian/control
+clean_build_deps_artifacts
 dch -v "1:${VERSION}${RELEASE}~22.04" "commit: ${COMMIT}"
 dch -v "1:${VERSION}${RELEASE}~22.04" "checkout: ${BRANCH}"
 dch -r --distribution jammy --urgency high ignored
@@ -24,6 +29,7 @@ for i in dashboard MCPClient MCPServer archivematicaCommon; do
 	pushd "${SOURCE}/src/archivematica/${i}"
 	cp -rf "${BASE}/debian-${i}" debian
 	mk-build-deps -i debian/control
+	clean_build_deps_artifacts
 	dch -v "1:${VERSION}${RELEASE}~22.04" "commit: ${COMMIT}"
 	dch -v "1:${VERSION}${RELEASE}~22.04" "checkout: ${BRANCH}"
 	dch -r --distribution jammy --urgency high ignored
