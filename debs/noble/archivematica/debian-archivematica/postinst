@@ -1,0 +1,56 @@
+#!/bin/bash
+
+set -euxo pipefail
+
+ARCHIVEMATICA_USER="archivematica"
+ARCHIVEMATICA_GROUP="archivematica"
+ARCHIVEMATICA_UID="333"
+ARCHIVEMATICA_GID="333"
+ARCHIVEMATICA_HOME="/var/lib/archivematica"
+
+ensure_group() {
+	if getent group "${ARCHIVEMATICA_GROUP}" >/dev/null; then
+		return 0
+	fi
+
+	if getent group "${ARCHIVEMATICA_GID}" >/dev/null; then
+		addgroup --system "${ARCHIVEMATICA_GROUP}"
+	else
+		addgroup --system --gid "${ARCHIVEMATICA_GID}" "${ARCHIVEMATICA_GROUP}"
+	fi
+}
+
+ensure_user() {
+	if getent passwd "${ARCHIVEMATICA_USER}" >/dev/null; then
+		return 0
+	fi
+
+	# Make sure the target home exists before creating the user.
+	mkdir -p "${ARCHIVEMATICA_HOME}"
+
+	if getent passwd "${ARCHIVEMATICA_UID}" >/dev/null; then
+		adduser --system \
+			--ingroup "${ARCHIVEMATICA_GROUP}" \
+			--home "${ARCHIVEMATICA_HOME}" \
+			--shell /usr/sbin/nologin \
+			"${ARCHIVEMATICA_USER}"
+	else
+		adduser --system \
+			--uid "${ARCHIVEMATICA_UID}" \
+			--ingroup "${ARCHIVEMATICA_GROUP}" \
+			--home "${ARCHIVEMATICA_HOME}" \
+			--shell /usr/sbin/nologin \
+			"${ARCHIVEMATICA_USER}"
+	fi
+}
+
+case "$1" in
+	configure|reconfigure)
+		ensure_group
+		ensure_user
+		;;
+esac
+
+#DEBHELPER#
+
+exit 0

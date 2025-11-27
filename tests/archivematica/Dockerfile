@@ -4,7 +4,7 @@ ARG DOCKER_IMAGE_TAG=22.04
 
 FROM ubuntu:22.04 AS install_ubuntu_22.04
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN set -ex \
 	&& apt-get update \
@@ -19,9 +19,33 @@ RUN set -ex \
     && apt-get clean
 
 RUN locale-gen en_US.UTF-8
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en
-ENV LC_ALL en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
+ENV TZ=UTC
+
+RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone
+
+FROM ubuntu:24.04 AS install_ubuntu_24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN set -ex \
+	&& apt-get update \
+	&& apt-get install -y \
+        curl \
+        dialog \
+        gnupg \
+        locales \
+        openssh-server \
+        rsync \
+        sudo \
+    && apt-get clean
+
+RUN locale-gen en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
 ENV TZ=UTC
 
 RUN ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime && echo ${TZ} > /etc/timezone
@@ -41,7 +65,8 @@ RUN set -ex \
 
 FROM install_${DOCKER_IMAGE_NAME}_${DOCKER_IMAGE_TAG} as server
 
-RUN useradd --home-dir /home/ubuntu --system ubuntu
+# Create ubuntu user only if it doesn't already exist
+RUN id -u ubuntu 2>/dev/null || useradd --home-dir /home/ubuntu --system ubuntu
 
 RUN mkdir -p /etc/sudoers.d/ && echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/ubuntu
 

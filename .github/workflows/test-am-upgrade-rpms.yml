@@ -130,7 +130,6 @@ jobs:
       }}
     env:
       build_packages: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
-      python_version: "3.10"
     steps:
     - name: Check out code
       uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
@@ -148,8 +147,7 @@ jobs:
     - name: "Prepare Archivematica test environment"
       uses: ./.github/actions/setup-am-tests-venv
       with:
-        python-version: "${{ env.python_version }}"
-        working-directory: "tests/archivematica"
+        codename: "rocky9"
     - name: "Start the Compose environment"
       working-directory: "${{ github.workspace }}/tests/archivematica"
       env:
@@ -265,5 +263,5 @@ jobs:
       if: ${{ failure() }}
       uses: "actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4" # v5.0.0
       with:
-        name: "logs-test-upgrade"
+        name: "logs-test-upgrade-rocky9"
         path: "${{ github.workspace }}/tests/archivematica/logs"

@@ -66,19 +66,25 @@ function configure_archivematica_apt_repos() {
     local version_slug="${repo_version//\//-}"
     local keyring_path="/etc/apt/keyrings/archivematica-${version_slug}.gpg"
 
+    local arch
+    arch=$(dpkg --print-architecture)
+    local version_codename
+    version_codename=$(grep -Po '(?<=^VERSION_CODENAME=).+' /etc/os-release)
+
     sudo -u root install -d -m 0755 /etc/apt/keyrings
     curl -fsSL "https://packages.archivematica.org/${repo_version}/key.asc" | sudo -u root gpg --dearmor --yes -o "${keyring_path}"
     sudo -u root bash -c "cat <<EOF > /etc/apt/sources.list.d/archivematica-externals.list
-deb [arch=amd64 signed-by=${keyring_path}] http://packages.archivematica.org/${repo_version}/ubuntu-externals jammy main
+deb [arch=${arch} signed-by=${keyring_path}] http://packages.archivematica.org/${repo_version}/ubuntu-externals jammy main
 EOF"
 
     if [ "${local_repository}" == "true" ]; then
-        sudo -u root bash -c 'cat << EOF > /etc/apt/sources.list.d/archivematica.list
-deb file:/am-packbuild/debs/jammy/_deb_repository ./
-EOF'
+        sudo -u root bash -c "cat << EOF > /etc/apt/sources.list.d/archivematica.list
+deb file:/am-packbuild/debs/${version_codename}/_deb_repository ./
+EOF"
     else
+
         sudo -u root bash -c "cat <<EOF > /etc/apt/sources.list.d/archivematica.list
-deb [arch=amd64 signed-by=${keyring_path}] http://packages.archivematica.org/${repo_version}/ubuntu jammy main
+deb [arch=${arch} signed-by=${keyring_path}] http://packages.archivematica.org/${repo_version}/ubuntu ${version_codename} main
 EOF"
     fi
 }
