@@ -43,7 +43,7 @@ archivematica_src_rpm_repository_local_baseurl: "file:///am-packbuild/rpms/EL9/_
 archivematica_src_rpm_repository_public_baseurl: >-
   {{ archivematica_packages_repo_baseurl
      if archivematica_packages_repo_baseurl | length > 0
-     else "https://packages.archivematica.org/{{ archivematica_packages_repo_version }}/rocky9" }}
+     else "https://packages.archivematica.org/" ~ archivematica_packages_repo_version ~ "/rocky9" }}
 archivematica_src_rpm_repository_use_local_baseurl: true
 archivematica_src_rpm_repository_gpgcheck: >-
   {{ 0 if archivematica_src_rpm_repository_use_local_baseurl | bool

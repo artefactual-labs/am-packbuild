@@ -100,10 +100,20 @@ function configure_archivematica_apt_repos() {
         repo_line="deb [${repo_options}] ${remote_baseurl} ${repo_suite}"
     fi
 
+    local externals_suite="jammy"
+    local repo_major repo_minor
+    if [[ "${repo_version}" =~ ([0-9]+)\.([0-9]+) ]]; then
+        repo_major="${BASH_REMATCH[1]}"
+        repo_minor="${BASH_REMATCH[2]}"
+        if (( repo_major > 1 || (repo_major == 1 && repo_minor >= 18) )); then
+            externals_suite="${version_codename}"
+        fi
+    fi
+
     sudo -u root install -d -m 0755 /etc/apt/keyrings
     curl -fsSL "https://packages.archivematica.org/${repo_version}/key.asc" | sudo -u root gpg --dearmor --yes -o "${keyring_path}"
     sudo -u root bash -c "cat <<EOF > /etc/apt/sources.list.d/archivematica-externals.list
-deb [arch=${arch} signed-by=${keyring_path}] http://packages.archivematica.org/${repo_version}/ubuntu-externals jammy main
+deb [arch=${arch} signed-by=${keyring_path}] http://packages.archivematica.org/${repo_version}/ubuntu-externals ${externals_suite} main
 EOF"
 
     if [ "${local_repository}" == "true" ]; then
