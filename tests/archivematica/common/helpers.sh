@@ -63,6 +63,7 @@ function dump_lowercase_environment_variables() {
 function configure_archivematica_apt_repos() {
     local local_repository="$1"
     local repo_version="${2:-${ARCHIVEMATICA_PACKAGES_REPO_VERSION:-1.18.x}}"
+    local repo_baseurl="${3:-${ARCHIVEMATICA_PACKAGES_REPO_BASEURL:-}}"
     local version_slug="${repo_version//\//-}"
     local keyring_path="/etc/apt/keyrings/archivematica-${version_slug}.gpg"
 
@@ -70,6 +71,34 @@ function configure_archivematica_apt_repos() {
     arch=$(dpkg --print-architecture)
     local version_codename
     version_codename=$(grep -Po '(?<=^VERSION_CODENAME=).+' /etc/os-release)
+
+    local remote_baseurl="http://packages.archivematica.org/${repo_version}/ubuntu"
+    local repo_options="arch=${arch} signed-by=${keyring_path}"
+    local repo_suite="${version_codename}"
+    local repo_component="main"
+    if [ -n "${repo_baseurl}" ]; then
+        remote_baseurl="${repo_baseurl%/}"
+        repo_options="arch=${arch} trusted=yes"
+        # If the provided base URL ends with a codename, switch it to the
+        # current codename when needed; otherwise append the codename.
+        if [[ "${remote_baseurl}" =~ /(jammy|noble)(/)?$ ]]; then
+            if [ "${BASH_REMATCH[1]}" != "${version_codename}" ]; then
+                remote_baseurl="${remote_baseurl%/*}/${version_codename}"
+            fi
+        elif [[ ! "${remote_baseurl}" =~ /${version_codename}(/)?$ ]]; then
+            remote_baseurl="${remote_baseurl}/${version_codename}"
+        fi
+        # Custom repos from Jenkins are flat (no dists tree), so use ./ to read Packages directly.
+        repo_suite="./"
+        repo_component=""
+    fi
+
+    local repo_line=""
+    if [ -n "${repo_component}" ]; then
+        repo_line="deb [${repo_options}] ${remote_baseurl} ${repo_suite} ${repo_component}"
+    else
+        repo_line="deb [${repo_options}] ${remote_baseurl} ${repo_suite}"
+    fi
 
     sudo -u root install -d -m 0755 /etc/apt/keyrings
     curl -fsSL "https://packages.archivematica.org/${repo_version}/key.asc" | sudo -u root gpg --dearmor --yes -o "${keyring_path}"
@@ -84,7 +113,7 @@ EOF"
     else
 
         sudo -u root bash -c "cat <<EOF > /etc/apt/sources.list.d/archivematica.list
-deb [arch=${arch} signed-by=${keyring_path}] http://packages.archivematica.org/${repo_version}/ubuntu ${version_codename} main
+${repo_line}
 EOF"
     fi
 }
@@ -92,6 +121,14 @@ EOF"
 function configure_archivematica_yum_repos() {
     local local_repository="$1"
     local repo_version="${2:-${ARCHIVEMATICA_PACKAGES_REPO_VERSION:-1.18.x}}"
+    local repo_baseurl="${3:-${ARCHIVEMATICA_PACKAGES_REPO_BASEURL:-}}"
+
+    local remote_baseurl="https://packages.archivematica.org/${repo_version}/rocky9"
+    local gpgcheck="1"
+    if [ -n "${repo_baseurl}" ]; then
+        remote_baseurl="${repo_baseurl%/}"
+        gpgcheck="0"
+    fi
 
     if [ "${local_repository}" == "true" ]; then
         sudo -u root bash -c 'cat << EOF > /etc/yum.repos.d/archivematica.repo
@@ -105,11 +142,15 @@ EOF'
         sudo -u root bash -c "cat <<EOF > /etc/yum.repos.d/archivematica.repo
 [archivematica]
 name=archivematica
-baseurl=https://packages.archivematica.org/${repo_version}/rocky9
-gpgcheck=1
-gpgkey=https://packages.archivematica.org/GPG-KEY-archivematica-sha512
+baseurl=${remote_baseurl}
+gpgcheck=${gpgcheck}
 enabled=1
 EOF"
+        if [ "${gpgcheck}" == "1" ]; then
+            sudo -u root bash -c "cat <<'EOF' >> /etc/yum.repos.d/archivematica.repo
+gpgkey=https://packages.archivematica.org/GPG-KEY-archivematica-sha512
+EOF"
+        fi
     fi
 
     sudo -u root bash -c "cat <<EOF > /etc/yum.repos.d/archivematica-extras.repo

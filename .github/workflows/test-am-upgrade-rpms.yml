@@ -7,6 +7,11 @@ on:
         required: false
         default: "1.17.x"
         type: "string"
+      baseline_archivematica_packages_repo_baseurl:
+        description: "Optional baseline Archivematica RPM repository base URL"
+        required: false
+        default: ""
+        type: "string"
       baseline_elasticsearch_repo_version:
         description: "Elasticsearch repository version for the baseline install (e.g. 6.x)"
         required: false
@@ -16,6 +21,11 @@ on:
         description: "Archivematica packages repository version to upgrade to (e.g. 1.18.x)"
         required: false
         default: "1.18.x"
+        type: "string"
+      upgrade_archivematica_packages_repo_baseurl:
+        description: "Optional upgrade Archivematica RPM repository base URL"
+        required: false
+        default: ""
         type: "string"
       upgrade_elasticsearch_repo_version:
         description: "Elasticsearch repository version for the upgraded system (e.g. 8.x)"
@@ -49,8 +59,10 @@ on:
 
 env:
   BASELINE_ARCHIVEMATICA_PACKAGES_REPO_VERSION: ${{ inputs.baseline_archivematica_packages_repo_version || '1.17.x' }}
+  BASELINE_ARCHIVEMATICA_PACKAGES_REPO_BASEURL: ${{ inputs.baseline_archivematica_packages_repo_baseurl || '' }}
   BASELINE_ELASTICSEARCH_PACKAGES_REPO_VERSION: ${{ inputs.baseline_elasticsearch_repo_version || '6.x' }}
   UPGRADE_ARCHIVEMATICA_PACKAGES_REPO_VERSION: ${{ inputs.upgrade_archivematica_packages_repo_version || '1.18.x' }}
+  UPGRADE_ARCHIVEMATICA_PACKAGES_REPO_BASEURL: ${{ inputs.upgrade_archivematica_packages_repo_baseurl || '' }}
   UPGRADE_ELASTICSEARCH_PACKAGES_REPO_VERSION: ${{ inputs.upgrade_elasticsearch_repo_version || '8.x' }}
 
 jobs:
@@ -161,7 +173,9 @@ jobs:
         podman-compose exec \
           --env LOCAL_REPOSITORY="false" \
           --env ARCHIVEMATICA_PACKAGES_REPO_VERSION="${{ env.BASELINE_ARCHIVEMATICA_PACKAGES_REPO_VERSION }}" \
+          --env ARCHIVEMATICA_PACKAGES_REPO_BASEURL="${{ env.BASELINE_ARCHIVEMATICA_PACKAGES_REPO_BASEURL }}" \
           --env ELASTICSEARCH_PACKAGES_REPO_VERSION="${{ env.BASELINE_ELASTICSEARCH_PACKAGES_REPO_VERSION }}" \
+          --env ELASTICSEARCH_MIGRATE_FROM_6X="${{ startsWith(env.BASELINE_ELASTICSEARCH_PACKAGES_REPO_VERSION, '6') }}" \
           --user ubuntu \
           archivematica \
           /am-packbuild/tests/archivematica/EL9/install.sh
@@ -199,7 +213,9 @@ jobs:
         podman-compose exec \
           --env LOCAL_REPOSITORY="${{ env.build_packages }}" \
           --env ARCHIVEMATICA_PACKAGES_REPO_VERSION="${{ env.UPGRADE_ARCHIVEMATICA_PACKAGES_REPO_VERSION }}" \
+          --env ARCHIVEMATICA_PACKAGES_REPO_BASEURL="${{ env.UPGRADE_ARCHIVEMATICA_PACKAGES_REPO_BASEURL }}" \
           --env ELASTICSEARCH_PACKAGES_REPO_VERSION="${{ env.UPGRADE_ELASTICSEARCH_PACKAGES_REPO_VERSION }}" \
+          --env ELASTICSEARCH_MIGRATE_FROM_6X="${{ startsWith(env.BASELINE_ELASTICSEARCH_PACKAGES_REPO_VERSION, '6') }}" \
           --user ubuntu \
           archivematica \
           /am-packbuild/tests/archivematica/EL9/upgrade.sh
