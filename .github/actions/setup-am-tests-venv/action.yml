@@ -17,6 +17,10 @@ inputs:
     description: "Virtualenv directory relative to the working directory"
     required: false
     default: ".venv"
+  codename:
+    description: "OS version codename"
+    required: false
+    default: "codename"
 runs:
   using: "composite"
   steps:
@@ -31,7 +35,7 @@ runs:
       uses: "actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830" # v4.3.0
       with:
         path: "${{ inputs.working-directory }}/${{ inputs.venv-path }}/"
-        key: "os-${{ runner.os }}-python_version-${{ inputs.python-version }}-hash-${{ hashFiles(format('{0}/{1}', inputs.working-directory, inputs.requirements-file)) }}"
+        key: "os-${{ runner.os }}-python_version-${{ inputs.python-version }}-codename-${{ inputs.codename }}-hash-${{ hashFiles(format('{0}/{1}', inputs.working-directory, inputs.requirements-file)) }}"
     - name: "Set up the virtual environment"
       if: "steps.venv-cache.outputs.cache-hit != 'true'"
       shell: bash

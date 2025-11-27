@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# shellcheck disable=SC1091  # debconf helper lives outside repo but is present in package environment
+# shellcheck source=/usr/share/debconf/confmodule
+. /usr/share/debconf/confmodule
+# shellcheck source=/usr/share/dbconfig-common/dpkg/prerm.mysql
+. /usr/share/dbconfig-common/dpkg/prerm.mysql
+dbc_go archivematica-mcp-server "$@"
+
+#DEBHELPER#

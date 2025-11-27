@@ -1,0 +1,2 @@
+install/serverConfig.conf /etc/archivematica/
+install/serverConfig.logging.json /etc/archivematica/
