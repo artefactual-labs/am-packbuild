@@ -2,6 +2,7 @@
 
 # archivematica-src role
 
+archivematica_packages_repo_baseurl: "{{ lookup('env', 'ARCHIVEMATICA_PACKAGES_REPO_BASEURL') | default('', true) | trim }}"
 archivematica_packages_repo_version: "{{ lookup('env', 'ARCHIVEMATICA_PACKAGES_REPO_VERSION') | default('1.18.x', true) }}"
 
 archivematica_src_configure_dashboard: "yes"
@@ -39,8 +40,14 @@ archivematica_src_install_ss: "rpm"
 install_rpm_repositories: "true"
 
 archivematica_src_rpm_repository_local_baseurl: "file:///am-packbuild/rpms/EL9/_yum_repository/"
-archivematica_src_rpm_repository_public_baseurl: "https://packages.archivematica.org/{{ archivematica_packages_repo_version }}/rocky9"
+archivematica_src_rpm_repository_public_baseurl: >-
+  {{ archivematica_packages_repo_baseurl
+     if archivematica_packages_repo_baseurl | length > 0
+     else "https://packages.archivematica.org/{{ archivematica_packages_repo_version }}/rocky9" }}
 archivematica_src_rpm_repository_use_local_baseurl: true
+archivematica_src_rpm_repository_gpgcheck: >-
+  {{ 0 if archivematica_src_rpm_repository_use_local_baseurl | bool
+     else (0 if archivematica_packages_repo_baseurl | length > 0 else 1) }}
 
 archivematica_src_rpm_repository_baseurl: >-
   {{ archivematica_src_rpm_repository_local_baseurl
@@ -50,7 +57,7 @@ archivematica_src_rpm_repository_baseurl: >-
 archivematica_src_rpm_repositories:
   archivematica:
     baseurl: "{{ archivematica_src_rpm_repository_baseurl }}"
-    gpgcheck: 0
+    gpgcheck: "{{ archivematica_src_rpm_repository_gpgcheck }}"
   archivematica-extras:
     baseurl: "https://packages.archivematica.org/{{ archivematica_packages_repo_version }}/rocky9-extras"
     gpgkey: "https://packages.archivematica.org/GPG-KEY-archivematica-sha512"

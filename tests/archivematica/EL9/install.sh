@@ -11,11 +11,15 @@ source "${THIS_DIR}/../common/helpers.sh"
 search_enabled=$(get_env_boolean "SEARCH_ENABLED" "true")
 local_repository=$(get_env_boolean "LOCAL_REPOSITORY" "false")
 packages_repo_version="${ARCHIVEMATICA_PACKAGES_REPO_VERSION:-1.18.x}"
+packages_repo_baseurl="${ARCHIVEMATICA_PACKAGES_REPO_BASEURL:-}"
 elasticsearch_repo_version="${ELASTICSEARCH_PACKAGES_REPO_VERSION:-8.x}"
 elasticsearch_package_version="${ELASTICSEARCH_PACKAGE_VERSION:-}"
 
 dump_lowercase_environment_variables
 echo "Using Archivematica packages repository version: ${packages_repo_version}"
+if [ -n "${packages_repo_baseurl}" ]; then
+    echo "Using Archivematica packages repository base URL: ${packages_repo_baseurl}"
+fi
 echo "Using Elasticsearch packages repository version: ${elasticsearch_repo_version}"
 if [ -n "${elasticsearch_package_version}" ]; then
     echo "Using Elasticsearch package version: ${elasticsearch_package_version}"
@@ -26,7 +30,7 @@ fi
 # Configure repository
 #
 
-configure_archivematica_yum_repos "${local_repository}" "${packages_repo_version}"
+configure_archivematica_yum_repos "${local_repository}" "${packages_repo_version}" "${packages_repo_baseurl}"
 
 sudo -u root yum update -y
 sudo -u root yum install -y epel-release policycoreutils-python-utils yum-utils
