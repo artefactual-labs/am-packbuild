@@ -78,7 +78,7 @@ jobs:
             ubuntu_version: "24.04"
     steps:
     - name: Check out code
-      uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
     - name: Build
       run: |
         make -C ${{ github.workspace }}/debs/${{ matrix.codename }}/archivematica
@@ -102,7 +102,7 @@ jobs:
             ubuntu_version: "24.04"
     steps:
     - name: Check out code
-      uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
     - name: Build
       run: |
         make -C ${{ github.workspace }}/debs/${{ matrix.codename }}/archivematica-storage-service
@@ -129,7 +129,7 @@ jobs:
     - build-ss-packages
     steps:
     - name: Check out code
-      uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
     - name: Restore Archivematica packages
       uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
       with:
@@ -176,7 +176,7 @@ jobs:
       build_packages: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
     steps:
     - name: Check out code
-      uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
     - name: Restore package repository
       if: ${{ env.build_packages == 'true' && needs.create-package-repo.result == 'success' }}
       uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
