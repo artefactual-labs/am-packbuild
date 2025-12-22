@@ -83,7 +83,7 @@ jobs:
       run: |
         make -C ${{ github.workspace }}/debs/${{ matrix.codename }}/archivematica
     - name: Save artifacts
-      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
       with:
         name: archivematica-packages-${{ matrix.codename }}
         path: |
@@ -107,7 +107,7 @@ jobs:
       run: |
         make -C ${{ github.workspace }}/debs/${{ matrix.codename }}/archivematica-storage-service
     - name: Save artifacts
-      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
       with:
         name: archivematica-storage-service-packages-${{ matrix.codename }}
         path: |
@@ -131,13 +131,13 @@ jobs:
     - name: Check out code
       uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
     - name: Restore Archivematica packages
-      uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+      uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
       with:
         name: archivematica-packages-${{ matrix.codename }}
         path: |
           ${{ github.workspace }}/debs/${{ matrix.codename }}/archivematica/repo
     - name: Restore Storage Service packages
-      uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+      uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
       with:
         name: archivematica-storage-service-packages-${{ matrix.codename }}
         path: |
@@ -146,7 +146,7 @@ jobs:
       run: |
         make -C ${{ github.workspace }}/debs/${{ matrix.codename }} createrepo
     - name: Save package repository
-      uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
       with:
         name: package-repository-${{ matrix.codename }}
         path: |
@@ -179,7 +179,7 @@ jobs:
       uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
     - name: Restore package repository
       if: ${{ env.build_packages == 'true' && needs.create-package-repo.result == 'success' }}
-      uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
+      uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
       with:
         name: package-repository-${{ matrix.codename }}
         path: ${{ github.workspace }}/debs/${{ matrix.codename }}/_deb_repository
@@ -306,7 +306,7 @@ jobs:
         podman cp archivematica-package-testing_archivematica_1:/tmp/logs/ .
     - name: "Upload logs on failure"
       if: "${{ failure() }}"
-      uses: "actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4" # v5.0.0
+      uses: "actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f" # v6.0.0
       with:
         name: "logs-test-upgrade-${{ matrix.ubuntu_version }}"
         path: "${{ github.workspace }}/tests/archivematica/logs"
