@@ -39,7 +39,10 @@ on:
         type: "boolean"
   pull_request:
     paths:
-      - "debs/{jammy,noble}/{archivematica,archivematica-storage-service}/**"
+      - "debs/jammy/archivematica/**"
+      - "debs/jammy/archivematica-storage-service/**"
+      - "debs/noble/archivematica/**"
+      - "debs/noble/archivematica-storage-service/**"
       - "tests/archivematica/**"
       - "!tests/archivematica/README.md"
       - "!tests/archivematica/EL9/**"
@@ -48,7 +51,10 @@ on:
       - "stable/**"
       - "qa/**"
     paths:
-      - "debs/{jammy,noble}/{archivematica,archivematica-storage-service}/**"
+      - "debs/jammy/archivematica/**"
+      - "debs/jammy/archivematica-storage-service/**"
+      - "debs/noble/archivematica/**"
+      - "debs/noble/archivematica-storage-service/**"
       - "tests/archivematica/**"
       - "!tests/archivematica/README.md"
       - "!tests/archivematica/EL9/**"
