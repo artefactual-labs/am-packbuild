@@ -6,8 +6,8 @@ export DH_VIRTUALENV_INSTALL_ROOT=/usr/share/archivematica/virtualenvs
 VENV_DIR := $(CURDIR)/debian/archivematica/usr/share/archivematica/virtualenvs/archivematica
 SRC_STAGE := $(CURDIR)/debian/archivematica/opt/archivematica/archivematica
 ABS_RUNTIME := /opt/archivematica/archivematica
-FRONTEND_DIR := $(CURDIR)/src/archivematica/dashboard/frontend
-FRONTEND_BUILD_DIR := $(CURDIR)/src/archivematica/dashboard/media/js/build
+FRONTEND_DIR := $(CURDIR)/src/archivematica/dashboard/vue
+FRONTEND_BUILD_DIR := $(FRONTEND_DIR)/dist
 
 %:
 	dh $@ --with python-virtualenv
@@ -18,10 +18,10 @@ override_dh_auto_clean:
 	dh_auto_clean
 
 override_dh_install:
-	cd $(FRONTEND_DIR) && npm ci --unsafe-perm
-	cd $(FRONTEND_DIR) && npm run prepare
-	# Ensure the Webpack bundle exists for packaging.
-	test -f $(FRONTEND_BUILD_DIR)/dashboard.js
+	cd $(FRONTEND_DIR) && npm clean-install --unsafe-perm
+	cd $(FRONTEND_DIR) && npm run build
+	# Ensure the Vue bundle exists for packaging.
+	test -d $(FRONTEND_BUILD_DIR)
 	dh_install
 	rm -rf $(SRC_STAGE)
 	install -d $(SRC_STAGE)
@@ -32,10 +32,8 @@ override_dh_install:
 	  --exclude "/.gitmodules" \
 	  --exclude "/.gitignore" \
 	  --exclude "/.gitattributes" \
-	  --exclude "/src/archivematica/dashboard/frontend/node_modules/" \
+	  --exclude "/src/archivematica/dashboard/vue/node_modules/" \
 	  ./ $(SRC_STAGE)
-	install -d $(SRC_STAGE)/src/archivematica/dashboard/media/js/build
-	install -m 0644 $(FRONTEND_BUILD_DIR)/dashboard.js $(SRC_STAGE)/src/archivematica/dashboard/media/js/build/dashboard.js
 	rm -rf $(FRONTEND_DIR)/node_modules
 
 override_dh_virtualenv:

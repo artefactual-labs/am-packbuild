@@ -22,5 +22,5 @@ RUN apt-get update \
 		rsync \
 		python3-dev \
 		software-properties-common \
-	&& curl -sL https://deb.nodesource.com/setup_20.x | bash - && apt-get install -y nodejs \
+	&& curl -sL https://deb.nodesource.com/setup_24.x | bash - && apt-get install -y nodejs \
 	&& rm -rf /var/lib/apt/lists/*

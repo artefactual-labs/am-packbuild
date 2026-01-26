@@ -12,7 +12,7 @@ Summary: Archivematica digital preservation system
 Group: Application/System
 License: AGPLv3
 Source0: %{git_repo}
-BuildRequires: git, gcc, openldap-devel, openssl-devel, python3-virtualenv, mariadb-devel, libxslt-devel, python3.12-devel, libffi-devel, gcc-c++, postgresql-devel, nodejs, pkgconfig
+BuildRequires: git, gcc, openldap-devel, openssl-devel, python3-virtualenv, mariadb-devel, libxslt-devel, python3.12-devel, libffi-devel, gcc-c++, postgresql-devel, nodejs >= 24, pkgconfig
 Requires: python3.12-devel
 AutoReq: No
 AutoProv: No
@@ -151,7 +151,7 @@ git clone \
 mkdir -p \
   %{buildroot}/etc/archivematica/ \
   %{buildroot}/usr/share/archivematica/virtualenvs/archivematica \
-  %{buildroot}/opt/archivematica/archivematica/src/archivematica/dashboard/media/js/build/ \
+  %{buildroot}/opt/archivematica/archivematica/src/archivematica/dashboard/vue/dist/ \
   %{buildroot}/var/archivematica/sharedDirectory \
   %{buildroot}/etc/sysconfig \
   %{buildroot}/usr/lib/systemd/system \
@@ -192,8 +192,10 @@ cp %{_etcdir}/archivematica-dashboard.service %{buildroot}/usr/lib/systemd/syste
 cp %{_etcdir}/archivematica-dashboard.env %{buildroot}/etc/sysconfig/archivematica-dashboard
 cp %{_etcdir}/dashboard.nginx %{buildroot}/etc/nginx/conf.d/archivematica-dashboard.conf
 
-cd %{_sourcedir}/%{name}/src/archivematica/dashboard/frontend/ && npm install --unsafe-perm
-cp %{_sourcedir}/%{name}/src/archivematica/dashboard/media/js/build/dashboard.js %{buildroot}/opt/archivematica/archivematica/src/archivematica/dashboard/media/js/build/dashboard.js
+cd %{_sourcedir}/%{name}/src/archivematica/dashboard/vue/ && npm clean-install --unsafe-perm
+cd %{_sourcedir}/%{name}/src/archivematica/dashboard/vue/ && npm run build
+test -d %{_sourcedir}/%{name}/src/archivematica/dashboard/vue/dist
+cp -a %{_sourcedir}/%{name}/src/archivematica/dashboard/vue/dist/. %{buildroot}/opt/archivematica/archivematica/src/archivematica/dashboard/vue/dist/
 
 #
 # Clean up build directory
