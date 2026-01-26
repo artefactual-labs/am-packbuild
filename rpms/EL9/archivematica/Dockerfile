@@ -22,7 +22,7 @@ ENV LC_ALL=en_US.UTF-8
 
 # Install node repo and build depends, to speed up the build process
 RUN set -ex \
-    && rpm -Uvh https://rpm.nodesource.com/pub_20.x/el/9/x86_64/nodesource-release-el9-1.noarch.rpm
+    && curl -fsSL https://rpm.nodesource.com/setup_24.x | bash -
 
 RUN set -ex \
     && yum -y update \

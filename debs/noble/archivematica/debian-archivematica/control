@@ -13,7 +13,7 @@ Build-Depends:
 	libssl-dev,
 	libxml2-dev,
 	libxslt1-dev,
-	nodejs,
+	nodejs (>= 24),
 	npm,
 	pkg-config,
 	rsync,
