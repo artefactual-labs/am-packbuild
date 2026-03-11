@@ -16,6 +16,7 @@ Build-Depends:
     libldap2-dev,
     libsasl2-dev,
     rsync,
+    nodejs (>= 24),
     pkg-config,
     zlib1g-dev
 Standards-Version: 3.9.8

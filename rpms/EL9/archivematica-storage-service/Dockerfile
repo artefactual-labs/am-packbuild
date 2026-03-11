@@ -20,6 +20,9 @@ ENV LANG=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
 
 RUN set -ex \
+    && curl -fsSL https://rpm.nodesource.com/setup_24.x | bash -
+
+RUN set -ex \
     && yum -y update \
     && yum -y install --enablerepo=crb \
         gcc \
@@ -28,6 +31,7 @@ RUN set -ex \
         libffi-devel \
         libxslt-devel \
         mariadb-devel \
+        nodejs \
         openldap-devel \
         openssl-devel \
         pkgconfig \
