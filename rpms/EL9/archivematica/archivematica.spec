@@ -151,7 +151,7 @@ git clone \
 mkdir -p \
   %{buildroot}/etc/archivematica/ \
   %{buildroot}/usr/share/archivematica/virtualenvs/archivematica \
-  %{buildroot}/opt/archivematica/archivematica/src/archivematica/dashboard/vue/dist/ \
+  %{buildroot}/opt/archivematica/archivematica/src/archivematica/dashboard/frontend/dist/ \
   %{buildroot}/var/archivematica/sharedDirectory \
   %{buildroot}/etc/sysconfig \
   %{buildroot}/usr/lib/systemd/system \
@@ -192,10 +192,10 @@ cp %{_etcdir}/archivematica-dashboard.service %{buildroot}/usr/lib/systemd/syste
 cp %{_etcdir}/archivematica-dashboard.env %{buildroot}/etc/sysconfig/archivematica-dashboard
 cp %{_etcdir}/dashboard.nginx %{buildroot}/etc/nginx/conf.d/archivematica-dashboard.conf
 
-cd %{_sourcedir}/%{name}/src/archivematica/dashboard/vue/ && npm clean-install --unsafe-perm
-cd %{_sourcedir}/%{name}/src/archivematica/dashboard/vue/ && npm run build
-test -d %{_sourcedir}/%{name}/src/archivematica/dashboard/vue/dist
-cp -a %{_sourcedir}/%{name}/src/archivematica/dashboard/vue/dist/. %{buildroot}/opt/archivematica/archivematica/src/archivematica/dashboard/vue/dist/
+cd %{_sourcedir}/%{name}/src/archivematica/dashboard/frontend/ && npm clean-install --unsafe-perm
+cd %{_sourcedir}/%{name}/src/archivematica/dashboard/frontend/ && npm run build
+test -d %{_sourcedir}/%{name}/src/archivematica/dashboard/frontend/dist
+cp -a %{_sourcedir}/%{name}/src/archivematica/dashboard/frontend/dist/. %{buildroot}/opt/archivematica/archivematica/src/archivematica/dashboard/frontend/dist/
 
 #
 # Clean up build directory
