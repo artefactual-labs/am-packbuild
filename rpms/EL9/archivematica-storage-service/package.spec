@@ -9,7 +9,7 @@ Summary: Archivematica Storage Service
 Group: Application/System
 License: AGPLv3
 Source0: %{git_repo}
-BuildRequires: git, gcc, libffi-devel, openssl-devel, libxslt-devel, python3-virtualenv, python3.12-devel, mariadb-devel, postgresql-devel, gcc-c++, openldap-devel, pkgconfig
+BuildRequires: git, gcc, libffi-devel, openssl-devel, libxslt-devel, python3-virtualenv, python3.12-devel, mariadb-devel, postgresql-devel, gcc-c++, openldap-devel, nodejs >= 24, pkgconfig
 Requires: gnupg, libxslt-devel, policycoreutils-python-utils, python3.12-devel, rng-tools, rsync, nginx, unar, p7zip, shadow-utils, gettext
 AutoReq: No
 AutoProv: No
@@ -50,6 +50,7 @@ git clone \
 mkdir -p \
   %{buildroot}/usr/share/archivematica/virtualenvs/archivematica-storage-service/ \
   %{buildroot}/opt/archivematica/archivematica-storage-service/src/archivematica/storage_service/assets \
+  %{buildroot}/opt/archivematica/archivematica-storage-service/src/archivematica/storage_service/frontend/dist/ \
   %{buildroot}/var/archivematica/storage-service/ \
   %{buildroot}/var/archivematica/storage_service/ \
   %{buildroot}/usr/lib/systemd/system \
@@ -77,6 +78,11 @@ cp %{_sourcedir}/%{name}/install/storageService.logging.json %{buildroot}/etc/ar
 cp %{_etcdir}/archivematica-storage-service.service %{buildroot}/usr/lib/systemd/system/archivematica-storage-service.service
 cp %{_etcdir}/archivematica-storage-service.env %{buildroot}/etc/sysconfig/archivematica-storage-service
 cp %{_etcdir}/archivematica-storage-service.nginx %{buildroot}/etc/nginx/conf.d/archivematica-storage-service.conf
+
+cd %{_sourcedir}/%{name}/src/archivematica/storage_service/frontend/ && npm clean-install --unsafe-perm
+cd %{_sourcedir}/%{name}/src/archivematica/storage_service/frontend/ && npm run build
+test -d %{_sourcedir}/%{name}/src/archivematica/storage_service/frontend/dist
+cp -a %{_sourcedir}/%{name}/src/archivematica/storage_service/frontend/dist/. %{buildroot}/opt/archivematica/archivematica-storage-service/src/archivematica/storage_service/frontend/dist/
 
 
 %clean

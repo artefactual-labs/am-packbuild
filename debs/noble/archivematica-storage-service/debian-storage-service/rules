@@ -6,11 +6,22 @@ export DH_VIRTUALENV_INSTALL_ROOT=/usr/share/archivematica/virtualenvs
 VENV_DIR := $(CURDIR)/debian/archivematica-storage-service/usr/share/archivematica/virtualenvs/archivematica-storage-service
 SRC_STAGE := $(CURDIR)/debian/archivematica-storage-service/opt/archivematica/archivematica-storage-service
 ABS_RUNTIME := /opt/archivematica/archivematica-storage-service
+FRONTEND_DIR := $(CURDIR)/src/archivematica/storage_service/frontend
+FRONTEND_BUILD_DIR := $(FRONTEND_DIR)/dist
 
 %:
 	dh $@ --with python-virtualenv --with systemd
 
+override_dh_auto_clean:
+	rm -rf $(FRONTEND_DIR)/node_modules
+	rm -rf $(FRONTEND_BUILD_DIR)
+	dh_auto_clean
+
 override_dh_install:
+	cd $(FRONTEND_DIR) && npm clean-install --unsafe-perm
+	cd $(FRONTEND_DIR) && npm run build
+	# Ensure the frontend bundle exists for packaging.
+	test -d $(FRONTEND_BUILD_DIR)
 	dh_install
 	rm -rf $(SRC_STAGE)
 	install -d $(SRC_STAGE)
@@ -21,7 +32,9 @@ override_dh_install:
 	  --exclude "/.gitmodules" \
 	  --exclude "/.gitignore" \
 	  --exclude "/.gitattributes" \
+	  --exclude "/src/archivematica/storage_service/frontend/node_modules/" \
 	  ./ $(SRC_STAGE)
+	rm -rf $(FRONTEND_DIR)/node_modules
 
 override_dh_virtualenv:
 	dh_virtualenv --python=python3 --preinstall "setuptools>=75" --requirements=requirements.txt --skip-install
