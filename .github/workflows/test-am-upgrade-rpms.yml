@@ -77,7 +77,7 @@ jobs:
       run: |
         make -C ${{ github.workspace }}/rpms/EL9/archivematica
     - name: Save artifacts
-      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: archivematica-packages
         path: |
@@ -93,7 +93,7 @@ jobs:
       run: |
         make -C ${{ github.workspace }}/rpms/EL9/archivematica-storage-service
     - name: Save artifacts
-      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: archivematica-storage-service-packages
         path: |
@@ -124,7 +124,7 @@ jobs:
       run: |
         make -C ${{ github.workspace }}/rpms/EL9 createrepo
     - name: Save package repository
-      uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: package-repository
         path: |
@@ -277,7 +277,7 @@ jobs:
         podman cp archivematica-package-testing_archivematica_1:/tmp/logs/ .
     - name: "Upload logs on failure"
       if: ${{ failure() }}
-      uses: "actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f" # v7.0.0
+      uses: "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" # v7.0.1
       with:
         name: "logs-test-upgrade-rocky9"
         path: "${{ github.workspace }}/tests/archivematica/logs"
