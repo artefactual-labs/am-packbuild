@@ -1,15 +1,15 @@
 FROM rockylinux:9
 
 # Environmnet variables needed during build
-ENV GOVERSION 1.21.4
+ENV GOVERSION 1.26.2
 ENV GOOS linux
 ENV GOARCH amd64
 
 # Environment variables needed during runtime
 ENV GOPATH /go
 ENV PATH /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/go/bin:/go/bin
-RUN curl -fsSL https://rpm.nodesource.com/setup_20.x | bash
-RUN yum -y install rpm-build make git systemd-rpm-macros nsolid && \
-	curl -sO https://storage.googleapis.com/golang/go${GOVERSION}.${GOOS}-${GOARCH}.tar.gz && \
+RUN curl -fsSL https://rpm.nodesource.com/setup_24.x | bash
+RUN yum -y install rpm-build make git systemd-rpm-macros nodejs && \
+	curl -fsSLO https://go.dev/dl/go${GOVERSION}.${GOOS}-${GOARCH}.tar.gz && \
 	tar -C /usr/local -xzf go${GOVERSION}.${GOOS}-${GOARCH}.tar.gz && \
 	rm go${GOVERSION}.${GOOS}-${GOARCH}.tar.gz
