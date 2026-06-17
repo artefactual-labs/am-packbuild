@@ -1,5 +1,5 @@
 NAME          = temporal
-VERSION       ?= 1.22.0
+VERSION       ?= 1.31.1
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
