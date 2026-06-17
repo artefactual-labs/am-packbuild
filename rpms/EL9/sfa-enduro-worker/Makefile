@@ -1,10 +1,10 @@
-NAME          = preprocessing-worker
+NAME          = sfa-enduro-worker
 VERSION      ?= 0.1.0
 RPM_TOPDIR    = "/rpmbuild"
 BRANCH	     ?= main
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
-ENDURO_SRC = "/src/preprocessing-worker"
+ENDURO_SRC = "/src/sfa-enduro-worker"
 
 RPMBUILD_ARGS := \
 	--define "_topdir $(RPM_TOPDIR)" \
@@ -29,7 +29,7 @@ build:
 rpm-build: rpm-clean
 	@echo "==> Downloading enduro code."
 	mkdir -p $(ENDURO_SRC)
-	git clone --branch $(BRANCH) --depth 1 https://github.com/artefactual-sdps/preprocessing-sfa.git $(ENDURO_SRC)
+	git clone --branch $(BRANCH) --depth 1 https://github.com/artefactual-sdps/sfa-enduro-workflows.git $(ENDURO_SRC)
 
 	@echo "==> Preparing environment for rpmbuild."
 	mkdir -p $(RPM_TOPDIR)/{BUILD,RPMS,SRPMS}
@@ -59,5 +59,5 @@ cleanup:
 		--rm \
 		--volume "$(shell pwd):$(DOCKER_VOLUME)" \
 		$(DOCKER_IMAGE) \
-		bash -c "rm -rf /src/*.rpm /src/preprocessing-worker"
+		bash -c "rm -rf /src/*.rpm /src/sfa-enduro-worker"
 

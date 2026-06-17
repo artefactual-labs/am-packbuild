@@ -1,7 +1,7 @@
 %define _builddir ./
 %define build_timestamp %(date +"%Y%m%d%H%M")
 
-Name: preprocessing-worker
+Name: sfa-enduro-worker
 Summary: A tool designed to run custom SFA workflows
 Version: %{version} 
 Release: %{build_timestamp}%{?dist}
@@ -12,13 +12,13 @@ BuildRequires: systemd-rpm-macros
 
 Provides: %{name} = %{version}
 %description
-Preprocessing child workflow
+SFA Enduro worker
 
 %global debug_package %{nil}
 
 
 %build
-hack/build_dist.sh -o preprocessing-worker ./cmd/worker/
+hack/build_dist.sh -o sfa-enduro-worker ./cmd/worker/
 
 
 %install 
