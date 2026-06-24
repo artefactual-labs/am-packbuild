@@ -1,13 +1,13 @@
 FROM rockylinux:9
 
 # Environmnet variables needed during build
-ENV GOVERSION 1.26.2
-ENV GOOS linux
-ENV GOARCH amd64
+ENV GOVERSION=1.26.2
+ENV GOOS=linux
+ENV GOARCH=amd64
 
 # Environment variables needed during runtime
-ENV GOPATH /go
-ENV PATH /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/go/bin:/go/bin
+ENV GOPATH=/go
+ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/go/bin:/go/bin
 
 RUN yum -y install rpm-build make git systemd-rpm-macros && \
 	curl -fsSLO https://go.dev/dl/go${GOVERSION}.${GOOS}-${GOARCH}.tar.gz && \

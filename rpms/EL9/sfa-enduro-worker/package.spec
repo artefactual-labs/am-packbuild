@@ -6,6 +6,7 @@ Summary: A tool designed to run custom SFA workflows
 Version: %{version} 
 Release: %{build_timestamp}%{?dist}
 License: ASL 2.0
+Obsoletes: preprocessing-worker <= 1.0.0
 
 # BuildRequires: golang
 BuildRequires: systemd-rpm-macros
