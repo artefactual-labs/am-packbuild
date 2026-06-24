@@ -13,4 +13,3 @@ RUN yum -y install rpm-build make git wget && \
         curl -fsSLO https://go.dev/dl/go${GOVERSION}.${GOOS}-${GOARCH}.tar.gz && \
         tar -C /usr/local -xzf go${GOVERSION}.${GOOS}-${GOARCH}.tar.gz && \
         rm go${GOVERSION}.${GOOS}-${GOARCH}.tar.gz
-

@@ -34,9 +34,6 @@ rpm-build: rpm-clean
 	mkdir -p $(RPM_TOPDIR)/BUILD/
 	cp files/* $(RPM_TOPDIR)/BUILD/
 	cd $(RPM_TOPDIR)/; rpmbuild $(RPMBUILD_ARGS) -ba --clean package.spec
-	
-
-
 	@echo "==> Copying RPM files."
 	cp -p $(RPM_TOPDIR)/RPMS/x86_64/$(NAME)-$(VERSION)*.x86_64.rpm $(DOCKER_VOLUME)
 	cp -p $(RPM_TOPDIR)/SRPMS/$(NAME)-$(VERSION)*.src.rpm $(DOCKER_VOLUME)
@@ -55,4 +52,3 @@ cleanup:
 		--volume "$(shell pwd):$(DOCKER_VOLUME)" \
 		$(DOCKER_IMAGE) \
 		bash -c "rm -rf /src/*.rpm /src/verapdf"
-

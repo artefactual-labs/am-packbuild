@@ -60,4 +60,3 @@ cleanup:
 		--volume "$(shell pwd):$(DOCKER_VOLUME)" \
 		$(DOCKER_IMAGE) \
 		bash -c "rm -rf /src/*.rpm /src/enduro-sfa"
-

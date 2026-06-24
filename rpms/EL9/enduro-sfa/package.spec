@@ -3,7 +3,7 @@
 
 Name: enduro
 Summary: A tool designed to automate the processing of transfers in multiple Archivematica pipelines
-Version: %{version} 
+Version: %{version}
 Release: %{build_timestamp}%{?dist}
 License: ASL 2.0
 
@@ -13,7 +13,7 @@ BuildRequires: nodejs
 
 Provides: %{name} = %{version}
 %description
-Enduro 
+Enduro
 
 %global debug_package %{nil}
 
@@ -48,7 +48,7 @@ hack/build_dist.sh -o enduro-am-worker ./cmd/enduro-am-worker/
 cd dashboard; npm install-clean; npm run build
 
 
-%install 
+%install
 install -Dpm 0755 %{name} %{buildroot}%{_bindir}/%{name}
 install -Dpm 0755 %{name}-a3m-worker %{buildroot}%{_bindir}/%{name}-a3m-worker
 install -Dpm 0755 %{name}-am-worker %{buildroot}%{_bindir}/%{name}-am-worker
@@ -104,4 +104,3 @@ mkdir -p %{buildroot}/var/lib/enduro
 %changelog server
 * Wed May 19 2021 John Doe - 1.0-1
 - First release
- 

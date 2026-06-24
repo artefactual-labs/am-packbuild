@@ -3,7 +3,7 @@
 
 Name: sfa-enduro-worker
 Summary: A tool designed to run custom SFA workflows
-Version: %{version} 
+Version: %{version}
 Release: %{build_timestamp}%{?dist}
 License: ASL 2.0
 Obsoletes: preprocessing-worker <= 1.0.0
@@ -22,7 +22,7 @@ SFA Enduro worker
 hack/build_dist.sh -o sfa-enduro-worker ./cmd/worker/
 
 
-%install 
+%install
 install -Dpm 0755 %{name} %{buildroot}%{_bindir}/%{name}
 install -Dpm 644 %{name}.service %{buildroot}%{_unitdir}/%{name}.service
 install -Dpm 644 %{name}.toml %{buildroot}%{_sysconfdir}/%{name}.toml
@@ -50,4 +50,3 @@ install -Dpm 644 %{name}.toml %{buildroot}%{_sysconfdir}/%{name}.toml
 %changelog
 * Wed May 19 2021 John Doe - 1.0-1
 - First release
- 
