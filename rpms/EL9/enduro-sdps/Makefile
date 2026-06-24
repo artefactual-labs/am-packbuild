@@ -4,7 +4,7 @@ RPM_TOPDIR    = "/rpmbuild"
 BRANCH	     ?= dev/sfa
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
-ENDURO_SRC = "/src/enduro-sfa"
+ENDURO_SRC = "/src/enduro-sdps"
 
 RPMBUILD_ARGS := \
 	--define "_topdir $(RPM_TOPDIR)" \
