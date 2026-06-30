@@ -50,4 +50,3 @@ cp %{nginx_build_dir}/objs/ngx_http_geoip2_module.so %{buildroot}/usr/lib64/ngin
 %changelog
 * Mon Feb 18 2025 sysadmin@artefactual.com - %{nginx_base_version}-%{nginx_release_version}-1
 - Rebuilt GeoIP2 module version %{geoip2_version} for Nginx %{nginx_base_version} on Rocky Linux 9
-
