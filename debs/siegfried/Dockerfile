@@ -15,7 +15,7 @@ ENV PATH /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local
 RUN apt-get update && \
     apt-get install -y dpkg-dev git build-essential wget debhelper curl \
     devscripts equivs dh-golang && \
-    curl -sO https://storage.googleapis.com/golang/go${GOVERSION}.${GOOS}-${GOARCH}.tar.gz && \
+    curl -sO https://dl.google.com/go/go${GOVERSION}.${GOOS}-${GOARCH}.tar.gz && \
     tar -C /usr/local -xzf go${GOVERSION}.${GOOS}-${GOARCH}.tar.gz && \
     rm go${GOVERSION}.${GOOS}-${GOARCH}.tar.gz
 

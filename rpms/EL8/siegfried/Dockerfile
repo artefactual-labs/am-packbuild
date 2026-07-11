@@ -12,6 +12,6 @@ ENV GOOS=${GOOS}
 ENV GOARCH=${GOARCH}
 
 RUN yum -y install rpm-build make git && \
-	curl -sO https://storage.googleapis.com/golang/go${GOVERSION}.${GOOS}-${GOARCH}.tar.gz && \
+	curl -sO https://dl.google.com/go/go${GOVERSION}.${GOOS}-${GOARCH}.tar.gz && \
 	tar -C /usr/local -xzf go${GOVERSION}.${GOOS}-${GOARCH}.tar.gz && \
 	rm go${GOVERSION}.${GOOS}-${GOARCH}.tar.gz
