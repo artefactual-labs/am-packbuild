@@ -1,7 +1,7 @@
 FROM ubuntu:xenial
 
 # Environmnet variables needed during build
-ARG GOVERSION=1.24.1
+ARG GOVERSION=1.25.0
 ARG GOOS=linux
 ARG GOARCH=amd64
 ENV GOOS=${GOOS}
