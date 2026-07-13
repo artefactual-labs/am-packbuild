@@ -28,70 +28,70 @@ jobs:
       matrix:
         include:
           - id: bulk-extractor-el8
-            display: "bulk_extractor 2.1.1 - EL8 (arm64)"
+            display: "bulk_extractor - EL8 (arm64)"
             make_dir: rpms/EL8/bulk_extractor
             artifact_name: bulk-extractor-el8-arm64
             artifacts: |
-              rpms/EL8/bulk_extractor/bulk_extractor-2.1.1-1.el8.aarch64.rpm
-              rpms/EL8/bulk_extractor/bulk_extractor-2.1.1-1.el8.src.rpm
+              rpms/EL8/bulk_extractor/bulk_extractor-*.el8.aarch64.rpm
+              rpms/EL8/bulk_extractor/bulk_extractor-*.el8.src.rpm
           - id: bulk-extractor-el9
-            display: "bulk_extractor 2.1.1 - EL9 (arm64)"
+            display: "bulk_extractor - EL9 (arm64)"
             make_dir: rpms/EL9/bulk_extractor
             artifact_name: bulk-extractor-el9-arm64
             artifacts: |
-              rpms/EL9/bulk_extractor/bulk_extractor-2.1.1-1.el9.aarch64.rpm
-              rpms/EL9/bulk_extractor/bulk_extractor-2.1.1-1.el9.src.rpm
+              rpms/EL9/bulk_extractor/bulk_extractor-*.el9.aarch64.rpm
+              rpms/EL9/bulk_extractor/bulk_extractor-*.el9.src.rpm
           - id: bulk-extractor-jammy
-            display: "bulk_extractor 2.1.1 - Ubuntu 22.04 (arm64)"
+            display: "bulk_extractor - Ubuntu 22.04 (arm64)"
             make_dir: debs/jammy/bulk_extractor
             artifact_name: bulk-extractor-ubuntu-22.04-arm64
             artifacts: |
-              debs/jammy/bulk_extractor/build/bulk-extractor_2.1.1-1~22.04_arm64.buildinfo
-              debs/jammy/bulk_extractor/build/bulk-extractor_2.1.1-1~22.04_arm64.changes
-              debs/jammy/bulk_extractor/build/bulk-extractor_2.1.1-1~22.04_arm64.deb
-              debs/jammy/bulk_extractor/build/bulk-extractor_2.1.1-1~22.04.dsc
-              debs/jammy/bulk_extractor/build/bulk-extractor_2.1.1-1~22.04.tar.gz
-              debs/jammy/bulk_extractor/build/bulk-extractor-dbgsym_2.1.1-1~22.04_arm64.ddeb
+              debs/jammy/bulk_extractor/build/bulk-extractor_*~22.04_arm64.buildinfo
+              debs/jammy/bulk_extractor/build/bulk-extractor_*~22.04_arm64.changes
+              debs/jammy/bulk_extractor/build/bulk-extractor_*~22.04_arm64.deb
+              debs/jammy/bulk_extractor/build/bulk-extractor_*~22.04.dsc
+              debs/jammy/bulk_extractor/build/bulk-extractor_*~22.04.tar.gz
+              debs/jammy/bulk_extractor/build/bulk-extractor-dbgsym_*~22.04_arm64.ddeb
           - id: bulk-extractor-noble
-            display: "bulk_extractor 2.1.1 - Ubuntu 24.04 (arm64)"
+            display: "bulk_extractor - Ubuntu 24.04 (arm64)"
             make_dir: debs/noble/bulk_extractor
             artifact_name: bulk-extractor-ubuntu-24.04-arm64
             artifacts: |
-              debs/noble/bulk_extractor/build/bulk-extractor_2.1.1-1~24.04_arm64.buildinfo
-              debs/noble/bulk_extractor/build/bulk-extractor_2.1.1-1~24.04_arm64.changes
-              debs/noble/bulk_extractor/build/bulk-extractor_2.1.1-1~24.04_arm64.deb
-              debs/noble/bulk_extractor/build/bulk-extractor_2.1.1-1~24.04.dsc
-              debs/noble/bulk_extractor/build/bulk-extractor_2.1.1-1~24.04.tar.gz
-              debs/noble/bulk_extractor/build/bulk-extractor-dbgsym_2.1.1-1~24.04_arm64.ddeb
+              debs/noble/bulk_extractor/build/bulk-extractor_*~24.04_arm64.buildinfo
+              debs/noble/bulk_extractor/build/bulk-extractor_*~24.04_arm64.changes
+              debs/noble/bulk_extractor/build/bulk-extractor_*~24.04_arm64.deb
+              debs/noble/bulk_extractor/build/bulk-extractor_*~24.04.dsc
+              debs/noble/bulk_extractor/build/bulk-extractor_*~24.04.tar.gz
+              debs/noble/bulk_extractor/build/bulk-extractor-dbgsym_*~24.04_arm64.ddeb
           - id: siegfried-el8
-            display: "siegfried 1.11.2 - EL8 (arm64)"
+            display: "siegfried - EL8 (arm64)"
             make_dir: rpms/EL8/siegfried
             artifact_name: siegfried-el8-arm64
             env:
               GOARCH: arm64
             artifacts: |
-              rpms/EL8/siegfried/siegfried-1.11.2-1.el8.aarch64.rpm
-              rpms/EL8/siegfried/siegfried-1.11.2-1.el8.src.rpm
+              rpms/EL8/siegfried/siegfried-*.el8.aarch64.rpm
+              rpms/EL8/siegfried/siegfried-*.el8.src.rpm
           - id: siegfried-el9
-            display: "siegfried 1.11.2 - EL9 (arm64)"
+            display: "siegfried - EL9 (arm64)"
             make_dir: rpms/EL9/siegfried
             artifact_name: siegfried-el9-arm64
             env:
               GOARCH: arm64
             artifacts: |
-              rpms/EL9/siegfried/siegfried-1.11.2-1.el9.aarch64.rpm
-              rpms/EL9/siegfried/siegfried-1.11.2-1.el9.src.rpm
+              rpms/EL9/siegfried/siegfried-*.el9.aarch64.rpm
+              rpms/EL9/siegfried/siegfried-*.el9.src.rpm
           - id: siegfried-jammy
-            display: "siegfried 1.11.2 - Ubuntu 22.04 (arm64)"
+            display: "siegfried - Ubuntu 22.04 (arm64)"
             make_dir: debs/siegfried
             artifact_name: siegfried-ubuntu-22.04-arm64
             env:
               GOARCH: arm64
             artifacts: |
-              debs/siegfried/build/siegfried_1.11.2-1_arm64.changes
-              debs/siegfried/build/siegfried_1.11.2-1_arm64.deb
-              debs/siegfried/build/siegfried_1.11.2-1.dsc
-              debs/siegfried/build/siegfried_1.11.2-1.tar.gz
+              debs/siegfried/build/siegfried_*_arm64.changes
+              debs/siegfried/build/siegfried_*_arm64.deb
+              debs/siegfried/build/siegfried_*.dsc
+              debs/siegfried/build/siegfried_*.tar.gz
     steps:
       - name: Check out repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -111,6 +111,7 @@ jobs:
         with:
           name: ${{ matrix.artifact_name }}
           path: ${{ matrix.artifacts }}
+          if-no-files-found: error
           retention-days: 7
       - name: Record result
         if: always()
