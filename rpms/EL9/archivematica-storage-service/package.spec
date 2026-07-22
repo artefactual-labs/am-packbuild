@@ -10,7 +10,7 @@ Group: Application/System
 License: AGPLv3
 Source0: %{git_repo}
 BuildRequires: git, gcc, libffi-devel, openssl-devel, libxslt-devel, python3-virtualenv, python3.12-devel, mariadb-devel, postgresql-devel, gcc-c++, openldap-devel, nodejs >= 24, pkgconfig
-Requires: gnupg, libxslt-devel, policycoreutils-python-utils, python3.12-devel, rng-tools, rsync, nginx, unar, p7zip, shadow-utils, gettext
+Requires: gnupg, libxslt-devel, mariadb-connector-c, policycoreutils-python-utils, python3.12-devel, rng-tools, rsync, nginx, unar, p7zip, shadow-utils, gettext
 AutoReq: No
 AutoProv: No
 %description
@@ -66,7 +66,10 @@ cp -rf %{_sourcedir}/%{name}/. %{buildroot}/opt/archivematica/archivematica-stor
 
 virtualenv --python=python3.12 /usr/share/archivematica/virtualenvs/archivematica-storage-service
 /usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/pip install --upgrade pip setuptools
-/usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/pip install -r %{_sourcedir}/%{name}/requirements.txt
+UV_PYTHON=python3.12 UV_PYTHON_DOWNLOADS=never \
+  uv export --project %{_sourcedir}/%{name} --locked --no-dev --no-hashes \
+    --no-emit-project --output-file %{_builddir}/uv-runtime-requirements.txt
+/usr/share/archivematica/virtualenvs/archivematica-storage-service/bin/pip install -r %{_builddir}/uv-runtime-requirements.txt
 
 # Install the application in editable mode so the source directory under /opt is
 # importable by the virtualenv at runtime.
