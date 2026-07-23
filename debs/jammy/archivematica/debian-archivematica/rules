@@ -8,6 +8,7 @@ SRC_STAGE := $(CURDIR)/debian/archivematica/opt/archivematica/archivematica
 ABS_RUNTIME := /opt/archivematica/archivematica
 FRONTEND_DIR := $(CURDIR)/src/archivematica/dashboard/frontend
 FRONTEND_BUILD_DIR := $(FRONTEND_DIR)/dist
+LOCK_EXPORT := $(CURDIR)/debian/uv-runtime-requirements.txt
 
 %:
 	dh $@ --with python-virtualenv
@@ -37,7 +38,11 @@ override_dh_install:
 	rm -rf $(FRONTEND_DIR)/node_modules
 
 override_dh_virtualenv:
-	dh_virtualenv --python=python3 --preinstall "setuptools>=75" --requirements=requirements.txt --skip-install
+	UV_PYTHON=python3 UV_PYTHON_DOWNLOADS=never \
+		uv export --locked --no-dev --no-hashes --no-emit-project \
+			--output-file $(LOCK_EXPORT)
+	dh_virtualenv --python=python3 --preinstall "setuptools>=75" \
+		--requirements=$(LOCK_EXPORT) --skip-install
 	# Bail out if a real installation already exists in the runtime location.
 	if [ -e $(ABS_RUNTIME) ]; then \
 	  echo "$(ABS_RUNTIME) exists; refusing to overwrite" >&2; exit 1; \

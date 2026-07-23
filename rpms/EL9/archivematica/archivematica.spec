@@ -166,7 +166,10 @@ cp -a %{_sourcedir}/%{name}/. %{buildroot}/opt/archivematica/archivematica/
 # Archivematica virtual environment
 virtualenv --python=python3.12 /usr/share/archivematica/virtualenvs/archivematica
 /usr/share/archivematica/virtualenvs/archivematica/bin/pip install --upgrade pip setuptools
-/usr/share/archivematica/virtualenvs/archivematica/bin/pip install -r %{_sourcedir}/%{name}/requirements.txt
+UV_PYTHON=python3.12 UV_PYTHON_DOWNLOADS=never \
+  uv export --project %{_sourcedir}/%{name} --locked --no-dev --no-hashes \
+    --no-emit-project --output-file %{_builddir}/uv-runtime-requirements.txt
+/usr/share/archivematica/virtualenvs/archivematica/bin/pip install -r %{_builddir}/uv-runtime-requirements.txt
 
 # Install the application in editable mode so the source directory under /opt is
 # importable by the virtualenv at runtime.
