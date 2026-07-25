@@ -8,20 +8,135 @@ THIS_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 # shellcheck source=tests/archivematica/common/helpers.sh
 source "${THIS_DIR}/../common/helpers.sh"
 
-wait_for_service_active() {
-    local service="$1"
-    local timeout="${2:-120}"
-    local interval="${3:-5}"
+wait_for_clamav_databases() {
+    local timeout="${1:-120}"
+    local interval=2
     local elapsed=0
 
-    until sudo systemctl is-active --quiet "${service}"; do
+    until {
+        { [ -s /var/lib/clamav/main.cvd ] || [ -s /var/lib/clamav/main.cld ]; } &&
+            { [ -s /var/lib/clamav/daily.cvd ] || [ -s /var/lib/clamav/daily.cld ]; }
+    }; do
         if [ "${elapsed}" -ge "${timeout}" ]; then
-            echo "Service ${service} did not become active within ${timeout}s" >&2
+            echo "ClamAV databases were not downloaded within ${timeout}s" >&2
             return 1
         fi
         sleep "${interval}"
         elapsed=$((elapsed + interval))
     done
+}
+
+patch_mysql_postinst() {
+    local candidate
+    local postinst=""
+    local matches=0
+    local patched_postinst
+    local patch_program
+    local postinst_candidates=()
+
+    # Keep the AWK variables and the literal $tmpdir for the maintainer script.
+    # shellcheck disable=SC2016
+    patch_program='
+        /^[[:space:]]*stop_server[[:space:]]*\(\)[[:space:]]*\{/ {
+            in_stop_server = 1
+        }
+        in_stop_server &&
+            /^[[:space:]]*(\/bin\/)?kill([[:space:]]+--)?[[:space:]]+["]?[$][{]?server_pid[}]?["]?[[:space:]]*$/ {
+            match($0, /^[[:space:]]*/)
+            indent = substr($0, RSTART, RLENGTH)
+            print indent "mysqladmin --no-defaults --socket=\"$tmpdir/mysqld.sock\" -uroot shutdown"
+            replacements++
+            next
+        }
+        {
+            print
+        }
+        in_stop_server && /^[[:space:]]*}[[:space:]]*$/ {
+            in_stop_server = 0
+        }
+        END {
+            if (replacements != 1) {
+                exit 42
+            }
+        }
+    '
+
+    shopt -s nullglob
+    postinst_candidates=(/var/lib/dpkg/info/mysql-server-*.postinst)
+    shopt -u nullglob
+
+    for candidate in "${postinst_candidates[@]}"; do
+        if awk "${patch_program}" "${candidate}" >/dev/null; then
+            postinst="${candidate}"
+            matches=$((matches + 1))
+        fi
+    done
+
+    if [ "${matches}" -ne 1 ]; then
+        echo "Expected one patchable MySQL post-install script, found ${matches}" >&2
+        return 1
+    fi
+
+    patched_postinst=$(mktemp)
+    if ! awk "${patch_program}" "${postinst}" >"${patched_postinst}"; then
+        rm -f "${patched_postinst}"
+        echo "Unable to patch MySQL shutdown in ${postinst}" >&2
+        return 1
+    fi
+    sudo -u root install --owner=root --group=root --mode=0755 \
+        "${patched_postinst}" "${postinst}"
+    rm -f "${patched_postinst}"
+}
+
+install_mysql_server() {
+    local download_dir
+    local mysql_server_deb
+    local mysql_server_package
+    local mysql_server_debs=()
+    local mysql_server_packages=()
+
+    mapfile -t mysql_server_packages < <(
+        apt-cache depends --important mysql-server |
+            awk '
+                $1 == "Depends:" &&
+                    $2 ~ /^mysql-server-[0-9]+([.][0-9]+)*$/ {
+                    print $2
+                }
+            '
+    )
+    if [ "${#mysql_server_packages[@]}" -ne 1 ]; then
+        echo "Expected one versioned MySQL server dependency, found" \
+            "${#mysql_server_packages[@]}" >&2
+        return 1
+    fi
+    mysql_server_package="${mysql_server_packages[0]}"
+
+    sudo -u root apt-get install -y mysql-common
+    download_dir=$(mktemp --directory)
+    (
+        cd "${download_dir}"
+        apt-get download "${mysql_server_package}"
+    )
+    mapfile -t mysql_server_debs < <(
+        find "${download_dir}" -maxdepth 1 -type f \
+            -name "${mysql_server_package}_*.deb" -print
+    )
+    if [ "${#mysql_server_debs[@]}" -ne 1 ]; then
+        echo "Expected one downloaded ${mysql_server_package} package, found" \
+            "${#mysql_server_debs[@]}" >&2
+        return 1
+    fi
+    mysql_server_deb="${mysql_server_debs[0]}"
+
+    # Ubuntu's MySQL package starts a temporary server during configuration
+    # and stops it with kill(1). Rootless Podman denies that signal even to
+    # container root. Unpack the dynamically resolved package first so its
+    # validated stop_server function can use MySQL's socket-based shutdown.
+    sudo -u root dpkg --unpack "${mysql_server_deb}"
+    patch_mysql_postinst
+    sudo -u root apt-get --fix-broken install -y
+    sudo -u root apt-get install -y openjdk-8-jre-headless mysql-server
+    sudo -u root rm -rf "${download_dir}"
 }
 
 search_enabled=$(get_env_boolean "SEARCH_ENABLED" "true")
@@ -60,9 +175,10 @@ else
 fi
 sudo apt-get -y upgrade
 
-sudo apt-get install -y openjdk-8-jre-headless mysql-server
+install_mysql_server
 sudo systemctl daemon-reload
-sudo service mysql restart
+# The package install has already written the final configuration and started MySQL.
+start_service_and_wait mysql
 sudo systemctl enable mysql
 
 if [ "${search_enabled}" == "true" ] ; then
@@ -96,22 +212,28 @@ fi
 
 sudo ln -sf /etc/nginx/sites-available/dashboard.conf /etc/nginx/sites-enabled/dashboard.conf
 
-sudo systemctl restart clamav-freshclam
-wait_for_service_active "clamav-freshclam" 120 5
-declare -a SERVICE_OPERATIONS=(
-    "start clamav-daemon"
-    "restart gearman-job-server"
-    "start archivematica-mcp-server"
-    "restart archivematica-mcp-client"
-    "start archivematica-storage-service"
-    "restart archivematica-dashboard"
-    "restart nginx"
+start_service_and_wait clamav-freshclam
+wait_for_clamav_databases
+declare -a SERVICES=(
+    "clamav-daemon"
+    "gearman-job-server"
+    "archivematica-mcp-server"
+    "archivematica-mcp-client"
+    "archivematica-storage-service"
+    "archivematica-dashboard"
+    "nginx"
 )
 
-for operation in "${SERVICE_OPERATIONS[@]}"; do
-    read -r action service <<<"${operation}"
-    sudo service "${service}" "${action}"
+for service in "${SERVICES[@]}"; do
+    if [ "${search_enabled}" != "true" ] &&
+        [[ "${service}" =~ ^archivematica-(dashboard|mcp-server|mcp-client)$ ]]; then
+        restart_service_and_wait "${service}"
+    else
+        start_service_and_wait "${service}"
+    fi
 done
+
+sudo timeout 120 systemctl reload nginx
 
 run_archivematica_manage storage-service create_user \
     --username=admin \

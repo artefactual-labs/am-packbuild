@@ -38,9 +38,78 @@ function get_env_boolean() {
     echo -n "${ret}"
 }
 
+function wait_for_service_active() {
+    local service="$1"
+    local timeout="${2:-120}"
+    local interval="${3:-5}"
+    local elapsed=0
+
+    until sudo -u root systemctl is-active --quiet "${service}"; do
+        if [ "${elapsed}" -ge "${timeout}" ]; then
+            echo "Service ${service} did not become active within ${timeout}s" >&2
+            return 1
+        fi
+        sleep "${interval}"
+        elapsed=$((elapsed + interval))
+    done
+}
+
+function wait_for_service_inactive() {
+    local service="$1"
+    local timeout="${2:-120}"
+    local interval="${3:-5}"
+    local elapsed=0
+
+    while sudo -u root systemctl is-active --quiet "${service}"; do
+        if [ "${elapsed}" -ge "${timeout}" ]; then
+            echo "Service ${service} did not become inactive within ${timeout}s" >&2
+            return 1
+        fi
+        sleep "${interval}"
+        elapsed=$((elapsed + interval))
+    done
+}
+
+function start_service_and_wait() {
+    local service="$1"
+    local timeout="${2:-120}"
+
+    sudo -u root timeout "${timeout}" systemctl start "${service}"
+    wait_for_service_active "${service}" "${timeout}"
+}
+
+function restart_service_and_wait() {
+    local service="$1"
+    local timeout="${2:-120}"
+    local previous_pid
+    local current_pid
+
+    previous_pid=$(sudo -u root systemctl show --property MainPID --value "${service}")
+    sudo -u root timeout "${timeout}" systemctl restart "${service}"
+    wait_for_service_active "${service}" "${timeout}"
+    current_pid=$(sudo -u root systemctl show --property MainPID --value "${service}")
+
+    if [ "${previous_pid}" != "0" ] && [ "${current_pid}" == "${previous_pid}" ]; then
+        echo "Service ${service} did not complete its restart" >&2
+        return 1
+    fi
+}
+
+function start_or_restart_service_and_wait() {
+    local service="$1"
+    local timeout="${2:-120}"
+
+    if sudo -u root systemctl is-active --quiet "${service}"; then
+        restart_service_and_wait "${service}" "${timeout}"
+    else
+        start_service_and_wait "${service}" "${timeout}"
+    fi
+}
+
 function stop_archivematica_services() {
     for service in "${ARCHIVEMATICA_SERVICES[@]}"; do
-        if ! sudo -u root systemctl stop "${service}"; then
+        if ! sudo -u root systemctl stop --no-block "${service}" ||
+            ! wait_for_service_inactive "${service}"; then
             echo "Warning: could not stop ${service}; continuing" >&2
         fi
     done
@@ -48,9 +117,7 @@ function stop_archivematica_services() {
 
 function restart_archivematica_services() {
     for service in "${ARCHIVEMATICA_SERVICES[@]}"; do
-        if ! sudo -u root systemctl restart "${service}"; then
-            echo "Warning: could not restart ${service}; continuing" >&2
-        fi
+        restart_service_and_wait "${service}"
     done
 }
 
@@ -198,7 +265,7 @@ function ensure_elasticsearch_setting() {
 }
 
 function configure_elasticsearch_settings() {
-    sudo -u root sed -i 's/^xpack\.security\.enabled:.*/xpack.security.enabled: false/' /etc/elasticsearch/elasticsearch.yml
+    ensure_elasticsearch_setting "xpack.security.enabled" "false"
     sudo -u root sed -i '/xpack\.security\.http\.ssl:/,/^xpack\.security/{s/^\(\s*\)enabled:.*/\1enabled: false/}' /etc/elasticsearch/elasticsearch.yml
     sudo -u root sed -i '/xpack\.security\.transport\.ssl:/,/^xpack\.security/{s/^\(\s*\)enabled:.*/\1enabled: false/}' /etc/elasticsearch/elasticsearch.yml
     ensure_elasticsearch_setting "reindex.remote.whitelist" "localhost:9500"
@@ -250,6 +317,48 @@ function wait_for_elasticsearch() {
         fi
     done
     echo "Elasticsearch at ${url} is ready."
+}
+
+function verify_elasticsearch_runtime() {
+    local expected_major="$1"
+    local url="${2:-http://localhost:9200}"
+
+    curl --silent --fail --max-time 5 "${url}" |
+        python3 -c '
+import json
+import sys
+
+expected_major = sys.argv[1]
+version = json.load(sys.stdin)["version"]["number"]
+if version.split(".", 1)[0] != expected_major:
+    raise SystemExit(
+        f"Expected Elasticsearch {expected_major}.x, found {version}"
+    )
+' "${expected_major}"
+
+    curl --silent --fail --max-time 5 \
+        "${url}/_nodes/settings?flat_settings=true" |
+        python3 -c '
+import json
+import sys
+
+nodes = json.load(sys.stdin).get("nodes", {})
+if not nodes:
+    raise SystemExit("Elasticsearch returned no node settings")
+
+expected = {
+    "xpack.security.enabled": "false",
+    "xpack.ml.enabled": "false",
+}
+for node_id, node in nodes.items():
+    settings = node.get("settings", {})
+    for name, value in expected.items():
+        if settings.get(name) != value:
+            raise SystemExit(
+                f"Elasticsearch node {node_id} has {name}="
+                f"{settings.get(name)!r}, expected {value!r}"
+            )
+'
 }
 
 function run_archivematica_manage() {
@@ -416,10 +525,11 @@ EOF"
     configure_elasticsearch_settings
 
     sudo -u root systemctl daemon-reload
-    sudo -u root service elasticsearch restart
     sudo -u root systemctl enable elasticsearch
+    start_or_restart_service_and_wait elasticsearch
 
     wait_for_elasticsearch "http://localhost:9200"
+    verify_elasticsearch_runtime "${repo_version%%.*}"
 }
 
 function install_elasticsearch_rpm() {
@@ -449,7 +559,8 @@ EOF"
     configure_elasticsearch_settings
 
     sudo -u root systemctl enable elasticsearch
-    sudo -u root systemctl start elasticsearch
+    start_or_restart_service_and_wait elasticsearch
 
     wait_for_elasticsearch "http://localhost:9200"
+    verify_elasticsearch_runtime "${repo_version%%.*}"
 }

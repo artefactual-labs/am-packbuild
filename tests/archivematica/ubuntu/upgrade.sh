@@ -35,7 +35,8 @@ stop_archivematica_services
 
 if [ "${elasticsearch_migrate_from_6x}" == "true" ]; then
     # Back up Elasticsearch data.
-    sudo -u root systemctl stop elasticsearch
+    sudo -u root systemctl stop --no-block elasticsearch
+    wait_for_service_inactive elasticsearch
     sudo -u root tar --create --gzip --file "/root/var_lib_elasticsearch_$(date +%y%m%d).tgz" /var/lib/elasticsearch
 
     # Set up temporary Elasticsearch 6.x instance.
@@ -61,9 +62,6 @@ fi
 
 # Install/upgrade Elasticsearch 8.x.
 install_elasticsearch_deb "${elasticsearch_repo_version}" "${elasticsearch_package_version}" "${local_repository}"
-
-sudo -u root systemctl restart elasticsearch
-wait_for_elasticsearch "http://localhost:9200"
 
 #
 # Configure repository

@@ -29,6 +29,7 @@ on:
       - "stable/**"
       - "qa/**"
     paths:
+      - ".github/workflows/test-am-rpms.yml"
       - "rpms/EL9/archivematica/**"
       - "rpms/EL9/archivematica-storage-service/**"
       - "tests/archivematica/**"
@@ -107,7 +108,7 @@ jobs:
   test:
     name: Test packages
     needs: create-package-repo
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: >-
       ${{
         always() && (
@@ -126,11 +127,6 @@ jobs:
       with:
         name: package-repository
         path: ${{ github.workspace }}/rpms/EL9/_yum_repository
-    - name: "Upgrade crun (supports Ubuntu's systemd in the Dockerfile)"
-      run: |
-        wget https://github.com/containers/crun/releases/download/1.15/crun-1.15-linux-amd64
-        sudo install crun-1.15-linux-amd64 /usr/bin/crun
-        rm crun-1.15-linux-amd64
     - name: "Prepare Archivematica test environment"
       uses: ./.github/actions/setup-am-tests-venv
       with:
@@ -199,7 +195,7 @@ jobs:
   test-ansible:
     name: Test packages with Ansible
     needs: create-package-repo
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: >-
       ${{
         always() && (
@@ -218,11 +214,6 @@ jobs:
       with:
         name: package-repository
         path: ${{ github.workspace }}/rpms/EL9/_yum_repository
-    - name: "Upgrade crun (supports Ubuntu's systemd in the Dockerfile)"
-      run: |
-        wget https://github.com/containers/crun/releases/download/1.15/crun-1.15-linux-amd64
-        sudo install crun-1.15-linux-amd64 /usr/bin/crun
-        rm crun-1.15-linux-amd64
     - name: "Prepare Archivematica test environment"
       uses: ./.github/actions/setup-am-tests-venv
       with:
@@ -246,6 +237,11 @@ jobs:
       working-directory: ${{ github.workspace }}/tests/archivematica
       run: |
         sed -i "s_cat /var/log/mysqld.log | sed -n '_journalctl --no-pager | sed -n '0,/.*temporary password is generated for root@localhost: /_g" EL9/ansible/roles/artefactual.percona/tasks/secure.yml
+    - name: "Avoid a redundant MySQL restart in rootless Podman"
+      working-directory: ${{ github.workspace }}/tests/archivematica
+      run: |
+        sed --in-place 's/state=restarted/state=started/' EL9/ansible/roles/artefactual.percona/handlers/main.yml
+        grep --quiet 'state=started' EL9/ansible/roles/artefactual.percona/handlers/main.yml
     - name: "Generate an SSH key"
       run: |
         mkdir $HOME/.ssh

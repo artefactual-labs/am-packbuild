@@ -31,6 +31,7 @@ on:
       - "stable/**"
       - "qa/**"
     paths:
+      - ".github/workflows/test-am-debs.yml"
       - "debs/jammy/archivematica/**"
       - "debs/jammy/archivematica-storage-service/**"
       - "debs/noble/archivematica/**"
@@ -135,7 +136,7 @@ jobs:
   test:
     name: Test packages (${{ matrix.codename }})
     needs: create-package-repo
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     # Allow noble runs to be non-blocking when testing 1.17.x (no Ubuntu 24.04 packages exist).
     continue-on-error: ${{ matrix.codename == 'noble' && startsWith(inputs.archivematica_packages_repo_version || '1.18.x', '1.17') }}
     strategy:
@@ -164,11 +165,6 @@ jobs:
       with:
         name: package-repository-${{ matrix.codename }}
         path: ${{ github.workspace }}/debs/${{ matrix.codename }}/_deb_repository
-    - name: "Upgrade crun (supports Ubuntu's systemd in the Dockerfile)"
-      run: |
-        wget https://github.com/containers/crun/releases/download/1.15/crun-1.15-linux-amd64
-        sudo install crun-1.15-linux-amd64 /usr/bin/crun
-        rm crun-1.15-linux-amd64
     - name: "Prepare Archivematica test environment"
       uses: ./.github/actions/setup-am-tests-venv
       with:
@@ -181,6 +177,7 @@ jobs:
       run: |
         podman-compose up --detach
     - name: Install packages
+      timeout-minutes: 15
       working-directory: ${{ github.workspace }}/tests/archivematica
       run: |
         podman-compose exec \

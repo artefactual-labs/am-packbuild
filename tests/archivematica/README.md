@@ -25,7 +25,6 @@
 ## Software requirements
 
 - Podman
-- crun >= 1.14.4
 - Python 3
 
 This environment has been tested with Podman 3.4.4 and podman-compose 1.1.0 and

@@ -49,6 +49,7 @@ on:
       - "stable/**"
       - "qa/**"
     paths:
+      - ".github/workflows/test-am-upgrade-rpms.yml"
       - "rpms/EL9/archivematica/**"
       - "rpms/EL9/archivematica-storage-service/**"
       - "tests/archivematica/**"
@@ -66,6 +67,45 @@ env:
   UPGRADE_ELASTICSEARCH_PACKAGES_REPO_VERSION: ${{ inputs.upgrade_elasticsearch_repo_version || '8.x' }}
 
 jobs:
+  select-upgrade-paths:
+    name: Select upgrade paths
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+    - id: matrix
+      name: Build upgrade matrix
+      env:
+        BASELINE_AM_VERSION: ${{ inputs.baseline_archivematica_packages_repo_version || '1.17.x' }}
+        BASELINE_ES_VERSION: ${{ inputs.baseline_elasticsearch_repo_version || '6.x' }}
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          matrix=$(jq -cn \
+            --arg am "${BASELINE_AM_VERSION}" \
+            --arg es "${BASELINE_ES_VERSION}" \
+            '{include: [{
+              label: "custom",
+              baseline_am_version: $am,
+              baseline_es_version: $es
+            }]}')
+        else
+          matrix=$(jq -cn '{
+            include: [
+              {
+                label: "6-to-8",
+                baseline_am_version: "1.17.x",
+                baseline_es_version: "6.x"
+              },
+              {
+                label: "8-to-8",
+                baseline_am_version: "1.18.x",
+                baseline_es_version: "8.x"
+              }
+            ]
+          }')
+        fi
+        echo "matrix=${matrix}" >> "${GITHUB_OUTPUT}"
+
   build-am-packages:
     name: Build Archivematica packages
     runs-on: ubuntu-latest
@@ -130,9 +170,14 @@ jobs:
         path: |
           ${{ github.workspace }}/rpms/EL9/_yum_repository
   test-upgrade:
-    name: Test upgrade path
-    needs: create-package-repo
-    runs-on: ubuntu-22.04
+    name: Test upgrade path (${{ matrix.label }})
+    needs:
+    - create-package-repo
+    - select-upgrade-paths
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.select-upgrade-paths.outputs.matrix) }}
     if: >-
       ${{
         always() && (
@@ -151,11 +196,6 @@ jobs:
       with:
         name: package-repository
         path: ${{ github.workspace }}/rpms/EL9/_yum_repository
-    - name: "Upgrade crun (supports Ubuntu's systemd in the Dockerfile)"
-      run: |
-        wget https://github.com/containers/crun/releases/download/1.15/crun-1.15-linux-amd64
-        sudo install crun-1.15-linux-amd64 /usr/bin/crun
-        rm crun-1.15-linux-amd64
     - name: "Prepare Archivematica test environment"
       uses: ./.github/actions/setup-am-tests-venv
       with:
@@ -172,10 +212,10 @@ jobs:
       run: |
         podman-compose exec \
           --env LOCAL_REPOSITORY="false" \
-          --env ARCHIVEMATICA_PACKAGES_REPO_VERSION="${{ env.BASELINE_ARCHIVEMATICA_PACKAGES_REPO_VERSION }}" \
+          --env ARCHIVEMATICA_PACKAGES_REPO_VERSION="${{ matrix.baseline_am_version }}" \
           --env ARCHIVEMATICA_PACKAGES_REPO_BASEURL="${{ env.BASELINE_ARCHIVEMATICA_PACKAGES_REPO_BASEURL }}" \
-          --env ELASTICSEARCH_PACKAGES_REPO_VERSION="${{ env.BASELINE_ELASTICSEARCH_PACKAGES_REPO_VERSION }}" \
-          --env ELASTICSEARCH_MIGRATE_FROM_6X="${{ startsWith(env.BASELINE_ELASTICSEARCH_PACKAGES_REPO_VERSION, '6') }}" \
+          --env ELASTICSEARCH_PACKAGES_REPO_VERSION="${{ matrix.baseline_es_version }}" \
+          --env ELASTICSEARCH_MIGRATE_FROM_6X="${{ startsWith(matrix.baseline_es_version, '6') }}" \
           --user ubuntu \
           archivematica \
           /am-packbuild/tests/archivematica/EL9/install.sh
@@ -215,7 +255,7 @@ jobs:
           --env ARCHIVEMATICA_PACKAGES_REPO_VERSION="${{ env.UPGRADE_ARCHIVEMATICA_PACKAGES_REPO_VERSION }}" \
           --env ARCHIVEMATICA_PACKAGES_REPO_BASEURL="${{ env.UPGRADE_ARCHIVEMATICA_PACKAGES_REPO_BASEURL }}" \
           --env ELASTICSEARCH_PACKAGES_REPO_VERSION="${{ env.UPGRADE_ELASTICSEARCH_PACKAGES_REPO_VERSION }}" \
-          --env ELASTICSEARCH_MIGRATE_FROM_6X="${{ startsWith(env.BASELINE_ELASTICSEARCH_PACKAGES_REPO_VERSION, '6') }}" \
+          --env ELASTICSEARCH_MIGRATE_FROM_6X="${{ startsWith(matrix.baseline_es_version, '6') }}" \
           --user ubuntu \
           archivematica \
           /am-packbuild/tests/archivematica/EL9/upgrade.sh
@@ -279,5 +319,5 @@ jobs:
       if: ${{ failure() }}
       uses: "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" # v7.0.1
       with:
-        name: "logs-test-upgrade-rocky9"
+        name: "logs-test-upgrade-rocky9-${{ matrix.label }}"
         path: "${{ github.workspace }}/tests/archivematica/logs"

@@ -14,6 +14,7 @@ RUN set -ex \
         gnupg \
         locales \
         openssh-server \
+        python3 \
         rsync \
         sudo \
     && apt-get clean
@@ -38,6 +39,7 @@ RUN set -ex \
         gnupg \
         locales \
         openssh-server \
+        python3 \
         rsync \
         sudo \
     && apt-get clean
@@ -67,6 +69,8 @@ FROM install_${DOCKER_IMAGE_NAME}_${DOCKER_IMAGE_TAG} as server
 
 # Create ubuntu user only if it doesn't already exist
 RUN id -u ubuntu 2>/dev/null || useradd --home-dir /home/ubuntu --system ubuntu
+
+RUN chmod 0600 /etc/shadow /etc/gshadow
 
 RUN mkdir -p /etc/sudoers.d/ && echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers.d/ubuntu
 
