@@ -1,0 +1,95 @@
+name: "Set up an Archivematica Podman test"
+description: "Set up Python and start the Archivematica Compose environment"
+inputs:
+  python-version:
+    description: "Python version to install"
+    required: false
+    default: "3.10"
+  requirements-file:
+    description: "Requirements filename relative to the working directory"
+    required: false
+    default: "requirements.txt"
+  working-directory:
+    description: "Directory where the virtualenv should be created"
+    required: false
+    default: "tests/archivematica"
+  venv-path:
+    description: "Virtualenv directory relative to the working directory"
+    required: false
+    default: ".venv"
+  environment-label:
+    description: "Value that distinguishes the environment's virtualenv cache"
+    required: true
+  image-name:
+    description: "Base image name used to build the test container"
+    required: true
+  image-tag:
+    description: "Base image tag used to build the test container"
+    required: true
+  setup-ssh:
+    description: "Authorize a generated SSH key for the ubuntu user"
+    required: false
+    default: "false"
+runs:
+  using: "composite"
+  steps:
+    - name: "Install Python"
+      uses: "actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97" # v7.0.0
+      with:
+        python-version: "${{ inputs.python-version }}"
+        cache: "pip"
+        cache-dependency-path: "${{ format('{0}/{1}', inputs.working-directory, inputs.requirements-file) }}"
+    - name: "Cache the virtual environment"
+      id: "venv-cache"
+      uses: "actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9" # v6.1.0
+      with:
+        path: "${{ inputs.working-directory }}/${{ inputs.venv-path }}/"
+        key: >-
+          podman-test-os-${{ runner.os }}-python-${{
+          inputs.python-version }}-environment-${{
+          inputs.environment-label }}-requirements-${{
+          hashFiles(
+          format(
+          '{0}/{1}',
+          inputs.working-directory,
+          inputs.requirements-file
+          )
+          ) }}
+    - name: "Set up the virtual environment"
+      if: "steps.venv-cache.outputs.cache-hit != 'true'"
+      shell: bash
+      working-directory: "${{ inputs.working-directory }}"
+      run: |
+        python3 -m venv "${{ inputs.venv-path }}"
+        "${{ inputs.venv-path }}/bin/python" -m pip install -r "${{ inputs.requirements-file }}"
+    - name: "Add virtual environment to PATH"
+      shell: bash
+      working-directory: "${{ inputs.working-directory }}"
+      run: |
+        echo "$PWD/${{ inputs.venv-path }}/bin" >> "$GITHUB_PATH"
+    - name: "Generate an SSH key"
+      if: "inputs.setup-ssh == 'true'"
+      shell: "bash"
+      run: |
+        mkdir -p "$HOME/.ssh"
+        ssh-keygen -t rsa -f "$HOME/.ssh/id_rsa" -N ""
+    - name: "Start the Compose environment"
+      shell: "bash"
+      working-directory: "${{ github.workspace }}/${{ inputs.working-directory }}"
+      env:
+        DOCKER_IMAGE_NAME: "${{ inputs.image-name }}"
+        DOCKER_IMAGE_TAG: "${{ inputs.image-tag }}"
+      run: |
+        podman-compose up --detach
+    - name: "Authorize the SSH key"
+      if: "inputs.setup-ssh == 'true'"
+      shell: "bash"
+      working-directory: "${{ github.workspace }}/${{ inputs.working-directory }}"
+      run: |
+        podman-compose exec --user root -T archivematica sh -c '
+          install -d -m 0755 -o ubuntu -g ubuntu /home/ubuntu
+          install -d -m 0700 -o ubuntu -g ubuntu /home/ubuntu/.ssh
+          cat > /home/ubuntu/.ssh/authorized_keys
+          chown ubuntu:ubuntu /home/ubuntu/.ssh/authorized_keys
+          chmod 0600 /home/ubuntu/.ssh/authorized_keys
+        ' < "$HOME/.ssh/id_rsa.pub"

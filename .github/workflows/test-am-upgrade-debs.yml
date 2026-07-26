@@ -39,6 +39,8 @@ on:
         type: "boolean"
   pull_request:
     paths:
+      - ".github/actions/setup-podman-test/**"
+      - ".github/workflows/test-am-upgrade-debs.yml"
       - "debs/jammy/archivematica/**"
       - "debs/jammy/archivematica-storage-service/**"
       - "debs/noble/archivematica/**"
@@ -51,6 +53,7 @@ on:
       - "stable/**"
       - "qa/**"
     paths:
+      - ".github/actions/setup-podman-test/**"
       - ".github/workflows/test-am-upgrade-debs.yml"
       - "debs/jammy/archivematica/**"
       - "debs/jammy/archivematica-storage-service/**"
@@ -209,16 +212,11 @@ jobs:
         name: package-repository-${{ matrix.codename }}
         path: ${{ github.workspace }}/debs/${{ matrix.codename }}/_deb_repository
     - name: "Prepare Archivematica test environment"
-      uses: ./.github/actions/setup-am-tests-venv
+      uses: ./.github/actions/setup-podman-test
       with:
-        codename: ${{ matrix.codename }}
-    - name: "Start the Compose environment"
-      working-directory: "${{ github.workspace }}/tests/archivematica"
-      env:
-        DOCKER_IMAGE_NAME: "ubuntu"
-        DOCKER_IMAGE_TAG: "${{ matrix.ubuntu_version }}"
-      run: |
-        podman-compose up --detach
+        environment-label: "${{ matrix.codename }}-upgrade"
+        image-name: "ubuntu"
+        image-tag: "${{ matrix.ubuntu_version }}"
     - name: "Install baseline packages"
       timeout-minutes: 15
       working-directory: ${{ github.workspace }}/tests/archivematica
@@ -239,26 +237,9 @@ jobs:
           --header 'Authorization: ApiKey admin:apikey' \
           --header 'Content-Type: application/json' \
           'http://localhost:8000/api/processing-configuration/' | grep X-Archivematica-Version
-    - name: Test baseline AM API - Get processing configurations
+    - name: "Check baseline Archivematica APIs"
       run: |
-        test $( \
-            curl \
-                --silent \
-                --header 'Authorization: ApiKey admin:apikey' \
-                --header 'Content-Type: application/json' \
-                'http://localhost:8000/api/processing-configuration/' \
-            | jq -r '.processing_configurations == ["automated", "default"]' \
-        ) == true
-    - name: Test baseline SS API - Get pipeline count
-      run: |
-        test $( \
-            curl \
-                --silent \
-                --header 'Authorization: ApiKey admin:apikey' \
-                --header 'Content-Type: application/json' \
-                'http://localhost:8001/api/v2/pipeline/' \
-            | jq -r '.meta.total_count == 1' \
-        ) == true
+        tests/archivematica/common/check-archivematica-apis
     - name: "Upgrade packages"
       timeout-minutes: 15
       working-directory: ${{ github.workspace }}/tests/archivematica
@@ -280,54 +261,16 @@ jobs:
           --header 'Authorization: ApiKey admin:apikey' \
           --header 'Content-Type: application/json' \
           'http://localhost:8000/api/processing-configuration/' | grep X-Archivematica-Version
-    - name: Test AM API - Get processing configurations
+    - name: "Check upgraded Archivematica APIs"
       run: |
-        test $( \
-            curl \
-                --silent \
-                --header 'Authorization: ApiKey admin:apikey' \
-                --header 'Content-Type: application/json' \
-                'http://localhost:8000/api/processing-configuration/' \
-            | jq -r '.processing_configurations == ["automated", "default"]' \
-        ) == true
-    - name: Test SS API - Get pipeline count
-      run: |
-        test $( \
-            curl \
-                --silent \
-                --header 'Authorization: ApiKey admin:apikey' \
-                --header 'Content-Type: application/json' \
-                'http://localhost:8001/api/v2/pipeline/' \
-            | jq -r '.meta.total_count == 1' \
-        ) == true
-    - name: "Save common logs on failure"
-      if: "${{ failure() }}"
-      working-directory: "${{ github.workspace }}/tests/archivematica"
-      run: |
-        podman-compose exec --user root archivematica mkdir -p /tmp/logs/journalctl
-        podman-compose exec --user root archivematica bash -c 'journalctl -u archivematica-mcp-client --no-pager > /tmp/logs/journalctl/archivematica-mcp-client'
+        tests/archivematica/common/check-archivematica-apis
     - name: "Save logs on failure"
-      if: "${{ failure() }}"
+      if: "${{ failure() || cancelled() }}"
       working-directory: "${{ github.workspace }}/tests/archivematica"
       run: |
-        podman-compose exec --user root archivematica bash -c '
-          set -euo pipefail
-          mkdir -p /tmp/logs
-          for path in /var/log/archivematica /var/log/mysql /var/log/elasticsearch /var/log/gearman-job-server /var/log/clamav /var/log/nginx; do
-            if [ -e "$path" ]; then
-              cp -r "$path" /tmp/logs/
-            else
-              echo "Skipping missing log path: $path"
-            fi
-          done
-        '
-    - name: "Copy logs from VM"
-      if: "${{ failure() }}"
-      working-directory: "${{ github.workspace }}/tests/archivematica"
-      run: |
-        podman cp archivematica-package-testing_archivematica_1:/tmp/logs/ .
+        common/collect-test-logs logs archivematica
     - name: "Upload logs on failure"
-      if: "${{ failure() }}"
+      if: "${{ failure() || cancelled() }}"
       uses: "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" # v7.0.1
       with:
         name: "logs-test-upgrade-${{ matrix.ubuntu_version }}"

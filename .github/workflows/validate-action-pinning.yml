@@ -3,12 +3,14 @@ name: Validate GitHub Action pinning
 on:
   pull_request:
     paths:
+      - ".github/actions/**"
       - ".github/workflows/**"
   push:
     branches:
       - "qa/**"
       - "stable/**"
     paths:
+      - ".github/actions/**"
       - ".github/workflows/**"
 
 permissions:

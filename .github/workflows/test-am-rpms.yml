@@ -19,6 +19,8 @@ on:
         type: "boolean"
   pull_request:
     paths:
+      - ".github/actions/setup-podman-test/**"
+      - ".github/workflows/test-am-rpms.yml"
       - "rpms/EL9/archivematica/**"
       - "rpms/EL9/archivematica-storage-service/**"
       - "tests/archivematica/**"
@@ -29,6 +31,7 @@ on:
       - "stable/**"
       - "qa/**"
     paths:
+      - ".github/actions/setup-podman-test/**"
       - ".github/workflows/test-am-rpms.yml"
       - "rpms/EL9/archivematica/**"
       - "rpms/EL9/archivematica-storage-service/**"
@@ -128,16 +131,11 @@ jobs:
         name: package-repository
         path: ${{ github.workspace }}/rpms/EL9/_yum_repository
     - name: "Prepare Archivematica test environment"
-      uses: ./.github/actions/setup-am-tests-venv
+      uses: ./.github/actions/setup-podman-test
       with:
-        codename: rocky9
-    - name: "Start the Compose environment"
-      working-directory: "${{ github.workspace }}/tests/archivematica"
-      env:
-        DOCKER_IMAGE_NAME: "rockylinux"
-        DOCKER_IMAGE_TAG: "9"
-      run: |
-        podman-compose up --detach
+        environment-label: "rocky9"
+        image-name: "rockylinux"
+        image-tag: "9"
     - name: Install packages
       working-directory: ${{ github.workspace }}/tests/archivematica
       run: |
@@ -148,46 +146,16 @@ jobs:
           --user ubuntu \
           archivematica \
           /am-packbuild/tests/archivematica/EL9/install.sh
-    - name: Test AM API - Get processing configurations
+    - name: "Check Archivematica APIs"
       run: |
-        test $( \
-            curl \
-                --silent \
-                --header 'Authorization: ApiKey admin:apikey' \
-                --header 'Content-Type: application/json' \
-                'http://localhost:8000/api/processing-configuration/' \
-            | jq -r '.processing_configurations == ["automated", "default"]' \
-        ) == true
-    - name: Test SS API - Get pipeline count
-      run: |
-        test $( \
-            curl \
-                --silent \
-                --header 'Authorization: ApiKey admin:apikey' \
-                --header 'Content-Type: application/json' \
-                'http://localhost:8001/api/v2/pipeline/' \
-            | jq -r '.meta.total_count == 1' \
-        ) == true
-    - name: "Save common logs on failure"
-      if: ${{ failure() }}
-      working-directory: "${{ github.workspace }}/tests/archivematica"
-      run: |
-        podman-compose exec --user root archivematica mkdir -p /tmp/logs/journalctl
-        podman-compose exec --user root archivematica bash -c 'journalctl -u archivematica-mcp-client --no-pager > /tmp/logs/journalctl/archivematica-mcp-client'
+        tests/archivematica/common/check-archivematica-apis
     - name: "Save logs on failure"
-      if: ${{ failure() }}
+      if: "${{ failure() || cancelled() }}"
       working-directory: "${{ github.workspace }}/tests/archivematica"
       run: |
-        podman-compose exec --user root archivematica bash -c 'journalctl -u mysqld --no-pager > /tmp/logs/journalctl/mysql'
-        podman-compose exec --user root archivematica bash -c 'journalctl -u clamd@scan --no-pager > /tmp/logs/journalctl/clamd'
-        podman-compose exec --user root archivematica bash -c 'cp -r /var/log/{archivematica,mysqld.log,elasticsearch,nginx} /tmp/logs'
-    - name: "Copy logs from VM"
-      if: ${{ failure() }}
-      working-directory: "${{ github.workspace }}/tests/archivematica"
-      run: |
-        podman cp archivematica-package-testing_archivematica_1:/tmp/logs/ .
+        common/collect-test-logs logs archivematica
     - name: "Upload logs on failure"
-      if: ${{ failure() }}
+      if: "${{ failure() || cancelled() }}"
       uses: "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" # v7.0.1
       with:
         name: "logs-test-rocky9"
@@ -215,43 +183,20 @@ jobs:
         name: package-repository
         path: ${{ github.workspace }}/rpms/EL9/_yum_repository
     - name: "Prepare Archivematica test environment"
-      uses: ./.github/actions/setup-am-tests-venv
+      uses: ./.github/actions/setup-podman-test
       with:
-        codename: rocky9
-    - name: "Start the Compose environment"
-      working-directory: "${{ github.workspace }}/tests/archivematica"
-      env:
-        DOCKER_IMAGE_NAME: "rockylinux"
-        DOCKER_IMAGE_TAG: "9"
-      run: |
-        podman-compose up --detach
+        environment-label: "rocky9-ansible"
+        image-name: "rockylinux"
+        image-tag: "9"
+        setup-ssh: "true"
     - name: Install Ansible
       working-directory: ${{ github.workspace }}/tests/archivematica
       run: |
         python3 -m pip install ansible
-    - name: Install the playbook requirements
-      working-directory: ${{ github.workspace }}/tests/archivematica
+    - name: "Prepare the playbook roles"
+      working-directory: "${{ github.workspace }}/tests/archivematica/EL9/ansible"
       run: |
-        ansible-galaxy install -f -p EL9/ansible/roles/ -r EL9/ansible/requirements.yml
-    - name: "Adjust parsing of root's initial MySQL password in RedHat distros"
-      working-directory: ${{ github.workspace }}/tests/archivematica
-      run: |
-        sed -i "s_cat /var/log/mysqld.log | sed -n '_journalctl --no-pager | sed -n '0,/.*temporary password is generated for root@localhost: /_g" EL9/ansible/roles/artefactual.percona/tasks/secure.yml
-    - name: "Avoid a redundant MySQL restart in rootless Podman"
-      working-directory: ${{ github.workspace }}/tests/archivematica
-      run: |
-        sed --in-place 's/state=restarted/state=started/' EL9/ansible/roles/artefactual.percona/handlers/main.yml
-        grep --quiet 'state=started' EL9/ansible/roles/artefactual.percona/handlers/main.yml
-    - name: "Generate an SSH key"
-      run: |
-        mkdir $HOME/.ssh
-        ssh-keygen -t rsa -f $HOME/.ssh/id_rsa -N ""
-    - name: Copy your SSH public key to the container
-      working-directory: ${{ github.workspace }}/tests/archivematica
-      run: |
-        podman-compose exec -u root archivematica bash -c 'mkdir -p /home/ubuntu/.ssh'
-        podman cp $HOME/.ssh/id_rsa.pub archivematica-package-testing_archivematica_1:/home/ubuntu/.ssh/authorized_keys
-        podman-compose exec -u root archivematica bash -c 'chown -R ubuntu:ubuntu /home/ubuntu/'
+        ../../common/prepare-ansible-roles requirements.yml
     - name: Run the Archivematica installation playbook
       working-directory: ${{ github.workspace }}/tests/archivematica
       run: |
@@ -261,46 +206,19 @@ jobs:
             -u ubuntu \
             -e "archivematica_src_rpm_repository_use_local_baseurl=${{ env.build_packages }}" \
             -v
-    - name: Test AM API - Get processing configurations
+    - name: "Check Archivematica APIs"
+      env:
+        AM_API_KEY: "this_is_the_am_api_key"
+        SS_API_KEY: "this_is_the_ss_api_key"
       run: |
-        test $( \
-            curl \
-                --silent \
-                --header 'Authorization: ApiKey admin:this_is_the_am_api_key' \
-                --header 'Content-Type: application/json' \
-                'http://localhost:8000/api/processing-configuration/' \
-            | jq -r '.processing_configurations == ["automated", "default"]' \
-        ) == true
-    - name: Test SS API - Get pipeline count
-      run: |
-        test $( \
-            curl \
-                --silent \
-                --header 'Authorization: ApiKey admin:this_is_the_ss_api_key' \
-                --header 'Content-Type: application/json' \
-                'http://localhost:8001/api/v2/pipeline/' \
-            | jq -r '.meta.total_count == 1' \
-        ) == true
-    - name: "Save common logs on failure"
-      if: ${{ failure() }}
-      working-directory: "${{ github.workspace }}/tests/archivematica"
-      run: |
-        podman-compose exec --user root archivematica mkdir -p /tmp/logs/journalctl
-        podman-compose exec --user root archivematica bash -c 'journalctl -u archivematica-mcp-client --no-pager > /tmp/logs/journalctl/archivematica-mcp-client'
+        tests/archivematica/common/check-archivematica-apis
     - name: "Save logs on failure"
-      if: ${{ failure() }}
+      if: "${{ failure() || cancelled() }}"
       working-directory: "${{ github.workspace }}/tests/archivematica"
       run: |
-        podman-compose exec --user root archivematica bash -c 'journalctl -u mysqld --no-pager > /tmp/logs/journalctl/mysql'
-        podman-compose exec --user root archivematica bash -c 'journalctl -u clamd@scan --no-pager > /tmp/logs/journalctl/clamd'
-        podman-compose exec --user root archivematica bash -c 'cp -r /var/log/{archivematica,mysqld.log,elasticsearch,nginx} /tmp/logs'
-    - name: "Copy logs from VM"
-      if: ${{ failure() }}
-      working-directory: "${{ github.workspace }}/tests/archivematica"
-      run: |
-        podman cp archivematica-package-testing_archivematica_1:/tmp/logs/ .
+        common/collect-test-logs logs archivematica
     - name: "Upload logs on failure"
-      if: ${{ failure() }}
+      if: "${{ failure() || cancelled() }}"
       uses: "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" # v7.0.1
       with:
         name: "logs-test-rocky9-ansible"

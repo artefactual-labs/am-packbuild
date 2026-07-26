@@ -27,7 +27,7 @@
 - Podman
 - Python 3
 
-This environment has been tested with Podman 3.4.4 and podman-compose 1.1.0 and
+This environment has been tested with Podman 3.4.4 and podman-compose 1.6.0 and
 it is based on the official Docker images:
 
 - rockylinux:9
