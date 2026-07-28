@@ -2,6 +2,15 @@ name: Archivematica DEB Packages Test
 on:
   workflow_dispatch:
     inputs:
+      os:
+        description: "Operating system to test"
+        default: "all"
+        required: true
+        type: "choice"
+        options:
+          - "all"
+          - "jammy"
+          - "noble"
       archivematica_packages_repo_version:
         description: "Archivematica packages repository version (e.g. 1.18.x)"
         required: false
@@ -19,6 +28,8 @@ on:
         type: "boolean"
   pull_request:
     paths:
+      - ".github/actions/setup-podman-test/**"
+      - ".github/workflows/test-am-debs.yml"
       - "debs/jammy/archivematica/**"
       - "debs/jammy/archivematica-storage-service/**"
       - "debs/noble/archivematica/**"
@@ -31,6 +42,8 @@ on:
       - "stable/**"
       - "qa/**"
     paths:
+      - ".github/actions/setup-podman-test/**"
+      - ".github/workflows/test-am-debs.yml"
       - "debs/jammy/archivematica/**"
       - "debs/jammy/archivematica-storage-service/**"
       - "debs/noble/archivematica/**"
@@ -45,18 +58,76 @@ env:
   ARCHIVEMATICA_PACKAGES_REPO_VERSION: ${{ inputs.archivematica_packages_repo_version || '1.18.x' }}
   ARCHIVEMATICA_PACKAGES_REPO_BASEURL: ${{ inputs.archivematica_packages_repo_baseurl || '' }}
 jobs:
+  select_matrix:
+    name: Select DEB package test matrix
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: "${{ steps.select.outputs.matrix }}"
+      test_matrix: "${{ steps.select.outputs.test_matrix }}"
+    steps:
+    - name: Select matrix
+      id: select
+      env:
+        SELECTED_OS: "${{ inputs.os }}"
+      run: |
+        selected_os=${SELECTED_OS:-all}
+        matrix=$(
+          jq --compact-output --null-input \
+            --arg selected_os "$selected_os" \
+            '{
+              include: (
+                [
+                  {
+                    codename: "jammy",
+                    ubuntu_version: "22.04"
+                  },
+                  {
+                    codename: "noble",
+                    ubuntu_version: "24.04"
+                  }
+                ]
+                | if $selected_os == "all"
+                  then .
+                  else map(select(.codename == $selected_os))
+                  end
+              )
+            }'
+        )
+        if [[ $(jq '.include | length' <<< "$matrix") -eq 0 ]]; then
+          echo "Unknown operating system: ${selected_os}" >&2
+          exit 1
+        fi
+        test_matrix=$(
+          jq --compact-output \
+            '{
+              include: (
+                (.include | map(. + {
+                  label: .codename,
+                  search_enabled: "true"
+                }))
+                + (
+                  .include
+                  | map(
+                      select(.codename == "jammy")
+                      | . + {
+                          label: "jammy-search-disabled",
+                          search_enabled: "false"
+                        }
+                    )
+                )
+              )
+            }' <<< "$matrix"
+        )
+        echo "matrix=${matrix}" >> "$GITHUB_OUTPUT"
+        echo "test_matrix=${test_matrix}" >> "$GITHUB_OUTPUT"
   build-am-packages:
     name: Build Archivematica packages (${{ matrix.codename }})
     runs-on: ubuntu-latest
+    needs: select_matrix
     if: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - codename: jammy
-            ubuntu_version: "22.04"
-          - codename: noble
-            ubuntu_version: "24.04"
+      matrix: "${{ fromJSON(needs.select_matrix.outputs.matrix) }}"
     steps:
     - name: Check out code
       uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -72,15 +143,11 @@ jobs:
   build-ss-packages:
     name: Build Storage Service packages (${{ matrix.codename }})
     runs-on: ubuntu-latest
+    needs: select_matrix
     if: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - codename: jammy
-            ubuntu_version: "22.04"
-          - codename: noble
-            ubuntu_version: "24.04"
+      matrix: "${{ fromJSON(needs.select_matrix.outputs.matrix) }}"
     steps:
     - name: Check out code
       uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -99,13 +166,9 @@ jobs:
     if: "${{ github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.build_packages) }}"
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - codename: jammy
-            ubuntu_version: "22.04"
-          - codename: noble
-            ubuntu_version: "24.04"
+      matrix: "${{ fromJSON(needs.select_matrix.outputs.matrix) }}"
     needs:
+    - select_matrix
     - build-am-packages
     - build-ss-packages
     steps:
@@ -133,19 +196,16 @@ jobs:
         path: |
           ${{ github.workspace }}/debs/${{ matrix.codename }}/_deb_repository
   test:
-    name: Test packages (${{ matrix.codename }})
-    needs: create-package-repo
-    runs-on: ubuntu-22.04
+    name: Test packages (${{ matrix.label }})
+    needs:
+    - select_matrix
+    - create-package-repo
+    runs-on: ubuntu-24.04
     # Allow noble runs to be non-blocking when testing 1.17.x (no Ubuntu 24.04 packages exist).
     continue-on-error: ${{ matrix.codename == 'noble' && startsWith(inputs.archivematica_packages_repo_version || '1.18.x', '1.17') }}
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - codename: jammy
-            ubuntu_version: "22.04"
-          - codename: noble
-            ubuntu_version: "24.04"
+      matrix: "${{ fromJSON(needs.select_matrix.outputs.test_matrix) }}"
     if: >-
       ${{
         always() && (
@@ -164,71 +224,69 @@ jobs:
       with:
         name: package-repository-${{ matrix.codename }}
         path: ${{ github.workspace }}/debs/${{ matrix.codename }}/_deb_repository
-    - name: "Upgrade crun (supports Ubuntu's systemd in the Dockerfile)"
-      run: |
-        wget https://github.com/containers/crun/releases/download/1.15/crun-1.15-linux-amd64
-        sudo install crun-1.15-linux-amd64 /usr/bin/crun
-        rm crun-1.15-linux-amd64
     - name: "Prepare Archivematica test environment"
-      uses: ./.github/actions/setup-am-tests-venv
+      uses: ./.github/actions/setup-podman-test
       with:
-        codename: ${{ matrix.codename }}
-    - name: "Start the Compose environment"
-      working-directory: "${{ github.workspace }}/tests/archivematica"
-      env:
-        DOCKER_IMAGE_NAME: "ubuntu"
-        DOCKER_IMAGE_TAG: "${{ matrix.ubuntu_version }}"
-      run: |
-        podman-compose up --detach
+        environment-label: "${{ matrix.label }}"
+        image-name: "ubuntu"
+        image-tag: "${{ matrix.ubuntu_version }}"
     - name: Install packages
+      timeout-minutes: 15
       working-directory: ${{ github.workspace }}/tests/archivematica
       run: |
         podman-compose exec \
           --env LOCAL_REPOSITORY="${{ env.build_packages }}" \
           --env ARCHIVEMATICA_PACKAGES_REPO_VERSION="${{ env.ARCHIVEMATICA_PACKAGES_REPO_VERSION }}" \
           --env ARCHIVEMATICA_PACKAGES_REPO_BASEURL="${{ env.ARCHIVEMATICA_PACKAGES_REPO_BASEURL }}" \
+          --env SEARCH_ENABLED="${{ matrix.search_enabled }}" \
           --user ubuntu \
           archivematica \
           /am-packbuild/tests/archivematica/ubuntu/install.sh
-    - name: Test AM API - Get processing configurations
+    - name: "Verify search-disabled service environments"
+      if: ${{ matrix.search_enabled == 'false' }}
+      working-directory: ${{ github.workspace }}/tests/archivematica
       run: |
-        test $( \
-            curl \
-                --silent \
-                --header 'Authorization: ApiKey admin:apikey' \
-                --header 'Content-Type: application/json' \
-                'http://localhost:8000/api/processing-configuration/' \
-            | jq -r '.processing_configurations == ["automated", "default"]' \
-        ) == true
-    - name: Test SS API - Get pipeline count
+        podman-compose exec --user root archivematica bash -c '
+          set -euo pipefail
+          services=(
+            archivematica-dashboard
+            archivematica-mcp-server
+            archivematica-mcp-client
+          )
+          variables=(
+            ARCHIVEMATICA_DASHBOARD_DASHBOARD_SEARCH_ENABLED=false
+            ARCHIVEMATICA_MCPSERVER_MCPSERVER_SEARCH_ENABLED=false
+            ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_SEARCH_ENABLED=false
+          )
+          for index in "${!services[@]}"; do
+            service_user=$(systemctl show \
+              --property User \
+              --value \
+              "${services[$index]}")
+            pid=$(systemctl show \
+              --property MainPID \
+              --value \
+              "${services[$index]}")
+            test -n "${service_user}"
+            test "${pid}" -gt 0
+            sudo --user "${service_user}" \
+              cat "/proc/${pid}/environ" |
+              tr "\0" "\n" |
+              grep --fixed-strings --line-regexp "${variables[$index]}"
+          done
+          ! systemctl is-active --quiet elasticsearch
+        '
+    - name: "Check Archivematica APIs"
       run: |
-        test $( \
-            curl \
-                --silent \
-                --header 'Authorization: ApiKey admin:apikey' \
-                --header 'Content-Type: application/json' \
-                'http://localhost:8001/api/v2/pipeline/' \
-            | jq -r '.meta.total_count == 1' \
-        ) == true
-    - name: "Save common logs on failure"
-      if: "${{ failure() }}"
-      working-directory: "${{ github.workspace }}/tests/archivematica"
-      run: |
-        podman-compose exec --user root archivematica mkdir -p /tmp/logs/journalctl
-        podman-compose exec --user root archivematica bash -c 'journalctl -u archivematica-mcp-client --no-pager > /tmp/logs/journalctl/archivematica-mcp-client'
+        tests/archivematica/common/check-archivematica-apis
     - name: "Save logs on failure"
-      if: "${{ failure() }}"
+      if: "${{ failure() || cancelled() }}"
       working-directory: "${{ github.workspace }}/tests/archivematica"
       run: |
-        podman-compose exec --user root archivematica bash -c 'cp -r /var/log/{archivematica,mysql,elasticsearch,gearman-job-server,clamav,nginx} /tmp/logs'
-    - name: "Copy logs from VM"
-      if: "${{ failure() }}"
-      working-directory: "${{ github.workspace }}/tests/archivematica"
-      run: |
-        podman cp archivematica-package-testing_archivematica_1:/tmp/logs/ .
+        common/collect-test-logs logs archivematica
     - name: "Upload logs on failure"
-      if: "${{ failure() }}"
+      if: "${{ failure() || cancelled() }}"
       uses: "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a" # v7.0.1
       with:
-        name: "logs-test-${{ matrix.codename }}"
+        name: "logs-test-${{ matrix.label }}"
         path: "${{ github.workspace }}/tests/archivematica/logs"

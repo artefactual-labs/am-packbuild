@@ -57,9 +57,6 @@ fi
 # Install Elasticsearch 8.x.
 install_elasticsearch_rpm "${elasticsearch_repo_version}" "${elasticsearch_package_version}"
 
-sudo -u root systemctl restart elasticsearch
-wait_for_elasticsearch "http://localhost:9200"
-
 #
 # Configure repository
 #
