@@ -1,10 +1,11 @@
-NAME          = temporal-ui-server
-VERSION       ?= 2.51.0
+NAME          = temporal_cli
+VERSION       ?= 1.7.2
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"
-TEMPORAL_UI_SRC_DIR = "/go/src/github.com/temporalio/ui-server"
+TEMPORAL_CLI_SRC = "/go/src/github.com/temporalio/cli"
 
+CHANGELOG_DATE = $(shell date "+%a %b %d %Y")
 RPMBUILD_ARGS := \
 	--define "_topdir $(RPM_TOPDIR)" \
 	--define "name $(NAME)" \
@@ -20,24 +21,39 @@ build-docker-image:
 
 build:
 	@echo "==> Building RPM inside Docker container."
-	@docker run --rm --volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) make -C $(DOCKER_VOLUME) rpm-build
+	@docker run --rm -e VERSION="$(VERSION)" \
+			--volume "$(shell pwd):$(DOCKER_VOLUME)" \
+			$(DOCKER_IMAGE) \
+			make -C $(DOCKER_VOLUME) rpm-build
+
+dev:
+	@echo "==> Building RPM inside Docker container."
+	@docker run -i -t --rm --volume "$(shell pwd):$(DOCKER_VOLUME)" $(DOCKER_IMAGE) /bin/bash
+
+cleanup:
+	@echo "==> Remove artifacts created as root."
+	@docker run -i  \
+                --rm \
+                --volume "$(shell pwd):$(DOCKER_VOLUME)" \
+                 $(DOCKER_IMAGE) \
+                bash -c "rm -rf /src/*.rpm"
+
 
 rpm-build: rpm-clean
-	@echo "==> Downloading temporal ui-server."
-	mkdir -p $(TEMPORAL_UI_SRC_DIR)
-	git clone --branch v$(VERSION) --depth 1 https://github.com/temporalio/ui-server.git $(TEMPORAL_UI_SRC_DIR)
-
-	@echo "==> Building sources."
-	go build -C $(TEMPORAL_UI_SRC_DIR) -o temporal-ui cmd/server/main.go
+	@echo "==> Download and unpack temporal_cli."
+	mkdir -p $(TEMPORAL_CLI_SRC)
+	wget -q https://github.com/temporalio/cli/releases/download/v${VERSION}/temporal_cli_${VERSION}_linux_amd64.tar.gz -O $(TEMPORAL_CLI_SRC)/temporal_cli.tar.gz
+	cd $(TEMPORAL_CLI_SRC) && tar zxf temporal_cli.tar.gz
 
 
 	@echo "==> Preparing environment for rpmbuild."
 	mkdir -p $(RPM_TOPDIR)/{BUILD,RPMS,SRPMS}
 	mkdir -p $(RPM_TOPDIR)/SOURCES/$(NAME)-$(VERSION)
-	cp -pR $(TEMPORAL_UI_SRC_DIR)/* $(RPM_TOPDIR)/SOURCES/$(NAME)-$(VERSION)/
-	cp -pR files/* $(RPM_TOPDIR)/SOURCES/$(NAME)-$(VERSION)/
+	cp -p $(TEMPORAL_CLI_SRC)/temporal $(RPM_TOPDIR)/SOURCES/$(NAME)-$(VERSION)/temporal_cli
 	tar czf $(RPM_TOPDIR)/SOURCES/$(NAME)-$(VERSION).tar.gz -C $(RPM_TOPDIR)/SOURCES $(NAME)-$(VERSION)
+	sed -i '2s/^/* $(CHANGELOG_DATE) Artefactual <sysadmin@artefactual.com> - $(VERSION)\n- Changes: Added v$(VERSION) version\n/' $(DOCKER_VOLUME)/changelog
 	cp $(DOCKER_VOLUME)/package.spec $(RPM_TOPDIR)/package.spec
+	cat $(DOCKER_VOLUME)/changelog >> $(RPM_TOPDIR)/package.spec
 
 	@echo "==> Running rpmbuild."
 	rpmbuild $(RPMBUILD_ARGS) -ba --clean $(RPM_TOPDIR)/package.spec
@@ -49,14 +65,6 @@ rpm-build: rpm-clean
 rpm-clean:
 	@echo "==> Cleaning up previous RPMs builds."
 	@rm -rf $(RPM_TOPDIR)
-
-cleanup:
-	@echo "==> Remove artifacts created as root."
-	@docker run -i  \
-		--rm \
-		--volume "$(shell pwd):$(DOCKER_VOLUME)" \
-		$(DOCKER_IMAGE) \
-		bash -c "rm -rf /src/*.rpm"
 
 rpm-test:
 	docker run --rm --volume="$(shell pwd):$(DOCKER_VOLUME)" rockylinux:9 bash -c "rpm -i $(DOCKER_VOLUME)/$(NAME)-$(VERSION)*.rpm && sf -version"
