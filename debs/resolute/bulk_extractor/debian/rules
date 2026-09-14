@@ -1,0 +1,27 @@
+#!/usr/bin/make -f
+
+# GCC 15 in Ubuntu 26.04 no longer includes <cstdint> transitively, and
+# bulk_extractor 2.1.1 relies on that in several headers. The joined form
+# is required because the configure script sorts the flags, which would
+# separate "-include" from its argument.
+export DEB_CXXFLAGS_MAINT_APPEND = -includecstdint
+
+%:
+	dh $@ --with autoreconf
+
+# On Ubuntu 26.04 the re2 pkg-config output wraps libatomic in linker
+# --push-state/--pop-state flags, and the configure script sorts RE2_LIBS,
+# which separates the pair and breaks the link. Pass the libraries without
+# those flags so that the sorting is harmless.
+override_dh_auto_configure:
+	dh_auto_configure -- \
+		RE2_CFLAGS="$$(pkg-config --cflags re2)" \
+		RE2_LIBS="$$(pkg-config --libs re2 | sed -e 's/-Wl,--push-state,--as-needed//g' -e 's/-Wl,--pop-state//g')"
+
+override_dh_autoreconf:
+	./bootstrap.sh
+	dh_autoreconf
+
+override_dh_gencontrol:
+	dh_gencontrol
+	perl -0pi -e 's/libre2-11 \(>= [^)]+\)/libre2-11/g' debian/bulk-extractor/DEBIAN/control
