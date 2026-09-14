@@ -63,6 +63,17 @@ jobs:
               debs/noble/bulk_extractor/build/bulk-extractor_*~24.04.dsc
               debs/noble/bulk_extractor/build/bulk-extractor_*~24.04.tar.gz
               debs/noble/bulk_extractor/build/bulk-extractor-dbgsym_*~24.04_arm64.ddeb
+          - id: bulk-extractor-resolute
+            display: "bulk_extractor - Ubuntu 26.04 (arm64)"
+            make_dir: debs/resolute/bulk_extractor
+            artifact_name: bulk-extractor-ubuntu-26.04-arm64
+            artifacts: |
+              debs/resolute/bulk_extractor/build/bulk-extractor_*~26.04_arm64.buildinfo
+              debs/resolute/bulk_extractor/build/bulk-extractor_*~26.04_arm64.changes
+              debs/resolute/bulk_extractor/build/bulk-extractor_*~26.04_arm64.deb
+              debs/resolute/bulk_extractor/build/bulk-extractor_*~26.04.dsc
+              debs/resolute/bulk_extractor/build/bulk-extractor_*~26.04.tar.gz
+              debs/resolute/bulk_extractor/build/bulk-extractor-dbgsym_*~26.04_arm64.ddeb
           - id: siegfried-el8
             display: "siegfried - EL8 (arm64)"
             make_dir: rpms/EL8/siegfried
