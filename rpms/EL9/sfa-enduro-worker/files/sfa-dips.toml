@@ -1,0 +1,53 @@
+logFormat = "json"
+verbosity = 0
+workingDir = ""
+xsdPath = ""
+
+[api]
+listen = ":8080"
+corsOrigin = "*"
+
+[api.log]
+path = ""
+level = ""
+format = ""
+
+[api.auth]
+enabled = false
+
+[[api.auth.oidc]]
+providerURL = ""
+clientID = ""
+skipEmailVerifiedCheck = false
+
+[persistence]
+driver = "mysql"
+dsn = ""
+migrate = true
+
+[temporal]
+address = ""
+namespace = "default"
+taskQueue = "sfa-dips"
+maxConcurrentSessions = 1
+
+[actapro]
+url = ""
+timeout = "10s"
+pollInterval = "1s"
+token = ""
+
+[actapro.oidc]
+enabled = false
+providerURL = ""
+tokenURL = ""
+clientID = ""
+clientSecret = ""
+username = ""
+password = ""
+scopes = ""
+tokenExpiryLeeway = "30s"
+retryMaxAttempts = 3
+retryInitialInterval = "500ms"
+retryMaxInterval = "2s"
+retryBackoffCoefficient = 2.0

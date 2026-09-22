@@ -30,7 +30,7 @@ install -Dpm 0755 %{dips_name} %{buildroot}%{_bindir}/%{dips_name}
 install -Dpm 644 %{name}.service %{buildroot}%{_unitdir}/%{name}.service
 install -Dpm 644 %{dips_name}.service %{buildroot}%{_unitdir}/%{dips_name}.service
 install -Dpm 644 %{name}.toml %{buildroot}%{_sysconfdir}/%{name}.toml
-
+install -Dpm 644 %{dips_name}.toml %{buildroot}%{_sysconfdir}/%{dips_name}.toml
 
 %check
 # go test should be here... :)
@@ -52,7 +52,7 @@ install -Dpm 644 %{name}.toml %{buildroot}%{_sysconfdir}/%{name}.toml
 %{_unitdir}/%{dips_name}.service
 #%config(noreplace) %{_etcdir}/%{name}.toml
 %config(noreplace) %{_sysconfdir}/%{name}.toml
-
+%config(noreplace) %{_sysconfdir}/%{dips_name}.toml
 
 
 %changelog
