@@ -1,5 +1,5 @@
 [Unit]
-Description=SFA DIPs worker
+Description=SFA DIPs application
 AssertFileIsExecutable=/usr/bin/sfa-dips
 
 
@@ -9,7 +9,7 @@ WorkingDirectory=/var/lib/enduro
 User=enduro
 Group=enduro
 #EnvironmentFile=-/etc/sysconfig/sfa-dips-config
-ExecStart=/usr/bin/sfa-dips-worker --config /etc/preprocessing-worker.toml
+ExecStart=/usr/bin/sfa-dips --config /etc/sfa-dips.toml
 
 # Let systemd restart this service always
 #Restart=always

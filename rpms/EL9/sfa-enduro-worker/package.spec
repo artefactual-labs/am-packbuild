@@ -1,6 +1,6 @@
 %define _builddir ./
 %define build_timestamp %(date +"%Y%m%d%H%M")
-%define dips_name sfa-dips-worker
+%define dips_name sfa-dips
 
 Name: sfa-enduro-worker
 Summary: A tool designed to run custom SFA workflows
@@ -14,14 +14,14 @@ BuildRequires: systemd-rpm-macros
 
 Provides: %{name} = %{version}
 %description
-SFA Enduro workers
+SFA Enduro worker and SFA DIPs application
 
 %global debug_package %{nil}
 
 
 %build
 hack/build_dist.sh -o sfa-enduro-worker ./cmd/worker/
-hack/build_dist.sh -o sfa-dips-worker ./cmd/sfa-dips/
+hack/build_dist.sh -o sfa-dips ./cmd/sfa-dips/
 
 
 %install
