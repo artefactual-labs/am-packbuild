@@ -1,4 +1,5 @@
 NAME          = sfa-enduro-worker
+PACKAGES      = $(NAME) sfa-dips
 VERSION      ?= 0.1.0
 RPM_TOPDIR    = "/rpmbuild"
 BRANCH	     ?= main
@@ -42,7 +43,9 @@ rpm-build: rpm-clean
 
 
 	@echo "==> Copying RPM files."
-	cp -p $(RPM_TOPDIR)/RPMS/x86_64/$(NAME)*-$(VERSION)*.x86_64.rpm $(DOCKER_VOLUME)/
+	@for package in $(PACKAGES); do \
+		cp -p $(RPM_TOPDIR)/RPMS/x86_64/$$package-$(VERSION)*.x86_64.rpm $(DOCKER_VOLUME)/ || exit 1; \
+	done
 	cp -p $(RPM_TOPDIR)/SRPMS/$(NAME)*-$(VERSION)*.src.rpm $(DOCKER_VOLUME)/
 
 rpm-clean:
@@ -51,7 +54,10 @@ rpm-clean:
 
 
 rpm-test:
-	docker run --rm --volume="$(shell pwd):$(DOCKER_VOLUME)" rockylinux:9 bash -c "rpm -i $(DOCKER_VOLUME)/$(NAME)-$(VERSION)*.rpm"
+	@for package in $(PACKAGES); do \
+		docker run --rm --volume="$(shell pwd):$(DOCKER_VOLUME)" rockylinux:9 \
+			bash -c "rpm -i $(DOCKER_VOLUME)/$$package-$(VERSION)*.rpm" || exit 1; \
+	done
 
 cleanup:
 	@echo "==> Remove artifacts created as root."

@@ -14,9 +14,15 @@ BuildRequires: systemd-rpm-macros
 
 Provides: %{name} = %{version}
 %description
-SFA Enduro worker and SFA DIPs application
+SFA Enduro worker
 
 %global debug_package %{nil}
+
+%package -n %{dips_name}
+Summary: SFA DIPs application
+
+%description -n %{dips_name}
+SFA DIPs API server and Temporal worker
 
 
 %build
@@ -37,21 +43,28 @@ install -Dpm 644 %{dips_name}.toml %{buildroot}%{_sysconfdir}/%{dips_name}.toml
 
 %post
 %systemd_post %{name}.service
-%systemd_post %{dips_name}.service
 
 %preun
 %systemd_preun %{name}.service
+
+%post -n %{dips_name}
+%systemd_post %{dips_name}.service
+
+%preun -n %{dips_name}
 %systemd_preun %{dips_name}.service
 
 
 %files
 %dir %{_sysconfdir}
 %{_bindir}/%{name}
-%{_bindir}/%{dips_name}
 %{_unitdir}/%{name}.service
-%{_unitdir}/%{dips_name}.service
 #%config(noreplace) %{_etcdir}/%{name}.toml
 %config(noreplace) %{_sysconfdir}/%{name}.toml
+
+%files -n %{dips_name}
+%dir %{_sysconfdir}
+%{_bindir}/%{dips_name}
+%{_unitdir}/%{dips_name}.service
 %config(noreplace) %{_sysconfdir}/%{dips_name}.toml
 
 
