@@ -1,3 +1,9 @@
+siegfried (1.11.9-1) xenial; urgency=medium
+
+  * Use Go 1.27.2
+
+ -- Artefactual Systems <sysadmin@artefactual.com>  Sat, 17 Oct 2026 04:15:00 +0000
+
 siegfried (1.11.5-1) xenial; urgency=medium
 
   * Use Go 1.25.0
