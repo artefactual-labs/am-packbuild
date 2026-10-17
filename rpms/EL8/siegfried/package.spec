@@ -30,6 +30,8 @@ rm -rf $RPM_BUILD_ROOT
 /usr/share/siegfried
 
 %changelog
+* Sat Oct 17 2026 sysadmin@artefactual.com
+- Update to v1.11.9
 * Sat Jul 11 2026 sysadmin@artefactual.com
 - Update to v1.11.5
 * Thu Mar 6 2025 sysadmin@artefactual.com
