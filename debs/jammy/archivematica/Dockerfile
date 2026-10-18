@@ -27,7 +27,10 @@ RUN apt-get update \
 		libxslt-dev \
 		pkg-config \
 		rsync \
-		python3-dev \
 		software-properties-common \
+	&& add-apt-repository -y ppa:deadsnakes/ppa \
+	&& apt-get install -y \
+		python3.12-dev \
+		python3.12-venv \
 	&& curl -sL https://deb.nodesource.com/setup_24.x | bash - && apt-get install -y nodejs \
 	&& rm -rf /var/lib/apt/lists/*

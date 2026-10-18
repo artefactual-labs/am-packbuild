@@ -173,6 +173,16 @@ function configure_archivematica_apt_repos() {
 deb [arch=${arch} signed-by=${keyring_path}] http://packages.archivematica.org/${repo_version}/ubuntu-externals jammy main
 EOF"
 
+    # Jammy packages built from debs/jammy depend on python3.12 from the deadsnakes PPA.
+    if [ "${version_codename}" == "jammy" ]; then
+        local deadsnakes_key_fingerprint="F23C5A6CF475977595C89F51BA6932366A755776"
+        local deadsnakes_keyring_path="/etc/apt/keyrings/deadsnakes.gpg"
+        curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x${deadsnakes_key_fingerprint}" | sudo -u root gpg --dearmor --yes -o "${deadsnakes_keyring_path}"
+        sudo -u root bash -c "cat <<EOF > /etc/apt/sources.list.d/deadsnakes.list
+deb [arch=${arch} signed-by=${deadsnakes_keyring_path}] https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu ${version_codename} main
+EOF"
+    fi
+
     if [ "${local_repository}" == "true" ]; then
         sudo -u root bash -c "cat << EOF > /etc/apt/sources.list.d/archivematica.list
 deb file:/am-packbuild/debs/${version_codename}/_deb_repository ./
