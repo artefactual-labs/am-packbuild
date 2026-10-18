@@ -1,5 +1,5 @@
-ARG UV_VERSION=0.11.30
-ARG UV_DIGEST=sha256:93b61e21202b1dab861092748e46bbd6e0e41dd84f59b9174efd2353186e1b47
+ARG UV_VERSION=0.12.24
+ARG UV_DIGEST=sha256:3af4716e991d6956a41e573eab705d0ee08500cd829ed30293eb8472f372c65a
 
 FROM ghcr.io/astral-sh/uv:${UV_VERSION}@${UV_DIGEST} AS uv
 
@@ -27,7 +27,6 @@ RUN apt-get update \
 		libxslt-dev \
 		pkg-config \
 		rsync \
-		python3-dev \
 		software-properties-common \
 	&& curl -sL https://deb.nodesource.com/setup_24.x | bash - && apt-get install -y nodejs \
 	&& rm -rf /var/lib/apt/lists/*

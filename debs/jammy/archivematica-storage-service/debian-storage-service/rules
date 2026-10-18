@@ -9,6 +9,13 @@ ABS_RUNTIME := /opt/archivematica/archivematica-storage-service
 FRONTEND_DIR := $(CURDIR)/src/archivematica/storage_service/frontend
 FRONTEND_BUILD_DIR := $(FRONTEND_DIR)/dist
 LOCK_EXPORT := $(CURDIR)/debian/uv-runtime-requirements.txt
+# CPython bundled with the package. A new release may need a uv version that
+# knows about it (UV_VERSION in the Dockerfile).
+PYTHON_VERSION := 3.12.15
+PYTHON_INSTALL_DIR := /usr/share/archivematica/python/archivematica-storage-service
+PYTHON_HOME := $(PYTHON_INSTALL_DIR)/cpython-$(PYTHON_VERSION)-linux-x86_64-gnu
+PYTHON := $(PYTHON_HOME)/bin/python3.12
+PYTHON_STAGE := $(CURDIR)/debian/archivematica-storage-service$(PYTHON_HOME)
 
 %:
 	dh $@ --with python-virtualenv --with systemd
@@ -38,10 +45,22 @@ override_dh_install:
 	rm -rf $(FRONTEND_DIR)/node_modules
 
 override_dh_virtualenv:
-	UV_PYTHON=python3 UV_PYTHON_DOWNLOADS=never \
+	# Bail out if a real interpreter already exists in the runtime location.
+	if [ -e $(PYTHON_INSTALL_DIR) ]; then \
+	  echo "$(PYTHON_INSTALL_DIR) exists; refusing to overwrite" >&2; exit 1; \
+	fi
+	# Install the interpreter where the package ships it so the virtualenv
+	# links to its final path.
+	uv python install --install-dir $(PYTHON_INSTALL_DIR) --no-bin $(PYTHON_VERSION)
+	# Precompile the standard library with hash-based bytecode, which stays
+	# valid when dpkg-deb clamps file mtimes. Force it to also replace the
+	# timestamp-based bytecode written when the interpreter first ran.
+	$(PYTHON) -I -m compileall -q -f -j0 --invalidation-mode unchecked-hash \
+		$(PYTHON_HOME)/lib/python3.12
+	UV_PYTHON=$(PYTHON) UV_PYTHON_DOWNLOADS=never \
 		uv export --locked --no-dev --no-hashes --no-emit-project \
 			--output-file $(LOCK_EXPORT)
-	dh_virtualenv --python=python3 --preinstall "setuptools>=75" \
+	dh_virtualenv --python=$(PYTHON) --preinstall "setuptools>=75" \
 		--requirements=$(LOCK_EXPORT) --skip-install
 	# Bail out if a real installation already exists in the runtime location.
 	if [ -e $(ABS_RUNTIME) ]; then \
@@ -54,3 +73,14 @@ override_dh_virtualenv:
 	$(VENV_DIR)/bin/python -m pip install --no-deps --editable $(ABS_RUNTIME)
 	# Drop the temporary /opt copy; the package will deliver it during install.
 	rm -rf $(ABS_RUNTIME)
+	# Ship the interpreter without uv's bookkeeping files and drop the
+	# temporary copy. python3.12 links libpython statically, so leave out the
+	# shared libpython libraries, which only applications embedding Python use.
+	install -d $(PYTHON_STAGE)
+	rsync -a --exclude "/lib/libpython3*" $(PYTHON_HOME)/ $(PYTHON_STAGE)/
+	rm -rf $(PYTHON_INSTALL_DIR)
+
+# Leave the bundled interpreter alone: jammy's strip corrupts its python3.12
+# binary.
+override_dh_strip:
+	dh_strip --exclude=$(PYTHON_INSTALL_DIR)

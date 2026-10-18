@@ -3,7 +3,6 @@ Section: utils
 Priority: extra
 Maintainer: Artefactual Systems Inc. <sysadmin@artefactual.com>
 Build-Depends:
-    python3-dev,
     debhelper,
     dh-virtualenv (>= 1.2.2),
     gnupg,
@@ -20,7 +19,7 @@ Build-Depends:
     pkg-config,
     zlib1g-dev
 Standards-Version: 3.9.8
-X-Python3-Version: >= 3.10
+X-Python3-Version: >= 3.12
 
 Package: archivematica-storage-service
 Architecture: amd64
@@ -28,7 +27,6 @@ Depends:
     ${misc:Depends},
     nginx,
     unar (>= 1.8.1-4~),
-    python3,
     rng-tools,
     gnupg,
     gettext,

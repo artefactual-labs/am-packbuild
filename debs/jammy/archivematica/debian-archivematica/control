@@ -5,7 +5,6 @@ Maintainer: Artefactual Systems Inc. <sysadmin@artefactual.com>
 Build-Depends:
 	debhelper,
 	dh-virtualenv,
-	python3-dev,
 	libmysqlclient-dev,
 	libffi-dev,
 	libldap2-dev,
@@ -18,7 +17,7 @@ Build-Depends:
 	pkg-config,
 	rsync,
 Standards-Version: 3.9.8
-X-Python3-Version: >= 3.10
+X-Python3-Version: >= 3.12
 
 Package: archivematica
 Architecture: amd64
