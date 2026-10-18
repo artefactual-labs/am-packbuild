@@ -1,5 +1,5 @@
 NAME          = temporal-ui-server
-VERSION       ?= 2.20.0
+VERSION       ?= 2.51.0
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"

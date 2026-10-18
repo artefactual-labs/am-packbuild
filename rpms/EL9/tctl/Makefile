@@ -1,5 +1,5 @@
 NAME          = tctl
-VERSION       ?= 1.18.0
+VERSION       ?= 1.18.4
 RPM_TOPDIR    = "/rpmbuild"
 DOCKER_VOLUME = "/src"
 DOCKER_IMAGE  = "rpmbuild-$(NAME)-$(VERSION)"

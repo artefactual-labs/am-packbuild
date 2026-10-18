@@ -1,0 +1,9 @@
+[Unit]
+Description=Enduro
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/enduro-a3m-worker -config /etc/enduro/enduro.toml
+
+[Install]
+WantedBy=multi-user.target
